@@ -29,7 +29,6 @@ public class Bet {
     private final double[][] winOddsOvertime = new double[numHours][2]; // Array to track odds over time
 
     private boolean fulfillment;
-    private final long currentEpochSeconds = System.currentTimeMillis() / 1000; // Current time in seconds
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -42,6 +41,7 @@ public class Bet {
      * @throws Exception If serialization fails.
      */
     public static String toJSON(Bet bet) throws Exception {
+        // TODO: Improve exception handling - catch JsonProcessingException specifically
         return objectMapper.writeValueAsString(bet);
     }
 
@@ -80,6 +80,7 @@ public class Bet {
         this.betTeam = betTeam;
         this.betAmt = amt;
 
+        // TODO: Use an Enum instead of Strings for teams
         if (betTeam.equalsIgnoreCase("team1")) {
             winOdds = (int) Game.getTeam1Odd();
         } else if (betTeam.equalsIgnoreCase("team2")) {
@@ -94,6 +95,9 @@ public class Bet {
 
         // Populate winOddsOvertime with odds and timestamps
         for (int j = 0; j < numHours; j++) {
+            // Current time in seconds
+            // Moved to be a local variable
+            long currentEpochSeconds = System.currentTimeMillis() / 1000;
             long timeStamp = currentEpochSeconds - (j * 3600L); // Decrement by hours
             double odd = calculateOddsForGameAtTime(timeStamp);
             winOddsOvertime[j][0] = odd;
@@ -109,6 +113,7 @@ public class Bet {
      */
     private double calculateOddsForGameAtTime(long timeStamp) {
         return 1 + random.nextInt(100); // Generate a random value between 1 and 100
+        // TODO: Replace with real odds calculations using an API for architect assignment 2
     }
 
     /**
@@ -169,15 +174,13 @@ public class Bet {
      * Updates the user's money based on the outcome of the bet.
      *
      * @param user The user associated with the bet.
-     * @return The updated user object.
      */
-    public User updateUser(User user) {
+    public void updateUser(User user) {
         if (fulfillment) {
             user.setMoney(user.getMoney() + winAmt);
         } else {
             user.setMoney(user.getMoney() - winAmt);
         }
-        return user;
     }
 
     /**
@@ -228,7 +231,9 @@ public class Bet {
      * @return A string describing the bet.
      */
     @Override
+
     public String toString() {
+        // TODO: Improve output format to show team name, bet amount, and odds
         return "Bet on " + game + " for " + betAmt;
     }
 }
