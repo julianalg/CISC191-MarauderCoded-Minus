@@ -39,37 +39,39 @@ public class Game {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Serializes a  Game  object into a JSON string.
+     * Serializes a Game object to a JSON string.
      *
-     * @param customer The  Game  object to serialize.
-     * @return A JSON string representation of the  Game .
-     * @throws Exception If serialization fails.
+     * @param customer The Game object to serialize.
+     * @return A JSON string representation of the Game object.
+     * @throws Exception If something goes wrong during serialization.
      */
     public static String toJSON(Game customer) throws Exception {
+        // TODO: Check if customer is null before serializing.
         return objectMapper.writeValueAsString(customer);
     }
 
     /**
-     * Deserializes a JSON string into a  Game  object.
+     * Deserializes a JSON string into a Game object.
      *
      * @param input The JSON string to deserialize.
-     * @return A  Game  object created from the JSON string.
-     * @throws Exception If deserialization fails.
+     * @return A Game object created from the JSON string.
+     * @throws Exception If something goes wrong during deserialization.
      */
     public static Game fromJSON(String input) throws Exception {
+        // TODO: Handle errors if the input is not valid JSON.
         return objectMapper.readValue(input, Game.class);
     }
 
     /**
-     * Default constructor for  Game .
-     * Required for JSON serialization/deserialization.
+     * Default constructor for Game.
+     * Needed for JSON deserialization.
      */
     protected Game() {
-        // Default constructor for deserialization purposes
+        // TODO: Consider adding default values to the fields if needed.
     }
 
     /**
-     * Creates a  Game  object with mock betting odds.
+     * Creates a Game object with random betting odds.
      *
      * @param t1 The name of team 1.
      * @param t2 The name of team 2.
@@ -82,14 +84,13 @@ public class Game {
         this.startDate = startDate;
         this.endDate = endDate;
 
-        this.team1Odd = Math.round(Math.random() * 100);
-        this.team2Odd = Math.round(Math.random() * 100);
+        this.team1Odd = Math.round(Math.random() * 100); // TODO: Replace random odds with actual logic.
+        this.team2Odd = Math.round(Math.random() * 100); // TODO: Replace random odds with actual logic.
         this.dateClean = this.getDateClean();
     }
+
     /**
-     * Creates a  Game  object with betting odds loaded from an API.
-     *
-     * Does not calculate any odds.
+     * Creates a Game object with betting odds from an API.
      *
      * @param t1 The name of team 1.
      * @param t2 The name of team 2.
@@ -110,7 +111,7 @@ public class Game {
     }
 
     /**
-     * Creates a  Game  object with betting odds loaded from an API.
+     * Creates a Game object with betting odds and a betting pool.
      *
      * @param t1 The name of team 1.
      * @param t2 The name of team 2.
@@ -120,8 +121,8 @@ public class Game {
      * @param team2Odd The odds for team 2.
      */
     public Game(String t1, String t2, Date startDate, Date endDate, double team1Odd, double team2Odd, double pool) {
-        this.team1Wager = 80;
-        this.team2Wager = 20;
+        this.team1Wager = 80;  // TODO: Don't hardcode wager values, get them dynamically.
+        this.team2Wager = 20;  // TODO: Don't hardcode wager values, get them dynamically.
         this.betPool = team1Wager + team2Wager;
 
         this.team1PayoutRatio = betPool / team1Wager;
@@ -130,24 +131,23 @@ public class Game {
         this.team1ProfitFactor = team1PayoutRatio - 1;
         this.team2ProfitFactor = team2PayoutRatio - 1;
 
+        // TODO: Recalculate odds based on actual betting pool and profits, not hardcoded.
         if (team1ProfitFactor >= 1) {
             this.team1Odd = +(team1ProfitFactor * 100);
-        }
-        else {
-            this.team1Odd = -(100/team1ProfitFactor);
+        } else {
+            this.team1Odd = -(100 / team1ProfitFactor);
         }
         if (this.team2ProfitFactor >= 1) {
             this.team2Odd = +(team2ProfitFactor * 100);
-        }
-        else {
-            this.team2Odd = -(100/team2ProfitFactor);
+        } else {
+            this.team2Odd = -(100 / team2ProfitFactor);
         }
     }
 
     /**
      * Generates a string representation of the game.
      *
-     * @return A string describing the game details.
+     * @return A string with the game details.
      */
     @Override
     public String toString() {
@@ -155,11 +155,11 @@ public class Game {
     }
 
     /**
-     * Compares two  Game  objects for equality based on teams,
+     * Compares two Game objects for equality based on teams,
      * dates, and odds.
      *
      * @param obj The other object to compare with.
-     * @return  true  if the two objects are equal, otherwise  false .
+     * @return true if the two objects are equal, otherwise false.
      */
     @Override
     public boolean equals(Object obj) {
@@ -172,6 +172,7 @@ public class Game {
 
         Game game = (Game) obj;
 
+        // TODO: Check if the comparison for team1Odd and team2Odd needs more tolerance.
         boolean team1Equals = Objects.equals(this.team1, game.getTeam1());
         boolean team2Equals = Objects.equals(this.team2, game.getTeam2());
         boolean startDateEquals = this.startDate.compareTo(game.getStartDate()) == 0;
@@ -239,9 +240,7 @@ public class Game {
     /**
      * Generates a clean string representation of the date range for the game.
      *
-     * Offsets are because of the way java.util.Date works.
-     *
-     * @return A string describing the start and end dates.
+     * @return A string showing the start and end dates.
      */
     public String getDateClean() {
         return (startDate.getMonth() + 1) + "/" + startDate.getDate() + "/" + (startDate.getYear() + 1900) + " - " +
