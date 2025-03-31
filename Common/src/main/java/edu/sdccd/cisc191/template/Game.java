@@ -152,6 +152,7 @@ public class Game {
     @Override
     public String toString() {
         return team1 + " vs. " + team2 + " on " + startDate.getMonth() + "/" + startDate.getDate() + "/" + (startDate.getYear() + 1900);
+        // TODO: Consider using String.format() for better string formatting readability.
     }
 
     /**
@@ -246,6 +247,7 @@ public class Game {
     public String getDateClean() {
         return (startDate.getMonth() + 1) + "/" + startDate.getDate() + "/" + (startDate.getYear() + 1900) + " - " +
                 (endDate.getMonth() + 1) + "/" + endDate.getDate() + "/" + (endDate.getYear() + 1900);
+         // TODO: Consider using LocalDate instead of java.util.Date for better date handling.
     }
 
     /**
