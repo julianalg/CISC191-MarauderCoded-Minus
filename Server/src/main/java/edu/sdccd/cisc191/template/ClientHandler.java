@@ -1,8 +1,5 @@
 package edu.sdccd.cisc191.template;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,7 +17,7 @@ import java.util.*;
  *
  * @author Andy Ly
  * @see Server
- * @see CustomerRequest
+ * @see Request
  */
 class ClientHandler implements Runnable {
 
@@ -53,7 +50,7 @@ class ClientHandler implements Runnable {
 
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                CustomerRequest request = CustomerRequest.fromJSON(inputLine); // Deserialize the client request
+                Request request = Request.fromJSON(inputLine); // Deserialize the client request
                 System.out.println(request.toString()); // Log the request for debugging
 
                 // Handle request types
@@ -108,7 +105,7 @@ class ClientHandler implements Runnable {
      * @param request The client request containing the game ID.
      * @return The  Game  object corresponding to the ID, or null if not found.
      */
-    private static Game getGame(CustomerRequest request) {
+    private static Game getGame(Request request) {
         Game response;
 
         List<Game> gameDatabase = GameDatabase.getInstance().getGameDatabase();
@@ -126,7 +123,7 @@ class ClientHandler implements Runnable {
      * @param request The client request containing the user ID.
      * @return The  User  object corresponding to the ID, or null if not found.
      */
-    private static User getUser(CustomerRequest request) {
+    private static User getUser(Request request) {
         User response;
 
         List<User> userDatabase = UserDatabase.getInstance().getUserDatabase();
@@ -148,7 +145,7 @@ class ClientHandler implements Runnable {
      * @return The modified  User  object.
      * @throws Exception If an error occurs during modification.
      */
-    private static synchronized User handleModifyUserRequest(CustomerRequest request) throws Exception {
+    private static synchronized User handleModifyUserRequest(Request request) throws Exception {
         UserDatabase db = UserDatabase.getInstance();
         List<User> userDatabase = db.getUserDatabase();
 

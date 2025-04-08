@@ -62,9 +62,13 @@ public class GameDatabase {
         if (file.exists()) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
+                // Register subtypes explicitly if necessary (optional if using annotations)
+                objectMapper.registerSubtypes(Football.class, Basketball.class, Tennis.class);
+
                 CollectionType listType = objectMapper.getTypeFactory()
                         .constructCollectionType(List.class, Game.class);
                 List<Game> games = objectMapper.readValue(file, listType);
+
                 gameDatabase.clear();
                 gameDatabase.addAll(games);
                 System.out.println("GameDatabase loaded from file.");
@@ -80,7 +84,6 @@ public class GameDatabase {
             saveToFile();
         }
     }
-
     /**
      * Initializes the game database with default data.
      */
@@ -93,7 +96,7 @@ public class GameDatabase {
         for (int i = 0; i < 6; i++) {
             Date randomDate = new Date(ThreadLocalRandom.current()
                     .nextLong(d1.getTime(), d2.getTime()));
-            gameDatabase.add(new Game(
+            gameDatabase.add(new Basketball(
                     String.format("Team %d", count),
                     String.format("Team %d", count + 1), new Date(),
                     randomDate));

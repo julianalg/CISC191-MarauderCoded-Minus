@@ -1,6 +1,9 @@
 package edu.sdccd.cisc191.template;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Date;
@@ -15,8 +18,23 @@ import java.util.Objects;
  *
  * @author Andy Ly, Julian Garcia
  */
-public class Game {
 
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "gameType"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Football.class, name = "football"),
+        @JsonSubTypes.Type(value = Basketball.class, name = "basketball"),
+        @JsonSubTypes.Type(value = Tennis.class, name = "tennis")
+})
+
+
+public abstract class Game {
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Exclude from serialization
+    private String sport;
     private String team1;
     private String team2;
     private Date startDate;
@@ -24,9 +42,6 @@ public class Game {
     private String dateClean;
     private static double team1Odd;
     private static double team2Odd;
-    public static boolean getSelectedTeam;
-    public static boolean getTeam1;
-    public static boolean getTeam2;
     public double team1Wager;
     public double team2Wager;
     public double betPool;
@@ -34,6 +49,7 @@ public class Game {
     public double team2PayoutRatio;
     public double team1ProfitFactor;
     public double team2ProfitFactor;
+
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -67,6 +83,9 @@ public class Game {
     protected Game() {
         // Default constructor for deserialization purposes
     }
+
+    public abstract String getGameType();
+
 
     /**
      * Creates a  Game  object with mock betting odds.

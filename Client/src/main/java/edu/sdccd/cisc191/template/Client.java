@@ -14,13 +14,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
-import javax.security.auth.callback.Callback;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -73,7 +71,7 @@ public class Client extends Application {
      * @throws Exception if an error occurs during the request.
      */
     private <T> T sendRequest(String requestType, int id, Class<T> returnType) throws Exception {
-        out.println(CustomerRequest.toJSON(new CustomerRequest(requestType, id)));
+        out.println(Request.toJSON(new Request(requestType, id)));
         String response = in.readLine();
 
         if (returnType == Game.class) {
@@ -102,7 +100,7 @@ public class Client extends Application {
      * @throws Exception if an error occurs during the request.
      */
     private <T> T sendRequest(String requestType, int id, Map<String, Object> modifiedAttributes, Class<T> returnType) throws Exception {
-        out.println(CustomerRequest.toJSON(new CustomerRequest(requestType, id, modifiedAttributes)));
+        out.println(Request.toJSON(new Request(requestType, id, modifiedAttributes)));
         String response = in.readLine();
 
         if (returnType == Game.class) {
@@ -224,11 +222,11 @@ public class Client extends Application {
      * @param stage the Stage on which the TableView is displayed.
      * @return a TableView populated with game data.
      */
-    private TableView<Game> createGameTableView(Game[] games, Stage stage) {
-        TableView<Game> tableView = new TableView<>();
+    private <T extends Game> TableView<T> createGameTableView(T[] games, Stage stage) {
+        TableView<T> tableView = new TableView<>();
 
         // Column for Team 1
-        TableColumn<Game, String> team1Col = new TableColumn<>("Team 1");
+        TableColumn<T, String> team1Col = new TableColumn<>("Team 1");
         team1Col.setCellValueFactory(new PropertyValueFactory<>("team1"));
         tableView.getColumns().add(team1Col);
         team1Col.setResizable(false);
@@ -236,7 +234,7 @@ public class Client extends Application {
         team1Col.setReorderable(false);
 
         // Column for Team 2
-        TableColumn<Game, String> team2Col = new TableColumn<>("Team 2");
+        TableColumn<T, String> team2Col = new TableColumn<>("Team 2");
         team2Col.setCellValueFactory(new PropertyValueFactory<>("team2"));
         tableView.getColumns().add(team2Col);
         team2Col.setResizable(false);
@@ -244,7 +242,7 @@ public class Client extends Application {
         team2Col.setReorderable(false);
 
         // Column for Date
-        TableColumn<Game, String> dateCol = new TableColumn<>("Date");
+        TableColumn<T, String> dateCol = new TableColumn<>("Date");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("dateClean"));
         dateCol.setPrefWidth(150);
         tableView.getColumns().add(dateCol);
@@ -253,7 +251,7 @@ public class Client extends Application {
         dateCol.setReorderable(false);
 
         // Column for Team 1 Odds
-        TableColumn<Game, String> team1OddCol = new TableColumn<>("Team 1 Odds");
+        TableColumn<T, String> team1OddCol = new TableColumn<>("Team 1 Odds");
         team1OddCol.setCellValueFactory(new PropertyValueFactory<>("team1Odd"));
         tableView.getColumns().add(team1OddCol);
         team1OddCol.setResizable(false);
@@ -261,14 +259,14 @@ public class Client extends Application {
         team1OddCol.setReorderable(false);
 
         // Button column for betting on Team 1
-        TableColumn<Game, Void> bet1Column = new TableColumn<>("Bet");
-        bet1Column.setCellFactory(column -> new TableCell<Game, Void>() {
+        TableColumn<T, Void> bet1Column = new TableColumn<>("Bet");
+        bet1Column.setCellFactory(column -> new TableCell<T, Void>() {
             private final Button betButton = new Button("Bet");
             {
                 betButton.setOnAction(event -> {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         try {
                             new BetView().betView(stage, game, game.getTeam1());
                         } catch (Exception e) {
@@ -286,7 +284,7 @@ public class Client extends Application {
                 } else {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         betButton.setDisable(user.checkBet(game));
                     }
                     setGraphic(betButton);
@@ -299,7 +297,7 @@ public class Client extends Application {
         bet1Column.setReorderable(false);
 
         // Column for Team 2 Odds
-        TableColumn<Game, String> team2OddCol = new TableColumn<>("Team 2 Odds");
+        TableColumn<T, String> team2OddCol = new TableColumn<>("Team 2 Odds");
         team2OddCol.setCellValueFactory(new PropertyValueFactory<>("team2Odd"));
         tableView.getColumns().add(team2OddCol);
         team2OddCol.setResizable(false);
@@ -307,14 +305,14 @@ public class Client extends Application {
         team2OddCol.setReorderable(false);
 
         // Button column for betting on Team 2
-        TableColumn<Game, Void> bet2Column = new TableColumn<>("Bet");
-        bet2Column.setCellFactory(column -> new TableCell<Game, Void>() {
+        TableColumn<T, Void> bet2Column = new TableColumn<>("Bet");
+        bet2Column.setCellFactory(column -> new TableCell<T, Void>() {
             private final Button betButton = new Button("Bet");
             {
                 betButton.setOnAction(event -> {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         try {
                             new BetView().betView(stage, game, game.getTeam2());
                         } catch (Exception e) {
@@ -332,7 +330,7 @@ public class Client extends Application {
                 } else {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         betButton.setDisable(user.checkBet(game));
                     }
                     setGraphic(betButton);

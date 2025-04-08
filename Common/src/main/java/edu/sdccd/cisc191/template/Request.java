@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Andy Ly, Andrew Huang
  */
-public class CustomerRequest {
+public class Request {
 
     private Map<String, Object> attributesToModify;
     private Integer id;
@@ -31,7 +31,7 @@ public class CustomerRequest {
      * @return A JSON string representation of the  CustomerRequest .
      * @throws Exception If serialization fails.
      */
-    public static String toJSON(CustomerRequest customer) throws Exception {
+    public static String toJSON(Request customer) throws Exception {
         return objectMapper.writeValueAsString(customer);
     }
 
@@ -42,15 +42,15 @@ public class CustomerRequest {
      * @return A  CustomerRequest  object created from the JSON string.
      * @throws Exception If deserialization fails.
      */
-    public static CustomerRequest fromJSON(String input) throws Exception {
-        return objectMapper.readValue(input, CustomerRequest.class);
+    public static Request fromJSON(String input) throws Exception {
+        return objectMapper.readValue(input, Request.class);
     }
 
     /**
      * Default constructor for  CustomerRequest .
      * Required for JSON serialization/deserialization.
      */
-    protected CustomerRequest() {
+    protected Request() {
         // Default constructor for deserialization purposes
     }
 
@@ -60,7 +60,7 @@ public class CustomerRequest {
      * @param requestType The type of the request.
      * @param id The ID associated with the request.
      */
-    public CustomerRequest(String requestType, Integer id) {
+    public Request(String requestType, Integer id) {
         this.requestType = requestType;
         this.id = id;
         this.attributesToModify = new HashMap<>();
@@ -74,7 +74,7 @@ public class CustomerRequest {
      * @param id The ID associated with the request.
      * @param attributesToModify A map of attributes to be modified.
      */
-    public CustomerRequest(String requestType, int id, Map<String, Object> attributesToModify) {
+    public Request(String requestType, int id, Map<String, Object> attributesToModify) {
         this.requestType = requestType;
         this.id = id;
         this.attributesToModify = attributesToModify;
