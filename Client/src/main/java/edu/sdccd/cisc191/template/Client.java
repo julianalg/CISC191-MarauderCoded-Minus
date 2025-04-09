@@ -70,9 +70,13 @@ public class Client extends Application {
      * @return the response from the server cast to the specified type.
      * @throws Exception if an error occurs during the request.
      */
-    private <T> T sendRequest(String requestType, int id, Class<T> returnType) throws Exception {
-        out.println(Request.toJSON(new Request(requestType, id)));
+    // In the sendRequest method, add a null check for the response:
+    private <T> T sendRequest(String requestType, int id, Map<String, Object> modifiedRequest, Class<T> returnType) throws Exception {
+        out.println(Request.toJSON(new Request(requestType, id, modifiedRequest)));
         String response = in.readLine();
+        if (response == null) {
+            throw new IllegalArgumentException("No response received from server");
+        }
 
         if (returnType == Game.class) {
             return returnType.cast(Game.fromJSON(response));
@@ -80,51 +84,23 @@ public class Client extends Application {
             return returnType.cast(User.fromJSON(response));
         } else if (returnType == Integer.class) {
             return returnType.cast(Integer.parseInt(response));
-        }
-        else {
-            throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
-        }
-    }
-
-    /**
-     * Sends a modification request to the server with specified attributes and returns the updated object.
-     *
-     * Never call this method directly, call one of its wrappers for safe usage.
-     *
-     * @param requestType        the type of request, for example: "ModifyUser".
-     * @param id                 the identifier for the user to modify.
-     * @param modifiedAttributes a map containing the fields and their new values.
-     * @param returnType         the expected class type of the response.
-     * @param <T>                the type parameter corresponding to the expected response type.
-     * @return the updated object from the server cast to the specified type.
-     * @throws Exception if an error occurs during the request.
-     */
-    private <T> T sendRequest(String requestType, int id, Map<String, Object> modifiedAttributes, Class<T> returnType) throws Exception {
-        out.println(Request.toJSON(new Request(requestType, id, modifiedAttributes)));
-        String response = in.readLine();
-
-        if (returnType == Game.class) {
-            return returnType.cast(Game.fromJSON(response));
-        } else if (returnType == User.class) {
-            return returnType.cast(User.fromJSON(response));
         } else {
             throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
         }
     }
 
-    /**
-     * Stops the connection by closing the input and output streams as well as the socket.
-     *
-     * @throws IOException if an I/O error occurs when closing the connection.
-     */
+    // Update stopConnection to check for null before closing resources:
     public void stopConnection() throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
+        if (in != null) {
+            in.close();
+        }
+        if (out != null) {
+            out.close();
+        }
+        if (clientSocket != null) {
+            clientSocket.close();
+        }
     }
-
-    // -- Request Wrappers ---
-
     /**
      * Retrieves a game object from the server by the specified ID.
      *
@@ -137,15 +113,18 @@ public class Client extends Application {
         try {
             client.startConnection("localhost", 4444);
             System.out.println("Sending gameGetRequest with ID: " + id);
-            return client.sendRequest("Game", id, Game.class);
+            return client.sendRequest("Game", id, null, Game.class);
         } catch(Exception e) {
             e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                client.stopConnection();
+            } catch(IOException ex) {
+                ex.printStackTrace();
+            }
         }
-
-        stopConnection();
-        return null;
     }
-
     /**
      * Retrieves a user object from the server by the specified ID.
      *
@@ -158,7 +137,7 @@ public class Client extends Application {
         try {
             client.startConnection("localhost", 4444);
             System.out.println("Sending userRequest with ID: " + id);
-            return client.sendRequest("User", id, User.class);
+            return client.sendRequest("User", id, null, User.class);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -181,7 +160,7 @@ public class Client extends Application {
         try {
             client.startConnection("localhost", 4444);
             System.out.println("Sending getSizeRequest with ID: " + id);
-            return client.sendRequest("GetSize", id, Integer.class);
+            return client.sendRequest("GetSize", id, null, Integer.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

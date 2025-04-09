@@ -30,8 +30,7 @@ import java.util.Objects;
         @JsonSubTypes.Type(value = Tennis.class, name = "tennis")
 })
 
-
-public abstract class Game {
+public class Game {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Exclude from serialization
     private String sport;
@@ -84,7 +83,7 @@ public abstract class Game {
         // Default constructor for deserialization purposes
     }
 
-    public abstract String getGameType();
+    public String getGameType() {return "a";}
 
 
     /**
