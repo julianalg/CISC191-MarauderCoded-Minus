@@ -110,6 +110,7 @@ public class Client extends Application {
      */
     public Game gameGetRequest(int id) throws IOException {
         Client client = new Client();
+
         try {
             client.startConnection("localhost", 4444);
             System.out.println("Sending gameGetRequest with ID: " + id);
