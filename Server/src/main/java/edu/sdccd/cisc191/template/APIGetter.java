@@ -17,12 +17,13 @@ public class APIGetter {
     public static <T> void main(String[] args) throws ParseException {
         // Create an HttpClient instance
         HttpClient client = HttpClient.newHttpClient();
+        String apiKey = System.getenv("API_KEY");
 
         // Build the GET request with the required headers
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-10"))
                 .header("x-rapidapi-host", "v1.basketball.api-sports.io")
-                .header("x-rapidapi-key", "")
+                .header("x-rapidapi-key", apiKey)
                 .GET()
                 .build();
 
