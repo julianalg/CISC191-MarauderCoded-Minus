@@ -1,5 +1,7 @@
 package edu.sdccd.cisc191.template;
 
+import org.json.simple.parser.ParseException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -80,6 +82,13 @@ class ClientHandler implements Runnable {
                         response = handleModifyUserRequest(request);
                     }
                     out.println(User.toJSON(response));
+                } else if (Objects.equals(request.getRequestType(), "Basketball")) {
+                    ArrayList<Basketball> response = null;
+                    if (request.getId() >= 0) {
+                        response = getBasketball(request);
+                        System.out.println("response type: " + response.getClass().getSimpleName());
+                    }
+                    out.println(response);
                 }
             }
         } catch (Exception e) {
@@ -115,6 +124,10 @@ class ClientHandler implements Runnable {
             response = gameDatabase.get(request.getId());
         }
         return response;
+    }
+
+    private static ArrayList<Basketball> getBasketball(Request request) throws ParseException {
+        return APIGetter.getBasketballGames();
     }
 
     /**

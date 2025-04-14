@@ -2,6 +2,7 @@ package edu.sdccd.cisc191.template;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,12 +73,16 @@ public class GameDatabase {
                 gameDatabase.clear();
                 gameDatabase.addAll(games);
                 System.out.println("GameDatabase loaded from file.");
+                //this.updateDatabaseFromAPI();
+                //System.out.println("GameDatabase updated from API.");
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Failed to load GameDatabase from file. Initializing with default data.");
                 initializeDefaultGames();
                 saveToFile();
-            }
+            } //catch (ParseException e) {
+                //throw new RuntimeException(e);
+            //}
         } else {
             System.out.println("GameDatabase file not found. Initializing with default data.");
             initializeDefaultGames();
@@ -115,6 +120,13 @@ public class GameDatabase {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Updates the game database from the API
+     */
+    void updateDatabaseFromAPI() throws ParseException {
+
     }
 
     /**

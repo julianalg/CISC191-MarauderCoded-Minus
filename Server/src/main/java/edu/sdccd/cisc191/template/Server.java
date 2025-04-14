@@ -24,6 +24,7 @@ public class Server {
      *
      * @param args Command-line arguments (not used in this application).
      */
+
     public static void main(String[] args) {
         ServerSocket serverSocket = null;
 

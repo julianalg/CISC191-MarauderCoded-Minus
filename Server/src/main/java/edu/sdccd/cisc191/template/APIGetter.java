@@ -1,11 +1,11 @@
 package edu.sdccd.cisc191.template;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.json.simple.JSONArray;
@@ -14,14 +14,17 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class APIGetter {
-    public static <T> void main(String[] args) throws ParseException {
+    public APIGetter() {}
+
+    public static ArrayList<Basketball> getBasketballGames() throws ParseException {
         // Create an HttpClient instance
+        ArrayList<Basketball> bbGames = new ArrayList<>();
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
 
         // Build the GET request with the required headers
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-10"))
+                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-13"))
                 .header("x-rapidapi-host", "v1.basketball.api-sports.io")
                 .header("x-rapidapi-key", apiKey)
                 .GET()
@@ -34,7 +37,7 @@ public class APIGetter {
                     System.out.println("Error: " + e.getMessage());
                     return null;
                 })
-                .join(); // Waits for the async call to complete
+                .join().toString(); // Waits for the async call to complete
 
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
@@ -56,19 +59,29 @@ public class APIGetter {
                         JSONObject league = (JSONObject) nestedObj.get("league");
 //                        System.out.println(league);
                         if (Objects.equals(league.get("name").toString(), "NBA")) {
-                            System.out.println(nestedObj);
+                            JSONObject teams = (JSONObject) nestedObj.get("teams");
+                            JSONObject awayTeam = (JSONObject) teams.get("away");
+                            JSONObject homeTeam = (JSONObject) teams.get("home");
+                            String awayTeamName = awayTeam.get("name").toString();
+                            String homeTeamName = homeTeam.get("name").toString();
+
+//                            System.out.println(awayTeamName + homeTeamName);
+
+                            Basketball newGame = new Basketball(awayTeamName, homeTeamName);
+
+                            bbGames.add(newGame);
                         }
                     }
                 }
             }
         }
 
-        try (FileWriter file = new FileWriter("output.json")) {
-            file.write(json.toString());
-            file.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.out.println(bbGames);
 
+//        List<Game> gdb = GameDatabase.getInstance().getGameDatabase();
+//        gdb.addAll(bbGames);
+//        System.out.println(gdb);
+
+        return bbGames;
     }
 }

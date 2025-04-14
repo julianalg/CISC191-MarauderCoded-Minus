@@ -1,12 +1,9 @@
 package edu.sdccd.cisc191.template;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -71,7 +68,7 @@ public class Client extends Application {
      * @throws Exception if an error occurs during the request.
      */
     // In the sendRequest method, add a null check for the response:
-    private <T> T sendRequest(String requestType, int id, Map<String, Object> modifiedRequest, Class<T> returnType) throws Exception {
+    private <T, E> T sendRequest(String requestType, int id, Map<String, Object> modifiedRequest, Class<T> returnType) throws Exception {
         out.println(Request.toJSON(new Request(requestType, id, modifiedRequest)));
         String response = in.readLine();
         if (response == null) {
@@ -84,7 +81,9 @@ public class Client extends Application {
             return returnType.cast(User.fromJSON(response));
         } else if (returnType == Integer.class) {
             return returnType.cast(Integer.parseInt(response));
-        } else {
+        } else if (returnType == ArrayList.class) {
+            return returnType.cast(ArrayList.class);
+        }else {
             throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
         }
     }
@@ -169,6 +168,20 @@ public class Client extends Application {
         stopConnection();
         return -1;
     };
+
+    public ArrayList<Basketball> getBasketballGames(int id) throws IOException {
+        Client client = new Client();
+        try {
+            client.startConnection("localhost", 4444);
+            System.out.println("Sending Basketball with ID: " + id);
+            return client.sendRequest("Basketball", id, null, ArrayList.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        stopConnection();
+        return null;
+    }
 
     /**
      * Modifies a user on the server with the provided attributes and returns the updated user.
@@ -439,10 +452,9 @@ public class Client extends Application {
      *
      * @param args command-line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         launch();// Run this Application.
     }
-
 
     @Override
     /**
@@ -454,49 +466,51 @@ public class Client extends Application {
      * @throws Exception if an error occurs during initialization.
      */
     public void start(Stage stage) throws Exception {
-
-        // Build the main layout
-        BorderPane borderPane = new BorderPane();
-        borderPane.setPadding(new Insets(20));
-
-        // Retrieve game data (and user data if needed)
-        Game[] games = getGames();
-        // Note: The sample user array in the original code is replaced by the static "user" field.
-        // The below array is never used, but is shown as a demonstration of potential code
-        // (We never used it because the leaderboard designs we thought up looked ugly).
-        User[] users = new User[]{
-                userGetRequest(0),
-                userGetRequest(1),
-                userGetRequest(2),
-                userGetRequest(3),
-                userGetRequest(4),
-        };
-
-        // Example modification of user
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("Name", "John");
-        attributes.put("Money", 9999);
-        // Serialize Bet object into JSON string before sending to server
-        attributes.put("addBet", Bet.toJSON(new Bet(games[0], 100, games[0].getTeam1())));
-        userModifyRequest(2, attributes);
-        // --- END EXAMPLE CODE ---
-
-        // Create UI components
-        TableView<Game> gameTable = createGameTableView(games, stage);
-        HBox userInfoBox = createUserInfoBox();
-        HBox betListBox = createBetListBox(stage);
-
-        // Assemble components into the BorderPane
-        borderPane.setCenter(gameTable);
-        borderPane.setTop(userInfoBox);
-        borderPane.setBottom(betListBox);
-
-        // Create and set the scene
-        Scene scene = new Scene(borderPane, 800, 800);
-        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-        stage.setScene(scene);
-        stage.setTitle("Marauder Bets");
-        stage.show();
+//        System.out.println(getSizeRequest(1));
+        System.out.println(getBasketballGames(1));
     }
+//        // Build the main layout
+//        BorderPane borderPane = new BorderPane();
+//        borderPane.setPadding(new Insets(20));
+//
+//        // Retrieve game data (and user data if needed)
+//        Game[] games = getGames();
+//        // Note: The sample user array in the original code is replaced by the static "user" field.
+//        // The below array is never used, but is shown as a demonstration of potential code
+//        // (We never used it because the leaderboard designs we thought up looked ugly).
+//        User[] users = new User[]{
+//                userGetRequest(0),
+//                userGetRequest(1),
+//                userGetRequest(2),
+//                userGetRequest(3),
+//                userGetRequest(4),
+//        };
+//
+//        // Example modification of user
+//        Map<String, Object> attributes = new HashMap<>();
+//        attributes.put("Name", "John");
+//        attributes.put("Money", 9999);
+//        // Serialize Bet object into JSON string before sending to server
+//        attributes.put("addBet", Bet.toJSON(new Bet(games[0], 100, games[0].getTeam1())));
+//        userModifyRequest(2, attributes);
+//        // --- END EXAMPLE CODE ---
+//
+//        // Create UI components
+//        TableView<Game> gameTable = createGameTableView(games, stage);
+//        HBox userInfoBox = createUserInfoBox();
+//        HBox betListBox = createBetListBox(stage);
+//
+//        // Assemble components into the BorderPane
+//        borderPane.setCenter(gameTable);
+//        borderPane.setTop(userInfoBox);
+//        borderPane.setBottom(betListBox);
+//
+//        // Create and set the scene
+//        Scene scene = new Scene(borderPane, 800, 800);
+//        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+//        stage.setScene(scene);
+//        stage.setTitle("Marauder Bets");
+//        stage.show();
+//    }
 } //end class Client
 
