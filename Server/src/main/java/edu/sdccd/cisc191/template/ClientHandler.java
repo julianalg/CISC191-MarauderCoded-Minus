@@ -47,6 +47,7 @@ class ClientHandler implements Runnable {
         System.out.println("Passed duties on to ClientHandler...");
 
         try {
+            //Stream object the directly
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
@@ -86,6 +87,7 @@ class ClientHandler implements Runnable {
                     ArrayList<Basketball> response = null;
                     if (request.getId() >= 0) {
                         response = getBasketball(request);
+                        System.out.println(response);
                         System.out.println("response type: " + response.getClass().getSimpleName());
                     }
                     out.println(response);

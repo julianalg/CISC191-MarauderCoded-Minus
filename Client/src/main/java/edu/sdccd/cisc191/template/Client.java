@@ -84,7 +84,7 @@ public class Client extends Application {
             return returnType.cast(User.fromJSON(response));
         } else if (returnType == Integer.class) {
             return returnType.cast(Integer.parseInt(response));
-        } else if (returnType.equals(ArrayList.class)) {
+        }  else if (returnType.equals(ArrayList.class)) {
             // Manually parse the response data stream instead of using Jackson
             // Assuming the response contains one Basketball game per line with fields separated by commas.
             ArrayList<Basketball> games = new ArrayList<>();
