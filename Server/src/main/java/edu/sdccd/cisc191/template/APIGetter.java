@@ -24,7 +24,7 @@ public class APIGetter {
 
         // Build the GET request with the required headers
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-13"))
+                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-15"))
                 .header("x-rapidapi-host", "v1.basketball.api-sports.io")
                 .header("x-rapidapi-key", apiKey)
                 .GET()

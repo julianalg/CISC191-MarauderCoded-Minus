@@ -1,5 +1,7 @@
 package edu.sdccd.cisc191.template;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -15,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.*;
 
@@ -81,9 +84,25 @@ public class Client extends Application {
             return returnType.cast(User.fromJSON(response));
         } else if (returnType == Integer.class) {
             return returnType.cast(Integer.parseInt(response));
-        } else if (returnType == ArrayList.class) {
-            return returnType.cast(ArrayList.class);
-        }else {
+        } else if (returnType.equals(ArrayList.class)) {
+            // Manually parse the response data stream instead of using Jackson
+            // Assuming the response contains one Basketball game per line with fields separated by commas.
+            ArrayList<Basketball> games = new ArrayList<>();
+            String[] lines = response.split("\n");
+            for (String line : lines) {
+                // Split each line by comma. Adjust the expected number of fields if needed.
+                String[] fields = line.split(",");
+                if (fields.length >= 5) {
+                    Basketball game = new Basketball(
+                        fields[0].trim(),  // team1
+                        fields[1].trim()  // team2
+                    );
+                    games.add(game);
+                    System.out.println("AAAAAAAAAAAAA");
+                }
+            }
+            return returnType.cast(games);
+        } else {
             throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
         }
     }
