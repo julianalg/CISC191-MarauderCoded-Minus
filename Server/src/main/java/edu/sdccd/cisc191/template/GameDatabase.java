@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.io.FileWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -30,7 +31,7 @@ public class GameDatabase {
     private static final List<Game> gameDatabase = Collections.synchronizedList(new ArrayList<>());
 
     // File path for storing game data
-    private static final String FILE_PATH = "Server/Resources/games.json";
+    private static final URL FILE_PATH = GameDatabase.class.getResource("games.json");
 
     /**
      * Private constructor to prevent instantiation outside the class.
@@ -58,7 +59,7 @@ public class GameDatabase {
      * it with default data if the file is not found.
      */
     void loadOrInitializeDatabase() {
-        File file = new File(FILE_PATH);
+        File file = new File(FILE_PATH.getFile());
         if (file.exists()) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -105,7 +106,7 @@ public class GameDatabase {
      * Saves the current state of the game database to a JSON file.
      */
     void saveToFile() {
-        try (Writer writer = new FileWriter(FILE_PATH)) {
+        try (Writer writer = new FileWriter(FILE_PATH.getFile())) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(writer, gameDatabase);
             System.out.println("GameDatabase saved to file.");

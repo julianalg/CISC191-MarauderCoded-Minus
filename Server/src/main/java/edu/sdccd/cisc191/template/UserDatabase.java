@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ public class UserDatabase {
     private static final List<User> userDatabase = Collections.synchronizedList(new ArrayList<>());
 
     // File path for storing user data
-    private static final String FILE_PATH = "Server/Resources/Users.json";
+    private static final URL FILE_PATH = UserDatabase.class.getResource("Users.json");
 
     /**
      * Private constructor to prevent instantiation outside the class.
@@ -60,7 +61,7 @@ public class UserDatabase {
      * it with default data if the file is not found.
      */
     void loadOrInitializeDatabase() {
-        File file = new File(FILE_PATH);
+        File file = new File(FILE_PATH.getFile());
         if (file.exists()) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -99,7 +100,7 @@ public class UserDatabase {
      * Saves the current state of the user database to a JSON file.
      */
     public void saveToFile() {
-        try (Writer writer = new FileWriter(FILE_PATH)) {
+        try (Writer writer = new FileWriter(FILE_PATH.getFile())) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(writer, userDatabase);
             System.out.println("UserDatabase saved to file.");
