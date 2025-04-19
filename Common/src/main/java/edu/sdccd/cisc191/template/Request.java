@@ -1,5 +1,6 @@
 package edu.sdccd.cisc191.template;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Andy Ly, Andrew Huang
  */
-public class Request {
+public class Request implements Serializable {
 
     private Map<String, Object> attributesToModify;
     private Integer id;

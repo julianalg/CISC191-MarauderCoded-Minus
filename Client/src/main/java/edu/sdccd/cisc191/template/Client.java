@@ -13,10 +13,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.*;
@@ -35,14 +32,9 @@ public class Client extends Application {
      * The socket used to connect to the server.
      */
     private Socket clientSocket;
-    /**
-     * The output stream for sending requests to the server.
-     */
-    private PrintWriter out;
-    /**
-     * The input stream for receiving responses from the server.
-     */
-    private BufferedReader in;
+
+    private ObjectOutputStream out; // The output stream for sending requests to the server.
+    private ObjectInputStream in; // The input stream for receiving responses from the server.
 
     // --- Socket and Request Methods ---
     /**
@@ -54,57 +46,65 @@ public class Client extends Application {
      */
     public void startConnection(String ip, int port) throws IOException {
         clientSocket = new Socket(ip, port);
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        out = new ObjectOutputStream(clientSocket.getOutputStream());
+        in = new ObjectInputStream(clientSocket.getInputStream());
     }
+
 
     /**
      * Sends a request to the server and returns a response of the expected type.
      *
      * Never call this method directly, call one of its wrappers for safe usage.
      *
-     * @param requestType the type of request to send. For example: "Game", "User", "GetSize".
-     * @param id          the identifier for the requested data.
-     * @param returnType  the expected class type of the response.
      * @param <T>         the type parameter corresponding to the expected response type.
      * @return the response from the server cast to the specified type.
      * @throws Exception if an error occurs during the request.
      */
     // In the sendRequest method, add a null check for the response:
-    private <T, E> T sendRequest(String requestType, int id, Map<String, Object> modifiedRequest, Class<T> returnType) throws Exception {
-        out.println(Request.toJSON(new Request(requestType, id, modifiedRequest)));
-        String response = in.readLine();
-        if (response == null) {
-            throw new IllegalArgumentException("No response received from server");
-        }
+    private <T, E> T sendRequest(Request request, Class<T> responseType) throws Exception {
+        // Write request
+        out.writeObject(request);
+        out.flush();
 
-        if (returnType == Game.class) {
-            return returnType.cast(Game.fromJSON(response));
-        } else if (returnType == User.class) {
-            return returnType.cast(User.fromJSON(response));
-        } else if (returnType == Integer.class) {
-            return returnType.cast(Integer.parseInt(response));
-        }  else if (returnType.equals(ArrayList.class)) {
-            // Manually parse the response data stream instead of using Jackson
-            // Assuming the response contains one Basketball game per line with fields separated by commas.
-            ArrayList<Game> games = new ArrayList<>();
-            String[] lines = response.split("\n");
-            for (String line : lines) {
-                // Split each line by comma. Adjust the expected number of fields if needed.
-                String[] fields = line.split(",");
-                if (fields.length >= 5) {
-                    Game game = new Game(
-                        fields[0].trim(),  // team1
-                        fields[1].trim()  // team2
-                    );
-                    games.add(game);
-                    System.out.println("AAAAAAAAAAAAA");
-                }
-            }
-            return returnType.cast(games);
-        } else {
-            throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
-        }
+        // read back whatever the server sent
+        Object raw = in.readObject();
+
+        // cast into the expected type
+        return responseType.cast(raw);
+//        out.println(Request.toJSON(new Request(requestType, id, modifiedRequest)));
+//        String response = in.readLine();
+//        if (response == null) {
+//            throw new IllegalArgumentException("No response received from server");
+//        }
+//
+//        if (returnType == Game.class) {
+//            return returnType.cast(Game.fromJSON(response));
+//        } else if (returnType == User.class) {
+//            return returnType.cast(User.fromJSON(response));
+//        } else if (returnType == Integer.class) {
+//            return returnType.cast(Integer.parseInt(response));
+//        }  else if (returnType.equals(ArrayList.class)) {
+//            // Manually parse the response data stream instead of using Jackson
+//            // Assuming the response contains one Basketball game per line with fields separated by commas.
+//            ArrayList<Game> games = new ArrayList<>();
+//            String[] lines = response.split("\n");
+//            for (String line : lines) {
+//                // Split each line by comma. Adjust the expected number of fields if needed.
+//                String[] fields = line.split(",");
+//                if (fields.length >= 5) {
+//                    Game game = new Game(
+//                        fields[0].trim(),  // team1
+//                        fields[1].trim()  // team2
+//                    );
+//                    games.add(game);
+//                    System.out.println("AAAAAAAAAAAAA");
+//                }
+//            }
+//            return returnType.cast(games);
+//        } else {
+//            throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
+//        }
     }
 
     // Update stopConnection to check for null before closing resources:
@@ -126,80 +126,26 @@ public class Client extends Application {
      * @return the Game object if found; null otherwise.
      * @throws IOException if an I/O error occurs during the request.
      */
-    public Game gameGetRequest(int id) throws IOException {
+    public Game getRequest(int id, String type) throws IOException {
         Client client = new Client();
 
         try {
             client.startConnection("localhost", 4444);
-            System.out.println("Sending gameGetRequest with ID: " + id);
-            return client.sendRequest("Game", id, null, Game.class);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return null;
+
+            // build a request object
+            Request req = new Request("Game", id);
+
+            return client.sendRequest(req, Game.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             try {
                 client.stopConnection();
-            } catch(IOException ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-    }
-    /**
-     * Retrieves a user object from the server by the specified ID.
-     *
-     * @param id the identifier of the user to retrieve.
-     * @return the User object if found; null otherwise.
-     * @throws IOException if an I/O error occurs during the request.
-     */
-    public User userGetRequest(int id) throws IOException {
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending userRequest with ID: " + id);
-            return client.sendRequest("User", id, null, User.class);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
 
-        stopConnection();
-        return null;
-    }
-
-    /**
-     * Retrieves the size of a resource (e.g., number of games or users) from the server.
-     *
-     * @param id the identifier for the resource size request.
-     *           (1 for gameDatabase and 2 for userDatabase)
-     * @return the size of the requested resource; -1 if an error occurs.
-     * @throws IOException if an I/O error occurs during the request.
-     */
-    public int getSizeRequest(int id) throws IOException {
-
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending getSizeRequest with ID: " + id);
-            return client.sendRequest("GetSize", id, null, Integer.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        stopConnection();
-        return -1;
-    };
-
-    public ArrayList<Game> getBasketballGames(int id) throws IOException {
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending Basketball with ID: " + id);
-            return client.sendRequest("Basketball", id, null, ArrayList.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        stopConnection();
-        return null;
     }
 
     /**
@@ -211,18 +157,18 @@ public class Client extends Application {
      * @return the updated User object if modification is successful; null otherwise.
      * @throws IOException if an I/O error occurs during the request.
      */
-    public User userModifyRequest(int id, Map<String, Object> modifiedAttributes) throws IOException {
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending userModifyRequest with ID: " + id);
-            return client.sendRequest("ModifyUser", id, modifiedAttributes, User.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        stopConnection();
-        return null;
-    }
+//    public User userModifyRequest(int id, Map<String, Object> modifiedAttributes) throws IOException {
+//        Client client = new Client();
+//        try {
+//            client.startConnection("localhost", 4444);
+//            System.out.println("Sending userModifyRequest with ID: " + id);
+//            return client.sendRequest("ModifyUser", id, modifiedAttributes, User.class);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        stopConnection();
+//        return null;
+//    }
 
     // --- UI Component Builders ---
     // Build the table view for the games
@@ -454,13 +400,19 @@ public class Client extends Application {
      * @return an array of Game objects.
      * @throws IOException if an I/O error occurs during retrieval.
      */
-    private Game[] getGames() throws IOException {
-        int size = getSizeRequest(1);
+    private Game[] getGames() throws Exception {
+        int size = sendRequest(new Request("GetSize", 1), int.class);
         Game[] games = new Game[size];
         for (int i = 0; i < size; i++) {
-            games[i] = this.gameGetRequest(i);
+            games[i] = sendRequest(new Request("Game", 1), Game.class);
         }
         return games;
+    }
+
+    private ArrayList<Game> getBasketballGames() throws Exception {
+        ArrayList<Game> basketballGames;
+        basketballGames = sendRequest(new Request("Basketball", 1), ArrayList.class);
+        return basketballGames;
     }
 
 
@@ -486,7 +438,8 @@ public class Client extends Application {
      */
     public void start(Stage stage) throws Exception {
 //        System.out.println(getSizeRequest(1));
-        System.out.println(getBasketballGames(1));
+        startConnection("localhost", 4444);
+        System.out.println(getBasketballGames());
     }
 //        // Build the main layout
 //        BorderPane borderPane = new BorderPane();

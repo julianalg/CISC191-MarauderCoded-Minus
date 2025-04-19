@@ -1,5 +1,6 @@
 package edu.sdccd.cisc191.template;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Andy Ly, Julian Garcia
  */
-public class User {
+public class User implements Serializable {
 
     private String name;
     private int money;

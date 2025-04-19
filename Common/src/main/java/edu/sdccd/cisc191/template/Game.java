@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ import java.util.Objects;
  * @author Andy Ly, Julian Garcia
  */
 
-public class Game {
+public class Game implements Serializable {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Exclude from serialization
     private String sport;

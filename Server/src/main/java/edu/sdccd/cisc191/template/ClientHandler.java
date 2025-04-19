@@ -2,10 +2,7 @@ package edu.sdccd.cisc191.template;
 
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -25,17 +22,18 @@ class ClientHandler implements Runnable {
 
     private ServerSocket serverSocket; // Server socket for incoming connections
     private Socket clientSocket; // Socket for communicating with the client
-    private PrintWriter out; // Output stream to send responses to the client
-    private BufferedReader in; // Input stream to receive requests from the client
+    ObjectOutputStream out; // Output stream to send responses to the client
+    ObjectInputStream  in; // Input stream to receive requests from the client
 
     /**
      * Creates a new  ClientHandler  for a given client socket.
      *
      * @param socket The client socket to be handled.
      */
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket) throws IOException {
         this.clientSocket = socket;
     }
+
 
     /**
      * Executes the thread to handle client communication.
@@ -47,66 +45,55 @@ class ClientHandler implements Runnable {
         System.out.println("Passed duties on to ClientHandler...");
 
         try {
-            //Stream object the directly
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
+            in = new ObjectInputStream(clientSocket.getInputStream());
 
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                Request request = Request.fromJSON(inputLine); // Deserialize the client request
-                System.out.println(request.toString()); // Log the request for debugging
-
-                // Handle request types
-                if (Objects.equals(request.getRequestType(), "GetSize")) {
-                    String response = "-1";
-                    if (request.getId() == 1) {
-                        response = GameDatabase.getInstance().getSize();
-                    } else if (request.getId() == 2) {
-                        response = UserDatabase.getInstance().getSize();
-                    }
-                    out.println(response);
-                } else if (Objects.equals(request.getRequestType(), "Game")) {
-                    Game response = null;
-                    if (request.getId() >= 0) {
-                        response = getGame(request);
-                    }
-                    out.println(Game.toJSON(response));
-                } else if (Objects.equals(request.getRequestType(), "User")) {
-                    User response = null;
-                    if (request.getId() >= 0) {
-                        response = getUser(request);
-                    }
-                    out.println(User.toJSON(response));
-                } else if (Objects.equals(request.getRequestType(), "ModifyUser")) {
-                    User response = null;
-                    if (request.getId() >= 0) {
-                        response = handleModifyUserRequest(request);
-                    }
-                    out.println(User.toJSON(response));
-                } else if (Objects.equals(request.getRequestType(), "Basketball")) {
-                    ArrayList<Game> response = null;
-                    if (request.getId() >= 0) {
-                        response = getBasketball(request);
-                        System.out.println(response);
-                        System.out.println("response type: " + response.getClass().getSimpleName());
-                    }
-                    out.println(response);
+            while (true) {
+                // Block until the client sends a Request object
+                Object obj = in.readObject();
+                if(!(obj instanceof  Request)) {
+                    System.err.println("Unexpected type: " + obj.getClass().getName());
+                    break;
                 }
+                Request request = (Request) obj;
+                System.out.println("Client received: " + request);
+
+                // Handle the request
+                Object response;
+                switch (request.getRequestType()) {
+                    case "GetSize":
+                        response = (request.getId() == 1) ? GameDatabase.getInstance().getSize() : UserDatabase.getInstance().getSize();
+                        break;
+                    case "Game":
+                        response = (request.getId() >= 0) ? getGame(request) : null;
+                        break;
+                    case "User":
+                        response = (request.getId() >= 0) ? getUser(request) : null;
+                        break;
+                    case "ModifyUser":
+                        response = (request.getId() >= 0) ? handleModifyUserRequest(request) : null;
+                        break;
+                    case "Basketball":
+                        response = (request.getId() >= 0) ? getBasketball(request) : new ArrayList<Game>();
+                        break;
+                    default:
+                        response = new IllegalArgumentException("Unknown request type");
+                }
+
+                // Send it back
+                out.writeObject(response);
+                out.flush();
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } finally {
             try {
-                if (out != null) {
-                    out.close();
-                }
-                if (in != null) {
-                    in.close();
-                    clientSocket.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                clientSocket.close();
+            } catch (IOException ignored) {}
         }
     }
 

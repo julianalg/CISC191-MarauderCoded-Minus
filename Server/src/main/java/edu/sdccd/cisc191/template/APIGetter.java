@@ -26,8 +26,7 @@ public class APIGetter {
         // Create an HttpClient instance
         ArrayList<Game> bbGames = new ArrayList<>();
         HttpClient client = HttpClient.newHttpClient();
-//        String apiKey = System.getenv("API_KEY");
-        String apiKey = "de76b8f77c910ff8fdc3065e2f37a9d9";
+        String apiKey = System.getenv("API_KEY");
 
         // Build the GET request with the required headers
         HttpRequest request = HttpRequest.newBuilder()
