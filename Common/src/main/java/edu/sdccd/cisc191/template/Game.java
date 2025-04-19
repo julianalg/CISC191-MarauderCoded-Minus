@@ -19,17 +19,6 @@ import java.util.Objects;
  * @author Andy Ly, Julian Garcia
  */
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "gameType"
-)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = Football.class, name = "football"),
-        @JsonSubTypes.Type(value = Basketball.class, name = "basketball"),
-        @JsonSubTypes.Type(value = Tennis.class, name = "tennis")
-})
-
 public class Game {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Exclude from serialization
@@ -52,6 +41,9 @@ public class Game {
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public Game(String awayTeamName, String homeTeamName) {
+    }
 
     /**
      * Serializes a  Game  object into a JSON string.

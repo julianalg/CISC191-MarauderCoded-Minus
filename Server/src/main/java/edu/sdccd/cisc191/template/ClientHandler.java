@@ -84,7 +84,7 @@ class ClientHandler implements Runnable {
                     }
                     out.println(User.toJSON(response));
                 } else if (Objects.equals(request.getRequestType(), "Basketball")) {
-                    ArrayList<Basketball> response = null;
+                    ArrayList<Game> response = null;
                     if (request.getId() >= 0) {
                         response = getBasketball(request);
                         System.out.println(response);
@@ -128,7 +128,7 @@ class ClientHandler implements Runnable {
         return response;
     }
 
-    private static ArrayList<Basketball> getBasketball(Request request) throws ParseException {
+    private static ArrayList<Game> getBasketball(Request request) throws ParseException {
         return APIGetter.getBasketballGames();
     }
 

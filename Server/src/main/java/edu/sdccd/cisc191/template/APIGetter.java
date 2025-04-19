@@ -1,10 +1,12 @@
 package edu.sdccd.cisc191.template;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,15 +18,20 @@ import org.json.simple.parser.ParseException;
 public class APIGetter {
     public APIGetter() {}
 
-    public static ArrayList<Basketball> getBasketballGames() throws ParseException {
+    public static void main(String[] args) throws IOException, InterruptedException, ParseException {
+        System.out.println(getBasketballGames());
+    }
+
+    public static ArrayList<Game> getBasketballGames() throws ParseException {
         // Create an HttpClient instance
-        ArrayList<Basketball> bbGames = new ArrayList<>();
+        ArrayList<Game> bbGames = new ArrayList<>();
         HttpClient client = HttpClient.newHttpClient();
-        String apiKey = System.getenv("API_KEY");
+//        String apiKey = System.getenv("API_KEY");
+        String apiKey = "de76b8f77c910ff8fdc3065e2f37a9d9";
 
         // Build the GET request with the required headers
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-15"))
+                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-19"))
                 .header("x-rapidapi-host", "v1.basketball.api-sports.io")
                 .header("x-rapidapi-key", apiKey)
                 .GET()
@@ -67,7 +74,7 @@ public class APIGetter {
 
 //                            System.out.println(awayTeamName + homeTeamName);
 
-                            Basketball newGame = new Basketball(awayTeamName, homeTeamName);
+                            Game newGame = new Game(awayTeamName, homeTeamName, new Date(), new Date());
 
                             bbGames.add(newGame);
                         }

@@ -64,8 +64,6 @@ public class GameDatabase {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 // Register subtypes explicitly if necessary (optional if using annotations)
-                objectMapper.registerSubtypes(Football.class, Basketball.class, Tennis.class);
-
                 CollectionType listType = objectMapper.getTypeFactory()
                         .constructCollectionType(List.class, Game.class);
                 List<Game> games = objectMapper.readValue(file, listType);
@@ -101,7 +99,7 @@ public class GameDatabase {
         for (int i = 0; i < 6; i++) {
             Date randomDate = new Date(ThreadLocalRandom.current()
                     .nextLong(d1.getTime(), d2.getTime()));
-            gameDatabase.add(new Basketball(
+            gameDatabase.add(new Game(
                     String.format("Team %d", count),
                     String.format("Team %d", count + 1), new Date(),
                     randomDate));

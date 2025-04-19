@@ -87,13 +87,13 @@ public class Client extends Application {
         }  else if (returnType.equals(ArrayList.class)) {
             // Manually parse the response data stream instead of using Jackson
             // Assuming the response contains one Basketball game per line with fields separated by commas.
-            ArrayList<Basketball> games = new ArrayList<>();
+            ArrayList<Game> games = new ArrayList<>();
             String[] lines = response.split("\n");
             for (String line : lines) {
                 // Split each line by comma. Adjust the expected number of fields if needed.
                 String[] fields = line.split(",");
                 if (fields.length >= 5) {
-                    Basketball game = new Basketball(
+                    Game game = new Game(
                         fields[0].trim(),  // team1
                         fields[1].trim()  // team2
                     );
@@ -188,7 +188,7 @@ public class Client extends Application {
         return -1;
     };
 
-    public ArrayList<Basketball> getBasketballGames(int id) throws IOException {
+    public ArrayList<Game> getBasketballGames(int id) throws IOException {
         Client client = new Client();
         try {
             client.startConnection("localhost", 4444);
