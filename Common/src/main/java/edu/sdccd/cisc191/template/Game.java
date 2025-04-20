@@ -22,7 +22,6 @@ import java.util.Objects;
 
 public class Game implements Serializable {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Exclude from serialization
     private String sport;
     private String team1;
     private String team2;

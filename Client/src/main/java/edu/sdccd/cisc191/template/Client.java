@@ -1,7 +1,5 @@
 package edu.sdccd.cisc191.template;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -18,9 +16,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.*;
 
@@ -57,7 +53,6 @@ public class Client extends Application {
         in = new ObjectInputStream(clientSocket.getInputStream());
     }
 
-
     /**
      * Sends a request to the server and returns a response of the expected type.
      *
@@ -67,8 +62,7 @@ public class Client extends Application {
      * @return the response from the server cast to the specified type.
      * @throws Exception if an error occurs during the request.
      */
-    // In the sendRequest method, add a null check for the response:
-    private <T, E> T sendRequest(Request request, Class<T> responseType) throws Exception {
+    private <T> T sendRequest(Request request, Class<T> responseType) throws Exception {
         // Write request
         out.writeObject(request);
         out.flush();
@@ -78,39 +72,6 @@ public class Client extends Application {
 
         // cast into the expected type
         return responseType.cast(raw);
-//        out.println(Request.toJSON(new Request(requestType, id, modifiedRequest)));
-//        String response = in.readLine();
-//        if (response == null) {
-//            throw new IllegalArgumentException("No response received from server");
-//        }
-//
-//        if (returnType == Game.class) {
-//            return returnType.cast(Game.fromJSON(response));
-//        } else if (returnType == User.class) {
-//            return returnType.cast(User.fromJSON(response));
-//        } else if (returnType == Integer.class) {
-//            return returnType.cast(Integer.parseInt(response));
-//        }  else if (returnType.equals(ArrayList.class)) {
-//            // Manually parse the response data stream instead of using Jackson
-//            // Assuming the response contains one Basketball game per line with fields separated by commas.
-//            ArrayList<Game> games = new ArrayList<>();
-//            String[] lines = response.split("\n");
-//            for (String line : lines) {
-//                // Split each line by comma. Adjust the expected number of fields if needed.
-//                String[] fields = line.split(",");
-//                if (fields.length >= 5) {
-//                    Game game = new Game(
-//                        fields[0].trim(),  // team1
-//                        fields[1].trim()  // team2
-//                    );
-//                    games.add(game);
-//                    System.out.println("AAAAAAAAAAAAA");
-//                }
-//            }
-//            return returnType.cast(games);
-//        } else {
-//            throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
-//        }
     }
 
     // Update stopConnection to check for null before closing resources:
@@ -163,18 +124,18 @@ public class Client extends Application {
      * @return the updated User object if modification is successful; null otherwise.
      * @throws IOException if an I/O error occurs during the request.
      */
-//    public User userModifyRequest(int id, Map<String, Object> modifiedAttributes) throws IOException {
-//        Client client = new Client();
-//        try {
-//            client.startConnection("localhost", 4444);
-//            System.out.println("Sending userModifyRequest with ID: " + id);
-//            return client.sendRequest("ModifyUser", id, modifiedAttributes, User.class);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        stopConnection();
-//        return null;
-//    }
+    public User userModifyRequest(int id, Map<String, Object> modifiedAttributes) throws IOException {
+        Client client = new Client();
+        try {
+            client.startConnection("localhost", 4444);
+            System.out.println("Sending userModifyRequest with ID: " + id);
+            return client.sendRequest(new Request("ModifyUser", id, modifiedAttributes), User.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        stopConnection();
+        return null;
+    }
 
     // --- UI Component Builders ---
     // Build the table view for the games
@@ -448,6 +409,14 @@ public class Client extends Application {
 //        System.out.println(getSizeRequest(1));
         startConnection("localhost", 4444);
         System.out.println(getBasketballGames());
+        //Game[] response = getGames();
+        // Test modification of user
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("Name", "John");
+        attributes.put("Money", 9999);
+
+        System.out.println(userModifyRequest(2, attributes));
+
         // Build the main layout
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(20));

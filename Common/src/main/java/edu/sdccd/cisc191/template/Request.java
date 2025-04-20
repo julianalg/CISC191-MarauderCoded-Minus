@@ -68,7 +68,7 @@ public class Request implements Serializable {
     }
 
     /**
-     * Creates a  CustomerRequest  with a specified request type, ID, and
+     * Creates a CustomerRequest with a specified request type, ID, and
      * attributes to modify.
      *
      * @param requestType The type of the request.

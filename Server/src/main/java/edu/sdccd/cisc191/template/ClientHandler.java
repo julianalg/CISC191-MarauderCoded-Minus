@@ -51,7 +51,8 @@ class ClientHandler implements Runnable {
             while (true) {
                 // Block until the client sends a Request object
                 Object obj = in.readObject();
-                if(!(obj instanceof  Request)) {
+                System.out.println("Object Received: \n" + obj);
+                if(!(obj instanceof Request)) {
                     System.err.println("Unexpected type: " + obj.getClass().getName());
                     break;
                 }
