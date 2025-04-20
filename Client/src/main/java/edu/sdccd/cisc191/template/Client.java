@@ -3,9 +3,14 @@ package edu.sdccd.cisc191.template;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -13,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.Socket;
@@ -440,49 +446,27 @@ public class Client extends Application {
 //        System.out.println(getSizeRequest(1));
         startConnection("localhost", 4444);
         System.out.println(getBasketballGames());
+        // Build the main layout
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(20));
+
+
+        // Create UI components
+        TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
+        HBox userInfoBox = createUserInfoBox();
+        HBox betListBox = createBetListBox(stage);
+
+        // Assemble components into the BorderPane
+        borderPane.setCenter(gameTable);
+        borderPane.setTop(userInfoBox);
+        borderPane.setBottom(betListBox);
+
+        // Create and set the scene
+        Scene scene = new Scene(borderPane, 800, 800);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        stage.setScene(scene);
+        stage.setTitle("Marauder Bets");
+        stage.show();
     }
-//        // Build the main layout
-//        BorderPane borderPane = new BorderPane();
-//        borderPane.setPadding(new Insets(20));
-//
-//        // Retrieve game data (and user data if needed)
-//        Game[] games = getGames();
-//        // Note: The sample user array in the original code is replaced by the static "user" field.
-//        // The below array is never used, but is shown as a demonstration of potential code
-//        // (We never used it because the leaderboard designs we thought up looked ugly).
-//        User[] users = new User[]{
-//                userGetRequest(0),
-//                userGetRequest(1),
-//                userGetRequest(2),
-//                userGetRequest(3),
-//                userGetRequest(4),
-//        };
-//
-//        // Example modification of user
-//        Map<String, Object> attributes = new HashMap<>();
-//        attributes.put("Name", "John");
-//        attributes.put("Money", 9999);
-//        // Serialize Bet object into JSON string before sending to server
-//        attributes.put("addBet", Bet.toJSON(new Bet(games[0], 100, games[0].getTeam1())));
-//        userModifyRequest(2, attributes);
-//        // --- END EXAMPLE CODE ---
-//
-//        // Create UI components
-//        TableView<Game> gameTable = createGameTableView(games, stage);
-//        HBox userInfoBox = createUserInfoBox();
-//        HBox betListBox = createBetListBox(stage);
-//
-//        // Assemble components into the BorderPane
-//        borderPane.setCenter(gameTable);
-//        borderPane.setTop(userInfoBox);
-//        borderPane.setBottom(betListBox);
-//
-//        // Create and set the scene
-//        Scene scene = new Scene(borderPane, 800, 800);
-//        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-//        stage.setScene(scene);
-//        stage.setTitle("Marauder Bets");
-//        stage.show();
-//    }
 } //end class Client
 
