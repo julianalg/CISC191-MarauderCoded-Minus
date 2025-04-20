@@ -139,9 +139,9 @@ public class GameDatabase {
     /**
      * Gets the size of the game database.
      *
-     * @return The size of the database as a  String .
+     * @return The size of the database as an Int .
      */
-    public synchronized String getSize() {
-        return String.valueOf(gameDatabase.size());
+    public synchronized int getSize() {
+        return gameDatabase.size();
     }
 }

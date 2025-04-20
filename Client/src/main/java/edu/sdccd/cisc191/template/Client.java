@@ -69,9 +69,22 @@ public class Client extends Application {
 
         // read back whatever the server sent
         Object raw = in.readObject();
+        System.out.println("Raw: " + raw);
+        System.out.println("Raw type: " + raw.getClass());
+        System.out.println("Response Type: " + responseType);
 
         // cast into the expected type
-        return responseType.cast(raw);
+
+        try {
+            return responseType.cast(raw);
+        }
+        catch (ClassCastException e) {
+            System.out.println("ClassCastException, could not cast " + raw.getClass() + " to " + responseType);
+            System.out.println("Attempting to cast raw to an integer");
+        }
+
+        return null;
+
     }
 
     // Update stopConnection to check for null before closing resources:
@@ -370,7 +383,7 @@ public class Client extends Application {
      * @throws IOException if an I/O error occurs during retrieval.
      */
     private Game[] getGames() throws Exception {
-        int size = sendRequest(new Request("GetSize", 1), int.class);
+        int size = sendRequest(new Request("GetSize", 1), Integer.class);
         Game[] games = new Game[size];
         for (int i = 0; i < size; i++) {
             games[i] = sendRequest(new Request("Game", 1), Game.class);
@@ -408,8 +421,7 @@ public class Client extends Application {
     public void start(Stage stage) throws Exception {
 //        System.out.println(getSizeRequest(1));
         startConnection("localhost", 4444);
-        System.out.println(getBasketballGames());
-        //Game[] response = getGames();
+        //System.out.println(getBasketballGames());
         // Test modification of user
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("Name", "John");
@@ -417,13 +429,16 @@ public class Client extends Application {
 
         System.out.println(userModifyRequest(2, attributes));
 
+        Game[] response = getGames();
+        System.out.println(response);
+
         // Build the main layout
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(20));
 
 
         // Create UI components
-        TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
+        /*TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
         HBox userInfoBox = createUserInfoBox();
         HBox betListBox = createBetListBox(stage);
 
@@ -437,7 +452,7 @@ public class Client extends Application {
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Marauder Bets");
-        stage.show();
+        stage.show(); */
     }
 } //end class Client
 
