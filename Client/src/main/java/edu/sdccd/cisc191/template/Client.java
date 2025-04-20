@@ -80,7 +80,6 @@ public class Client extends Application {
         }
         catch (ClassCastException e) {
             System.out.println("ClassCastException, could not cast " + raw.getClass() + " to " + responseType);
-            System.out.println("Attempting to cast raw to an integer");
         }
 
         return null;
