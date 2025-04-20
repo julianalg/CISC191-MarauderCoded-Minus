@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,9 +30,20 @@ public class APIGetter {
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
 
+        Date today = new Date(); // current date
+        LocalDate localDate = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        LocalDate nextDay = localDate.plusDays(1);
+        Date nextDayDate = Date.from(nextDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
+        System.out.println(tomorrowArg);
+
         // Build the GET request with the required headers
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=2025-04-19"))
+                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=" + tomorrowArg))
                 .header("x-rapidapi-host", "v1.basketball.api-sports.io")
                 .header("x-rapidapi-key", apiKey)
                 .GET()
