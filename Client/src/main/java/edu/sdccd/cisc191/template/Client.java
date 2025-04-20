@@ -193,6 +193,7 @@ public class Client extends Application {
         TableColumn<T, String> team1Col = new TableColumn<>("Team 1");
         team1Col.setCellValueFactory(new PropertyValueFactory<>("team1"));
         tableView.getColumns().add(team1Col);
+        team1Col.setPrefWidth(150);
         team1Col.setResizable(false);
         team1Col.setSortable(false);
         team1Col.setReorderable(false);
@@ -202,13 +203,14 @@ public class Client extends Application {
         team2Col.setCellValueFactory(new PropertyValueFactory<>("team2"));
         tableView.getColumns().add(team2Col);
         team2Col.setResizable(false);
+        team2Col.setPrefWidth(150);
         team2Col.setSortable(false);
         team2Col.setReorderable(false);
 
         // Column for Date
         TableColumn<T, String> dateCol = new TableColumn<>("Date");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("dateClean"));
-        dateCol.setPrefWidth(150);
+        dateCol.setPrefWidth(175);
         tableView.getColumns().add(dateCol);
         dateCol.setResizable(false);
         dateCol.setSortable(false);
@@ -462,7 +464,7 @@ public class Client extends Application {
         borderPane.setBottom(betListBox);
 
         // Create and set the scene
-        Scene scene = new Scene(borderPane, 800, 800);
+        Scene scene = new Scene(borderPane, 1000, 800);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Marauder Bets");
