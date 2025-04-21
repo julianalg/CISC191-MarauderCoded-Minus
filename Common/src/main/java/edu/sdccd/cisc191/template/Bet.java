@@ -62,6 +62,7 @@ public class Bet {
      * Required for JSON serialization/deserialization.
      */
     protected Bet() {
+        // TODO: Consider adding logging here or a comment explaining why this constructor is necessary for JSON deserialization.
         // Default constructor for deserialization purposes
     }
 
@@ -109,6 +110,8 @@ public class Bet {
      */
     private double calculateOddsForGameAtTime(long timeStamp) {
         return 1 + random.nextInt(100); // Generate a random value between 1 and 100
+// TODO: The random number generation for odds could potentially result in unrealistic odds. Consider adding validation to ensure they are reasonable.
+    }
     }
 
     /**
