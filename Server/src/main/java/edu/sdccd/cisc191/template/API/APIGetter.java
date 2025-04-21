@@ -1,6 +1,5 @@
-package edu.sdccd.cisc191.template;
+package edu.sdccd.cisc191.template.API;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -9,22 +8,21 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
+import edu.sdccd.cisc191.template.Game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class APIGetter {
+public abstract class APIGetter {
+    String apiURL;
+    String leagueName;
     public APIGetter() {}
 
-    public static void main(String[] args) throws IOException, InterruptedException, ParseException {
-        System.out.println(getBasketballGames());
-    }
 
-    public static ArrayList<Game> getBasketballGames() throws ParseException {
+    public ArrayList<Game> getGames() throws ParseException {
         // Create an HttpClient instance
         ArrayList<Game> bbGames = new ArrayList<>();
         HttpClient client = HttpClient.newHttpClient();
@@ -41,9 +39,12 @@ public class APIGetter {
         String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
         System.out.println(tomorrowArg);
 
-        // Build the GET request with the required headers
+        String fullUrl     = apiURL + tomorrowArg;
+        URI   requestURI  = URI.create(fullUrl);
+        System.out.println(requestURI);  // prints: https://v1.basketball.api‑sports.io/games?date=2025‑04‑22
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://v1.basketball.api-sports.io/games?date=" + tomorrowArg))
+                .uri(requestURI)                  // <-- pass your concatenated URI here
                 .header("x-rapidapi-host", "v1.basketball.api-sports.io")
                 .header("x-rapidapi-key", apiKey)
                 .GET()
@@ -61,6 +62,8 @@ public class APIGetter {
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
 
+        System.out.println(leagueName);
+
         for (Object keyObj : json.keySet()) {
             String key = (String) keyObj;
             Object value = json.get(key);
@@ -76,15 +79,14 @@ public class APIGetter {
                         JSONObject nestedObj = (JSONObject) item;
                         // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
-//                        System.out.println(league);
-                        if (Objects.equals(league.get("name").toString(), "NBA")) {
+                        if (Objects.equals(league.get("name").toString(), leagueName)) {
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
                             JSONObject awayTeam = (JSONObject) teams.get("away");
                             JSONObject homeTeam = (JSONObject) teams.get("home");
                             String awayTeamName = awayTeam.get("name").toString();
                             String homeTeamName = homeTeam.get("name").toString();
 
-//                            System.out.println(awayTeamName + homeTeamName);
+                            System.out.println(awayTeamName + homeTeamName);
 
                             Game newGame = new Game(awayTeamName, homeTeamName, new Date(), new Date());
 
