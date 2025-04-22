@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class CustomerRequestTest {
 
-    private CustomerRequest request;
+    private Request request;
     private Map<String, Object> attributes;
 
     /**
@@ -30,7 +30,7 @@ class CustomerRequestTest {
         attributes.put("Name", "John");
         attributes.put("Age", 30);
 
-        request = new CustomerRequest("ModifyUser", 1, attributes);
+        request = new Request("ModifyUser", 1, attributes);
     }
 
     /**
@@ -90,7 +90,7 @@ class CustomerRequestTest {
     @Test
     void testToJSON() throws Exception {
         // Convert the request object to a JSON string
-        String json = CustomerRequest.toJSON(request);
+        String json = Request.toJSON(request);
 
         // Create the expected JSON string using the manually created object
         String expectedJson = """
@@ -119,7 +119,7 @@ class CustomerRequestTest {
                     }
                 }
                 """;
-        CustomerRequest deserializedRequest = CustomerRequest.fromJSON(json);
+        Request deserializedRequest = Request.fromJSON(json);
         assertNotNull(deserializedRequest, "The deserialized CustomerRequest object should not be null.");
         assertEquals("ModifyUser", deserializedRequest.getRequestType(), "The deserialized request type should be 'ModifyUser'.");
         assertEquals(1, deserializedRequest.getId(), "The deserialized request ID should be 1.");

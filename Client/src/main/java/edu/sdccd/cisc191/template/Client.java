@@ -2,8 +2,10 @@ package edu.sdccd.cisc191.template;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.scene.*;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
@@ -14,13 +16,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
-import javax.security.auth.callback.Callback;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
-import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -37,14 +34,9 @@ public class Client extends Application {
      * The socket used to connect to the server.
      */
     private Socket clientSocket;
-    /**
-     * The output stream for sending requests to the server.
-     */
-    private PrintWriter out;
-    /**
-     * The input stream for receiving responses from the server.
-     */
-    private BufferedReader in;
+
+    private ObjectOutputStream out; // The output stream for sending requests to the server.
+    private ObjectInputStream in; // The input stream for receiving responses from the server.
 
     // --- Socket and Request Methods ---
     /**
@@ -56,8 +48,9 @@ public class Client extends Application {
      */
     public void startConnection(String ip, int port) throws IOException {
         clientSocket = new Socket(ip, port);
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        out = new ObjectOutputStream(clientSocket.getOutputStream());
+        in = new ObjectInputStream(clientSocket.getInputStream());
     }
 
     /**
@@ -65,68 +58,46 @@ public class Client extends Application {
      *
      * Never call this method directly, call one of its wrappers for safe usage.
      *
-     * @param requestType the type of request to send. For example: "Game", "User", "GetSize".
-     * @param id          the identifier for the requested data.
-     * @param returnType  the expected class type of the response.
      * @param <T>         the type parameter corresponding to the expected response type.
      * @return the response from the server cast to the specified type.
      * @throws Exception if an error occurs during the request.
      */
-    private <T> T sendRequest(String requestType, int id, Class<T> returnType) throws Exception {
-        out.println(CustomerRequest.toJSON(new CustomerRequest(requestType, id)));
-        String response = in.readLine();
+    private <T> T sendRequest(Request request, Class<T> responseType) throws Exception {
+        // Write request
+        out.writeObject(request);
+        out.flush();
 
-        if (returnType == Game.class) {
-            return returnType.cast(Game.fromJSON(response));
-        } else if (returnType == User.class) {
-            return returnType.cast(User.fromJSON(response));
-        } else if (returnType == Integer.class) {
-            return returnType.cast(Integer.parseInt(response));
+        // read back whatever the server sent
+        Object raw = in.readObject();
+        System.out.println("Raw: " + raw);
+        System.out.println("Raw type: " + raw.getClass());
+        System.out.println("Response Type: " + responseType);
+
+        // cast into the expected type
+
+        try {
+            return responseType.cast(raw);
         }
-        else {
-            throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
+        catch (ClassCastException e) {
+            System.out.println("ClassCastException, could not cast " + raw.getClass() + " to " + responseType);
         }
+
+        return null;
+
     }
 
-    /**
-     * Sends a modification request to the server with specified attributes and returns the updated object.
-     *
-     * Never call this method directly, call one of its wrappers for safe usage.
-     *
-     * @param requestType        the type of request, for example: "ModifyUser".
-     * @param id                 the identifier for the user to modify.
-     * @param modifiedAttributes a map containing the fields and their new values.
-     * @param returnType         the expected class type of the response.
-     * @param <T>                the type parameter corresponding to the expected response type.
-     * @return the updated object from the server cast to the specified type.
-     * @throws Exception if an error occurs during the request.
-     */
-    private <T> T sendRequest(String requestType, int id, Map<String, Object> modifiedAttributes, Class<T> returnType) throws Exception {
-        out.println(CustomerRequest.toJSON(new CustomerRequest(requestType, id, modifiedAttributes)));
-        String response = in.readLine();
-
-        if (returnType == Game.class) {
-            return returnType.cast(Game.fromJSON(response));
-        } else if (returnType == User.class) {
-            return returnType.cast(User.fromJSON(response));
-        } else {
-            throw new IllegalArgumentException("Unsupported return type: " + returnType.getName());
-        }
-    }
-
-    /**
-     * Stops the connection by closing the input and output streams as well as the socket.
-     *
-     * @throws IOException if an I/O error occurs when closing the connection.
-     */
+    // Update stopConnection to check for null before closing resources:
     public void stopConnection() throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
+        if (in != null) {
+            in.close();
+        }
+        if (out != null) {
+            out.close();
+        }
+        if (clientSocket != null) {
+            clientSocket.close();
+        }
     }
-
-    // -- Request Wrappers ---
-
     /**
      * Retrieves a game object from the server by the specified ID.
      *
@@ -134,63 +105,27 @@ public class Client extends Application {
      * @return the Game object if found; null otherwise.
      * @throws IOException if an I/O error occurs during the request.
      */
-    public Game gameGetRequest(int id) throws IOException {
+    public Game getRequest(int id, String type) throws IOException {
         Client client = new Client();
+
         try {
             client.startConnection("localhost", 4444);
-            System.out.println("Sending gameGetRequest with ID: " + id);
-            return client.sendRequest("Game", id, Game.class);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
 
-        stopConnection();
-        return null;
-    }
+            // build a request object
+            Request req = new Request("Game", id);
 
-    /**
-     * Retrieves a user object from the server by the specified ID.
-     *
-     * @param id the identifier of the user to retrieve.
-     * @return the User object if found; null otherwise.
-     * @throws IOException if an I/O error occurs during the request.
-     */
-    public User userGetRequest(int id) throws IOException {
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending userRequest with ID: " + id);
-            return client.sendRequest("User", id, User.class);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        stopConnection();
-        return null;
-    }
-
-    /**
-     * Retrieves the size of a resource (e.g., number of games or users) from the server.
-     *
-     * @param id the identifier for the resource size request.
-     *           (1 for gameDatabase and 2 for userDatabase)
-     * @return the size of the requested resource; -1 if an error occurs.
-     * @throws IOException if an I/O error occurs during the request.
-     */
-    public int getSizeRequest(int id) throws IOException {
-
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending getSizeRequest with ID: " + id);
-            return client.sendRequest("GetSize", id, Integer.class);
+            return client.sendRequest(req, Game.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                client.stopConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        stopConnection();
-        return -1;
-    };
+    }
 
     /**
      * Modifies a user on the server with the provided attributes and returns the updated user.
@@ -206,7 +141,7 @@ public class Client extends Application {
         try {
             client.startConnection("localhost", 4444);
             System.out.println("Sending userModifyRequest with ID: " + id);
-            return client.sendRequest("ModifyUser", id, modifiedAttributes, User.class);
+            return client.sendRequest(new Request("ModifyUser", id, modifiedAttributes), User.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -224,36 +159,38 @@ public class Client extends Application {
      * @param stage the Stage on which the TableView is displayed.
      * @return a TableView populated with game data.
      */
-    private TableView<Game> createGameTableView(Game[] games, Stage stage) {
-        TableView<Game> tableView = new TableView<>();
+    private <T extends Game> TableView<T> createGameTableView(T[] games, Stage stage) {
+        TableView<T> tableView = new TableView<>();
 
         // Column for Team 1
-        TableColumn<Game, String> team1Col = new TableColumn<>("Team 1");
+        TableColumn<T, String> team1Col = new TableColumn<>("Team 1");
         team1Col.setCellValueFactory(new PropertyValueFactory<>("team1"));
         tableView.getColumns().add(team1Col);
+        team1Col.setPrefWidth(150);
         team1Col.setResizable(false);
         team1Col.setSortable(false);
         team1Col.setReorderable(false);
 
         // Column for Team 2
-        TableColumn<Game, String> team2Col = new TableColumn<>("Team 2");
+        TableColumn<T, String> team2Col = new TableColumn<>("Team 2");
         team2Col.setCellValueFactory(new PropertyValueFactory<>("team2"));
         tableView.getColumns().add(team2Col);
         team2Col.setResizable(false);
+        team2Col.setPrefWidth(150);
         team2Col.setSortable(false);
         team2Col.setReorderable(false);
 
         // Column for Date
-        TableColumn<Game, String> dateCol = new TableColumn<>("Date");
+        TableColumn<T, String> dateCol = new TableColumn<>("Date");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("dateClean"));
-        dateCol.setPrefWidth(150);
+        dateCol.setPrefWidth(175);
         tableView.getColumns().add(dateCol);
         dateCol.setResizable(false);
         dateCol.setSortable(false);
         dateCol.setReorderable(false);
 
         // Column for Team 1 Odds
-        TableColumn<Game, String> team1OddCol = new TableColumn<>("Team 1 Odds");
+        TableColumn<T, String> team1OddCol = new TableColumn<>("Team 1 Odds");
         team1OddCol.setCellValueFactory(new PropertyValueFactory<>("team1Odd"));
         tableView.getColumns().add(team1OddCol);
         team1OddCol.setResizable(false);
@@ -261,14 +198,14 @@ public class Client extends Application {
         team1OddCol.setReorderable(false);
 
         // Button column for betting on Team 1
-        TableColumn<Game, Void> bet1Column = new TableColumn<>("Bet");
-        bet1Column.setCellFactory(column -> new TableCell<Game, Void>() {
+        TableColumn<T, Void> bet1Column = new TableColumn<>("Bet");
+        bet1Column.setCellFactory(column -> new TableCell<T, Void>() {
             private final Button betButton = new Button("Bet");
             {
                 betButton.setOnAction(event -> {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         try {
                             new BetView().betView(stage, game, game.getTeam1());
                         } catch (Exception e) {
@@ -286,7 +223,7 @@ public class Client extends Application {
                 } else {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         betButton.setDisable(user.checkBet(game));
                     }
                     setGraphic(betButton);
@@ -299,7 +236,7 @@ public class Client extends Application {
         bet1Column.setReorderable(false);
 
         // Column for Team 2 Odds
-        TableColumn<Game, String> team2OddCol = new TableColumn<>("Team 2 Odds");
+        TableColumn<T, String> team2OddCol = new TableColumn<>("Team 2 Odds");
         team2OddCol.setCellValueFactory(new PropertyValueFactory<>("team2Odd"));
         tableView.getColumns().add(team2OddCol);
         team2OddCol.setResizable(false);
@@ -307,14 +244,14 @@ public class Client extends Application {
         team2OddCol.setReorderable(false);
 
         // Button column for betting on Team 2
-        TableColumn<Game, Void> bet2Column = new TableColumn<>("Bet");
-        bet2Column.setCellFactory(column -> new TableCell<Game, Void>() {
+        TableColumn<T, Void> bet2Column = new TableColumn<>("Bet");
+        bet2Column.setCellFactory(column -> new TableCell<T, Void>() {
             private final Button betButton = new Button("Bet");
             {
                 betButton.setOnAction(event -> {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         try {
                             new BetView().betView(stage, game, game.getTeam2());
                         } catch (Exception e) {
@@ -332,7 +269,7 @@ public class Client extends Application {
                 } else {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
-                        Game game = getTableView().getItems().get(index);
+                        T game = getTableView().getItems().get(index);
                         betButton.setDisable(user.checkBet(game));
                     }
                     setGraphic(betButton);
@@ -444,13 +381,19 @@ public class Client extends Application {
      * @return an array of Game objects.
      * @throws IOException if an I/O error occurs during retrieval.
      */
-    private Game[] getGames() throws IOException {
-        int size = getSizeRequest(1);
+    private Game[] getGames() throws Exception {
+        int size = sendRequest(new Request("GetSize", 1), Integer.class);
         Game[] games = new Game[size];
         for (int i = 0; i < size; i++) {
-            games[i] = this.gameGetRequest(i);
+            games[i] = sendRequest(new Request("Game", 1), Game.class);
         }
         return games;
+    }
+
+    private ArrayList<Game> getBasketballGames() throws Exception {
+        ArrayList<Game> basketballGames;
+        basketballGames = sendRequest(new Request("Basketball", 1), ArrayList.class);
+        return basketballGames;
     }
 
 
@@ -461,10 +404,9 @@ public class Client extends Application {
      *
      * @param args command-line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         launch();// Run this Application.
     }
-
 
     @Override
     /**
@@ -476,35 +418,26 @@ public class Client extends Application {
      * @throws Exception if an error occurs during initialization.
      */
     public void start(Stage stage) throws Exception {
+//        System.out.println(getSizeRequest(1));
+        startConnection("localhost", 4444);
+        System.out.println(getBasketballGames());
+        // Test modification of user
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("Name", "John");
+        attributes.put("Money", 9999);
+
+        System.out.println(userModifyRequest(2, attributes));
+
+        Game[] response = getGames();
+        System.out.println(response);
 
         // Build the main layout
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(20));
 
-        // Retrieve game data (and user data if needed)
-        Game[] games = getGames();
-        // Note: The sample user array in the original code is replaced by the static "user" field.
-        // The below array is never used, but is shown as a demonstration of potential code
-        // (We never used it because the leaderboard designs we thought up looked ugly).
-        User[] users = new User[]{
-                userGetRequest(0),
-                userGetRequest(1),
-                userGetRequest(2),
-                userGetRequest(3),
-                userGetRequest(4),
-        };
-
-        // Example modification of user
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("Name", "John");
-        attributes.put("Money", 9999);
-        // Serialize Bet object into JSON string before sending to server
-        attributes.put("addBet", Bet.toJSON(new Bet(games[0], 100, games[0].getTeam1())));
-        userModifyRequest(2, attributes);
-        // --- END EXAMPLE CODE ---
 
         // Create UI components
-        TableView<Game> gameTable = createGameTableView(games, stage);
+        TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
         HBox userInfoBox = createUserInfoBox();
         HBox betListBox = createBetListBox(stage);
 
@@ -514,7 +447,7 @@ public class Client extends Application {
         borderPane.setBottom(betListBox);
 
         // Create and set the scene
-        Scene scene = new Scene(borderPane, 800, 800);
+        Scene scene = new Scene(borderPane, 1000, 800);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Marauder Bets");

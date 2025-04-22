@@ -3,6 +3,7 @@ package edu.sdccd.cisc191.template;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
  *
  * @author Andy Ly, Julian Garcia
  */
-public class Game {
+public class Game implements Serializable {
 
     private String team1;
     private String team2;

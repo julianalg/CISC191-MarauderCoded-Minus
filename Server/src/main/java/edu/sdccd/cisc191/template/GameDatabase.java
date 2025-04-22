@@ -2,11 +2,13 @@ package edu.sdccd.cisc191.template;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.io.FileWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -30,7 +32,7 @@ public class GameDatabase {
     private static final List<Game> gameDatabase = Collections.synchronizedList(new ArrayList<>());
 
     // File path for storing game data
-    private static final String FILE_PATH = "Server/Resources/games.json";
+    private static final URL FILE_PATH = GameDatabase.class.getResource("games.json");
 
     /**
      * Private constructor to prevent instantiation outside the class.
@@ -58,29 +60,34 @@ public class GameDatabase {
      * it with default data if the file is not found.
      */
     void loadOrInitializeDatabase() {
-        File file = new File(FILE_PATH);
+        File file = new File(FILE_PATH.getFile());
         if (file.exists()) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
+                // Register subtypes explicitly if necessary (optional if using annotations)
                 CollectionType listType = objectMapper.getTypeFactory()
                         .constructCollectionType(List.class, Game.class);
                 List<Game> games = objectMapper.readValue(file, listType);
+
                 gameDatabase.clear();
                 gameDatabase.addAll(games);
                 System.out.println("GameDatabase loaded from file.");
+                //this.updateDatabaseFromAPI();
+                //System.out.println("GameDatabase updated from API.");
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Failed to load GameDatabase from file. Initializing with default data.");
                 initializeDefaultGames();
                 saveToFile();
-            }
+            } //catch (ParseException e) {
+                //throw new RuntimeException(e);
+            //}
         } else {
             System.out.println("GameDatabase file not found. Initializing with default data.");
             initializeDefaultGames();
             saveToFile();
         }
     }
-
     /**
      * Initializes the game database with default data.
      */
@@ -105,13 +112,20 @@ public class GameDatabase {
      * Saves the current state of the game database to a JSON file.
      */
     void saveToFile() {
-        try (Writer writer = new FileWriter(FILE_PATH)) {
+        try (Writer writer = new FileWriter(FILE_PATH.getFile())) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(writer, gameDatabase);
             System.out.println("GameDatabase saved to file.");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Updates the game database from the API
+     */
+    void updateDatabaseFromAPI() throws ParseException {
+
     }
 
     /**
@@ -126,9 +140,9 @@ public class GameDatabase {
     /**
      * Gets the size of the game database.
      *
-     * @return The size of the database as a  String .
+     * @return The size of the database as an Int .
      */
-    public synchronized String getSize() {
-        return String.valueOf(gameDatabase.size());
+    public synchronized int getSize() {
+        return gameDatabase.size();
     }
 }

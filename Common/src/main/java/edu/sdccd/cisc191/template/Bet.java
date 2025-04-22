@@ -3,6 +3,7 @@ package edu.sdccd.cisc191.template;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Random;
  * @see Game
  * @see User
  */
-public class Bet {
+public class Bet implements Serializable {
 
     private Game game;
     private String betTeam;

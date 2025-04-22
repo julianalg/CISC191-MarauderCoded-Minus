@@ -24,12 +24,14 @@ public class Server {
      *
      * @param args Command-line arguments (not used in this application).
      */
+
     public static void main(String[] args) {
         ServerSocket serverSocket = null;
 
         try {
             // Initialize the server to listen on port 4444 with a backlog of 4096.
             serverSocket = new ServerSocket(4444, 4096);
+
             System.out.println("Server started on port 4444");
 
             // Enable address reuse to allow multiple connections from the same host.
