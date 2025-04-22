@@ -420,7 +420,7 @@ public class Client extends Application {
     public void start(Stage stage) throws Exception {
 //        System.out.println(getSizeRequest(1));
         startConnection("localhost", 4444);
-        //System.out.println(getBasketballGames());
+        System.out.println(getBasketballGames());
         // Test modification of user
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("Name", "John");
@@ -437,7 +437,7 @@ public class Client extends Application {
 
 
         // Create UI components
-        /*TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
+        TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
         HBox userInfoBox = createUserInfoBox();
         HBox betListBox = createBetListBox(stage);
 
@@ -451,7 +451,7 @@ public class Client extends Application {
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Marauder Bets");
-        stage.show(); */
+        stage.show();
     }
 } //end class Client
 
