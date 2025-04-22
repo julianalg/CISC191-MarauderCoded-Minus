@@ -62,7 +62,7 @@ public class Client extends Application {
      * @return the response from the server cast to the specified type.
      * @throws Exception if an error occurs during the request.
      */
-    private <T> T sendRequest(Request request, Class<T> responseType) throws Exception {
+    <T> T sendRequest(Request request, Class<T> responseType) throws Exception {
         // Write request
         out.writeObject(request);
         out.flush();
