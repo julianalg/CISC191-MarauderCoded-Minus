@@ -35,7 +35,7 @@ public class BotBase {
     }
 
     // Simulates placing a random bet
-    private void placeRandomBet() {
+    private void placeRandomBet(Game game) {
         double betAmt = 10 + random.nextInt(91); // $10 to $100
         double winAmt = betAmt * (1.5 + random.nextDouble()); // random odds between 1.5x to 2.5x
 
@@ -47,8 +47,13 @@ public class BotBase {
             winOddsOvertime[i][1] = currentTime - (5 - i) * 60; // timestamps spaced 1 min apart
         }
 
+        int teamSelect = (Math.random() <= 0.5) ? 1 : 2;
+        String team;
+
+        if (teamSelect == 1) team = game.getTeam1(); else team = game.getTeam2();
+
         // Create a new Bet object using the updated constructor, casting the double to int
-        Bet newBet = new Bet((int) betAmt, (int) winAmt, winOddsOvertime);
+        Bet newBet = new Bet(game, (int) betAmt, team);
         System.out.println("Bot placed bet: " + newBet);
     }
 }
