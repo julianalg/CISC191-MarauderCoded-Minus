@@ -2,6 +2,7 @@ package edu.sdccd.cisc191.template;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,25 +64,30 @@ public class GameDatabase {
         if (file.exists()) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
+                // Register subtypes explicitly if necessary (optional if using annotations)
                 CollectionType listType = objectMapper.getTypeFactory()
                         .constructCollectionType(List.class, Game.class);
                 List<Game> games = objectMapper.readValue(file, listType);
+
                 gameDatabase.clear();
                 gameDatabase.addAll(games);
                 System.out.println("GameDatabase loaded from file.");
+                //this.updateDatabaseFromAPI();
+                //System.out.println("GameDatabase updated from API.");
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Failed to load GameDatabase from file. Initializing with default data.");
                 initializeDefaultGames();
                 saveToFile();
-            }
+            } //catch (ParseException e) {
+                //throw new RuntimeException(e);
+            //}
         } else {
             System.out.println("GameDatabase file not found. Initializing with default data.");
             initializeDefaultGames();
             saveToFile();
         }
     }
-
     /**
      * Initializes the game database with default data.
      */
@@ -116,6 +122,13 @@ public class GameDatabase {
     }
 
     /**
+     * Updates the game database from the API
+     */
+    void updateDatabaseFromAPI() throws ParseException {
+
+    }
+
+    /**
      * Retrieves an unmodifiable view of the game database.
      *
      * @return An unmodifiable List of games.
@@ -127,9 +140,9 @@ public class GameDatabase {
     /**
      * Gets the size of the game database.
      *
-     * @return The size of the database as a  String .
+     * @return The size of the database as an Int .
      */
-    public synchronized String getSize() {
-        return String.valueOf(gameDatabase.size());
+    public synchronized int getSize() {
+        return gameDatabase.size();
     }
 }

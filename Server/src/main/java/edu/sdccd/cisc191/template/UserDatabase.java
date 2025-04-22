@@ -123,7 +123,7 @@ public class UserDatabase {
      *
      * @return The size of the database as a String .
      */
-    public synchronized String getSize() {
-        return String.valueOf(userDatabase.size());
+    public synchronized int getSize() {
+        return userDatabase.size();
     }
 }
