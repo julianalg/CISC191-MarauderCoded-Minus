@@ -1,9 +1,7 @@
 package edu.sdccd.cisc191.template;
 
-import edu.sdccd.cisc191.template.API.APIGetter;
 import edu.sdccd.cisc191.template.API.BasketballGetter;
-import edu.sdccd.cisc191.template.API.FootballGetter;
-import org.json.simple.parser.ParseException;
+import edu.sdccd.cisc191.template.API.BaseballGetter;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -122,13 +120,13 @@ class ClientHandler implements Runnable {
         return response;
     }
 
-    private static ArrayList<Game> getBasketball(Request request) throws ParseException {
+    private static ArrayList<Game> getBasketball(Request request) throws Exception {
         BasketballGetter a = new BasketballGetter();
         return a.getGames();
     }
 
-    private static ArrayList<Game> getFootball(Request request) throws ParseException {
-        FootballGetter a = new FootballGetter();
+    private static ArrayList<Game> getFootball(Request request) throws Exception {
+        BaseballGetter a = new BaseballGetter();
         return a.getGames();
     }
 

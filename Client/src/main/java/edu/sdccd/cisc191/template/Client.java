@@ -62,7 +62,7 @@ public class Client extends Application {
      * @return the response from the server cast to the specified type.
      * @throws Exception if an error occurs during the request.
      */
-    private <T> T sendRequest(Request request, Class<T> responseType) throws Exception {
+    <T> T sendRequest(Request request, Class<T> responseType) throws Exception {
         // Write request
         out.writeObject(request);
         out.flush();
@@ -97,6 +97,34 @@ public class Client extends Application {
         if (clientSocket != null) {
             clientSocket.close();
         }
+    }
+    /**
+     * Retrieves a game object from the server by the specified ID.
+     *
+     * @param id the identifier of the game to retrieve.
+     * @return the Game object if found; null otherwise.
+     * @throws IOException if an I/O error occurs during the request.
+     */
+    public Game getRequest(int id, String type) throws IOException {
+        Client client = new Client();
+
+        try {
+            client.startConnection("localhost", 4444);
+
+            // build a request object
+            Request req = new Request("Game", id);
+
+            return client.sendRequest(req, Game.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                client.stopConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     /**
@@ -365,20 +393,8 @@ public class Client extends Application {
     private ArrayList<Game> getBasketballGames() throws Exception {
         ArrayList<Game> basketballGames;
         basketballGames = sendRequest(new Request("Basketball", 1), ArrayList.class);
-        System.out.println("Basketball games list: " + basketballGames);
-        System.out.println(basketballGames.getClass());
         return basketballGames;
     }
-
-    private ArrayList<Game> getFootballGames() throws Exception {
-        ArrayList<Game> footballGames;
-        footballGames = sendRequest(new Request("Football", 1), ArrayList.class);
-        System.out.println("Football games list: " + footballGames);
-        System.out.println(footballGames.getClass());
-        return footballGames;
-    }
-
-
 
 
     /**
@@ -403,38 +419,38 @@ public class Client extends Application {
     public void start(Stage stage) throws Exception {
 //        System.out.println(getSizeRequest(1));
         startConnection("localhost", 4444);
-        System.out.println(getFootballGames());
+        System.out.println(getBasketballGames());
         // Test modification of user
-//        Map<String, Object> attributes = new HashMap<>();
-//        attributes.put("Name", "John");
-//        attributes.put("Money", 9999);
-//
-//        System.out.println(userModifyRequest(2, attributes));
-//
-//        Game[] response = getGames();
-//        System.out.println(response);
-//
-//        // Build the main layout
-//        BorderPane borderPane = new BorderPane();
-//        borderPane.setPadding(new Insets(20));
-//
-//
-//        // Create UI components
-//        TableView<Game> gameTable = createGameTableView(getBasketballGames(), stage);
-//        HBox userInfoBox = createUserInfoBox();
-//        HBox betListBox = createBetListBox(stage);
-//
-//        // Assemble components into the BorderPane
-//        borderPane.setCenter(gameTable);
-//        borderPane.setTop(userInfoBox);
-//        borderPane.setBottom(betListBox);
-//
-//        // Create and set the scene
-//        Scene scene = new Scene(borderPane, 1000, 800);
-//        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-//        stage.setScene(scene);
-//        stage.setTitle("Marauder Bets");
-//        stage.show();
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("Name", "John");
+        attributes.put("Money", 9999);
+
+        System.out.println(userModifyRequest(2, attributes));
+
+        Game[] response = getGames();
+        System.out.println(response);
+
+        // Build the main layout
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(20));
+
+
+        // Create UI components
+        TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
+        HBox userInfoBox = createUserInfoBox();
+        HBox betListBox = createBetListBox(stage);
+
+        // Assemble components into the BorderPane
+        borderPane.setCenter(gameTable);
+        borderPane.setTop(userInfoBox);
+        borderPane.setBottom(betListBox);
+
+        // Create and set the scene
+        Scene scene = new Scene(borderPane, 1000, 800);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        stage.setScene(scene);
+        stage.setTitle("Marauder Bets");
+        stage.show();
     }
 } //end class Client
 

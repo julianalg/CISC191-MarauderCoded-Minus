@@ -1,7 +1,6 @@
 package edu.sdccd.cisc191.template.API;
 
 import edu.sdccd.cisc191.template.Game;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
@@ -10,18 +9,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
 
-public class BasketballGetter extends APIGetter {
-    public BasketballGetter() {
-        apiURL = "https://v1.basketball.api-sports.io/games?date=";
-        leagueName = "NBA";
-    }
-
-    public static void main(String[] args) throws Exception {
-        BasketballGetter basketballGetter = new BasketballGetter();
-        System.out.println(basketballGetter.getGames());
+public class BaseballGetter extends APIGetter{
+    public BaseballGetter() {
+        apiURL = "https://v1.baseball.api-sports.io/games?date=";
+        leagueName = "MLB";
     }
 
     @Override
@@ -30,10 +22,9 @@ public class BasketballGetter extends APIGetter {
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
 
-        ArrayList<Game> bbGames = new ArrayList<>();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(requestURI)                  // <-- pass your concatenated URI here
-                .header("x-rapidapi-host", "v1.basketball.api-sports.io")
+                .header("x-rapidapi-host", "v1.baseball.api-sports.io")
                 .header("x-rapidapi-key", apiKey)
                 .GET()
                 .build();
@@ -48,6 +39,12 @@ public class BasketballGetter extends APIGetter {
                 .join().toString(); // Waits for the async call to complete
 
         return response;
+
+    }
+
+    public static void main(String[] args) throws Exception {
+        BaseballGetter footballGetter = new BaseballGetter();
+        System.out.println(footballGetter.getGames());
     }
 
 }

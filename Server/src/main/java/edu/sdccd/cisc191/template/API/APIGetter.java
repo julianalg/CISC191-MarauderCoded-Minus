@@ -1,9 +1,6 @@
 package edu.sdccd.cisc191.template.API;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -17,17 +14,11 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public abstract class APIGetter {
-    String apiURL;
-    String leagueName;
+     String apiURL;
+     String leagueName;
     public APIGetter() {}
 
-
-    public ArrayList<Game> getGames() throws ParseException {
-        // Create an HttpClient instance
-        ArrayList<Game> bbGames = new ArrayList<>();
-        HttpClient client = HttpClient.newHttpClient();
-        String apiKey = System.getenv("API_KEY");
-
+    public String getDateAsString() {
         Date today = new Date(); // current date
         LocalDate localDate = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
@@ -37,32 +28,29 @@ public abstract class APIGetter {
         LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
-        System.out.println(tomorrowArg);
+        return tomorrowArg;
+    }
 
-        String fullUrl     = apiURL + tomorrowArg;
+    public ArrayList<Game> getGames() throws Exception {
+        String fullUrl     = apiURL + getDateAsString();
         URI   requestURI  = URI.create(fullUrl);
-        System.out.println(requestURI);  // prints: https://v1.basketball.api‑sports.io/games?date=2025‑04‑22
+        System.out.println(requestURI);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(requestURI)                  // <-- pass your concatenated URI here
-                .header("x-rapidapi-host", "v1.basketball.api-sports.io")
-                .header("x-rapidapi-key", apiKey)
-                .GET()
-                .build();
-
-        // Make an asynchronous request similar to using JavaScript promises
-        String response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .exceptionally(e -> {
-                    System.out.println("Error: " + e.getMessage());
-                    return null;
-                })
-                .join().toString(); // Waits for the async call to complete
+        String response = sendRequest(requestURI);
 
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
 
-        System.out.println(leagueName);
+
+        ArrayList<Game> games = parse(json);
+
+        return games;
+    }
+
+    public abstract String sendRequest(URI requestURI) throws Exception;
+
+    public ArrayList<Game> parse(JSONObject json) throws ParseException {
+        ArrayList<Game> games = new ArrayList<>();
 
         for (Object keyObj : json.keySet()) {
             String key = (String) keyObj;
@@ -90,19 +78,12 @@ public abstract class APIGetter {
 
                             Game newGame = new Game(awayTeamName, homeTeamName, new Date(), new Date());
 
-                            bbGames.add(newGame);
+                            games.add(newGame);
                         }
                     }
                 }
             }
         }
-
-        System.out.println(bbGames);
-
-//        List<Game> gdb = GameDatabase.getInstance().getGameDatabase();
-//        gdb.addAll(bbGames);
-//        System.out.println(gdb);
-
-        return bbGames;
+        return games;
     }
-}
+};
