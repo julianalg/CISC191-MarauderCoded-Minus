@@ -83,8 +83,8 @@ public class Game implements Serializable {
         this.startDate = startDate;
         this.endDate = endDate;
 
-        this.team1Odd = Math.round(Math.random() * 100);
-        this.team2Odd = Math.round(Math.random() * 100);
+        team1Odd = Math.round(Math.random() * 100);
+        team2Odd = Math.round(Math.random() * 100);
         this.dateClean = this.getDateClean();
     }
     /**
@@ -131,17 +131,17 @@ public class Game implements Serializable {
         this.team1ProfitFactor = team1PayoutRatio - 1;
         this.team2ProfitFactor = team2PayoutRatio - 1;
 
-        if (team1ProfitFactor >= 1) {
-            this.team1Odd = +(team1ProfitFactor * 100);
-        }
-        else {
+        if (team1ProfitFactor < 1) {
             this.team1Odd = -(100/team1ProfitFactor);
         }
-        if (this.team2ProfitFactor >= 1) {
-            this.team2Odd = +(team2ProfitFactor * 100);
+        else {
+            this.team1Odd = +(team1ProfitFactor * 100);
+        }
+        if (this.team2ProfitFactor < 1) {
+            this.team2Odd = -(100/team2ProfitFactor);
         }
         else {
-            this.team2Odd = -(100/team2ProfitFactor);
+            this.team2Odd = +(team2ProfitFactor * 100);
         }
     }
 
@@ -152,6 +152,7 @@ public class Game implements Serializable {
      */
     @Override
     public String toString() {
+
         return team1 + " vs. " + team2 + " on " + startDate.getMonth() + "/" + startDate.getDate() + "/" + (startDate.getYear() + 1900);
     }
 
@@ -177,8 +178,8 @@ public class Game implements Serializable {
         boolean team2Equals = Objects.equals(this.team2, game.getTeam2());
         boolean startDateEquals = this.startDate.compareTo(game.getStartDate()) == 0;
         boolean endDateEquals = this.endDate.compareTo(game.getEndDate()) == 0;
-        boolean team1OddEquals = Math.abs(this.team1Odd - game.getTeam1Odd()) < 0.0001;
-        boolean team2OddEquals = Math.abs(this.team2Odd - game.getTeam2Odd()) < 0.0001;
+        boolean team1OddEquals = Math.abs(team1Odd - getTeam1Odd()) < 0.0001;
+        boolean team2OddEquals = Math.abs(team2Odd - getTeam2Odd()) < 0.0001;
 
         return team1Equals && team2Equals && startDateEquals && endDateEquals && team1OddEquals && team2OddEquals;
     }
@@ -245,6 +246,8 @@ public class Game implements Serializable {
      * @return A string describing the start and end dates.
      */
     public String getDateClean() {
+        //TODO use SimpleDateFormat to construct a clean date string for start and end dates
+
         return (startDate.getMonth() + 1) + "/" + startDate.getDate() + "/" + (startDate.getYear() + 1900) + " - " +
                 (endDate.getMonth() + 1) + "/" + endDate.getDate() + "/" + (endDate.getYear() + 1900);
     }
