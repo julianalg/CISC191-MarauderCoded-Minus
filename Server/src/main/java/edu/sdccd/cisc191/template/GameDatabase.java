@@ -102,8 +102,7 @@ public class GameDatabase {
                     .nextLong(d1.getTime(), d2.getTime()));
             gameDatabase.add(new Game(
                     String.format("Team %d", count),
-                    String.format("Team %d", count + 1), new Date(),
-                    randomDate));
+                    String.format("Team %d", count + 1), new Date(),0, 0));
             count += 2;
         }
     }

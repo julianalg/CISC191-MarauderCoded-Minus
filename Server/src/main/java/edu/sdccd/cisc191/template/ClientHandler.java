@@ -1,6 +1,7 @@
 package edu.sdccd.cisc191.template;
 
-import org.json.simple.parser.ParseException;
+import edu.sdccd.cisc191.template.API.BasketballGetter;
+import edu.sdccd.cisc191.template.API.BaseballGetter;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -77,6 +78,9 @@ class ClientHandler implements Runnable {
                     case "Basketball":
                         response = (request.getId() >= 0) ? getBasketball(request) : new ArrayList<Game>();
                         break;
+                    case "Baseball":
+                        response = (request.getId() >= 0) ? getBaseball(request) : new ArrayList<Game>();
+                        break;
                     default:
                         response = new IllegalArgumentException("Unknown request type");
                 }
@@ -116,8 +120,14 @@ class ClientHandler implements Runnable {
         return response;
     }
 
-    private static ArrayList<Game> getBasketball(Request request) throws ParseException {
-        return APIGetter.getBasketballGames();
+    private static ArrayList<Game> getBasketball(Request request) throws Exception {
+        BasketballGetter a = new BasketballGetter();
+        return a.getGames();
+    }
+
+    private static ArrayList<Game> getBaseball(Request request) throws Exception {
+        BaseballGetter a = new BaseballGetter();
+        return a.getGames();
     }
 
     /**
