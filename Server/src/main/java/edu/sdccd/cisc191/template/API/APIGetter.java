@@ -76,7 +76,7 @@ public abstract class APIGetter {
 
                             System.out.println(awayTeamName + homeTeamName);
 
-                            Game newGame = new Game(awayTeamName, homeTeamName, new Date(), new Date());
+                            Game newGame = new Game(awayTeamName, homeTeamName, new Date(), 0, 0);
 
                             games.add(newGame);
                         }

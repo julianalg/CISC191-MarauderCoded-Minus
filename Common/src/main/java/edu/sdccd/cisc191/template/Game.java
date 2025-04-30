@@ -20,8 +20,7 @@ public class Game implements Serializable {
 
     private String team1;
     private String team2;
-    private Date startDate;
-    private Date endDate;
+    private Date date;
     private String dateClean;
     private static double team1Odd;
     private static double team2Odd;
@@ -70,80 +69,26 @@ public class Game implements Serializable {
     }
 
     /**
-     * Creates a  Game  object with mock betting odds.
-     *
-     * @param t1 The name of team 1.
-     * @param t2 The name of team 2.
-     * @param startDate The start date of the game.
-     * @param endDate The end date of the game.
-     */
-    public Game(String t1, String t2, Date startDate, Date endDate) {
-        this.team1 = t1;
-        this.team2 = t2;
-        this.startDate = startDate;
-        this.endDate = endDate;
-
-        this.team1Odd = Math.round(Math.random() * 100);
-        this.team2Odd = Math.round(Math.random() * 100);
-        this.dateClean = this.getDateClean();
-    }
-    /**
      * Creates a  Game  object with betting odds loaded from an API.
      *
      * Does not calculate any odds.
      *
      * @param t1 The name of team 1.
      * @param t2 The name of team 2.
-     * @param startDate The start date of the game.
-     * @param endDate The end date of the game.
+     * @param date The date of the game.
      * @param team1Odd The odds for team 1.
      * @param team2Odd The odds for team 2.
      */
-    public Game(String t1, String t2, Date startDate, Date endDate, double team1Odd, double team2Odd) {
+    public Game(String t1, String t2, Date date, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.date = date;
 
         this.team1Odd = team1Odd;
         this.team2Odd = team2Odd;
         this.dateClean = this.getDateClean();
     }
 
-    /**
-     * Creates a  Game  object with betting odds loaded from an API.
-     *
-     * @param t1 The name of team 1.
-     * @param t2 The name of team 2.
-     * @param startDate The start date of the game.
-     * @param endDate The end date of the game.
-     * @param team1Odd The odds for team 1.
-     * @param team2Odd The odds for team 2.
-     */
-    public Game(String t1, String t2, Date startDate, Date endDate, double team1Odd, double team2Odd, double pool) {
-        this.team1Wager = 80;
-        this.team2Wager = 20;
-        this.betPool = team1Wager + team2Wager;
-
-        this.team1PayoutRatio = betPool / team1Wager;
-        this.team2PayoutRatio = betPool / team2Wager;
-
-        this.team1ProfitFactor = team1PayoutRatio - 1;
-        this.team2ProfitFactor = team2PayoutRatio - 1;
-
-        if (team1ProfitFactor >= 1) {
-            this.team1Odd = +(team1ProfitFactor * 100);
-        }
-        else {
-            this.team1Odd = -(100/team1ProfitFactor);
-        }
-        if (this.team2ProfitFactor >= 1) {
-            this.team2Odd = +(team2ProfitFactor * 100);
-        }
-        else {
-            this.team2Odd = -(100/team2ProfitFactor);
-        }
-    }
 
     /**
      * Generates a string representation of the game.
@@ -152,7 +97,7 @@ public class Game implements Serializable {
      */
     @Override
     public String toString() {
-        return team1 + " vs. " + team2 + " on " + startDate.getMonth() + "/" + startDate.getDate() + "/" + (startDate.getYear() + 1900);
+        return team1 + " vs. " + team2 + " on " + date.getMonth() + "/" + date.getDate() + "/" + (date.getYear() + 1900);
     }
 
     /**
@@ -175,12 +120,11 @@ public class Game implements Serializable {
 
         boolean team1Equals = Objects.equals(this.team1, game.getTeam1());
         boolean team2Equals = Objects.equals(this.team2, game.getTeam2());
-        boolean startDateEquals = this.startDate.compareTo(game.getStartDate()) == 0;
-        boolean endDateEquals = this.endDate.compareTo(game.getEndDate()) == 0;
+        boolean startDateEquals = this.date.compareTo(game.getDate()) == 0;
         boolean team1OddEquals = Math.abs(this.team1Odd - game.getTeam1Odd()) < 0.0001;
         boolean team2OddEquals = Math.abs(this.team2Odd - game.getTeam2Odd()) < 0.0001;
 
-        return team1Equals && team2Equals && startDateEquals && endDateEquals && team1OddEquals && team2OddEquals;
+        return team1Equals && team2Equals && startDateEquals && team1OddEquals && team2OddEquals;
     }
 
     /**
@@ -224,18 +168,10 @@ public class Game implements Serializable {
      *
      * @return The start date.
      */
-    public Date getStartDate() {
-        return startDate;
+    public Date getDate() {
+        return this.date;
     }
 
-    /**
-     * Gets the end date of the game.
-     *
-     * @return The end date.
-     */
-    public Date getEndDate() {
-        return endDate;
-    }
 
     /**
      * Generates a clean string representation of the date range for the game.
@@ -245,8 +181,8 @@ public class Game implements Serializable {
      * @return A string describing the start and end dates.
      */
     public String getDateClean() {
-        return (startDate.getMonth() + 1) + "/" + startDate.getDate() + "/" + (startDate.getYear() + 1900) + " - " +
-                (endDate.getMonth() + 1) + "/" + endDate.getDate() + "/" + (endDate.getYear() + 1900);
+        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getYear() + 1900);
+
     }
 
     /**
@@ -273,15 +209,7 @@ public class Game implements Serializable {
      * @param startDate The new start date.
      */
     public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+        this.date = startDate;
     }
 
-    /**
-     * Sets the end date of the game.
-     *
-     * @param endDate The new end date.
-     */
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
 }
