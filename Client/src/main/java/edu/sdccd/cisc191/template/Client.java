@@ -109,7 +109,7 @@ public class Client extends Application {
         Client client = new Client();
 
         try {
-            client.startConnection("localhost", 4444);
+            client.startConnection("localhost", 4445);
 
             // build a request object
             Request req = new Request("Game", id);
@@ -396,6 +396,12 @@ public class Client extends Application {
         return basketballGames;
     }
 
+    private ArrayList<Game> getBaseballGames() throws Exception {
+        ArrayList<Game> baseballGames;
+        baseballGames = sendRequest(new Request("Baseball", 1), ArrayList.class);
+        return baseballGames;
+    }
+
 
     /**
      * The main entry point for the client application.
@@ -418,25 +424,31 @@ public class Client extends Application {
      */
     public void start(Stage stage) throws Exception {
 //        System.out.println(getSizeRequest(1));
-        startConnection("localhost", 4444);
+        startConnection("localhost", 4445);
         System.out.println(getBasketballGames());
         // Test modification of user
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("Name", "John");
         attributes.put("Money", 9999);
 
-        System.out.println(userModifyRequest(2, attributes));
+//        System.out.println(userModifyRequest(2, attributes));
 
-        Game[] response = getGames();
-        System.out.println(response);
+//        Game[] response = getGames();
+//        System.out.println(response);
+        // Fetch games
+        ArrayList<Game> basketballGames = getBasketballGames();
+        ArrayList<Game> baseballGames = getBaseballGames();
+
+        ArrayList<Game> allGames = new ArrayList<>();
+        allGames.addAll(basketballGames);
+        allGames.addAll(baseballGames);
 
         // Build the main layout
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(20));
 
-
         // Create UI components
-        TableView<Game> gameTable = createGameTableView(getBasketballGames().toArray(new Game[0]), stage);
+        TableView<Game> gameTable = createGameTableView(allGames.toArray(new Game[0]), stage);
         HBox userInfoBox = createUserInfoBox();
         HBox betListBox = createBetListBox(stage);
 
