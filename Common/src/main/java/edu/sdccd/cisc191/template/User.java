@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 /**
  * Represents a user in the system, holding information about their
  * name, available money, money currently in bets, and a list of active bets.
