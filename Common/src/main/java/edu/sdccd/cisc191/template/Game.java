@@ -185,8 +185,11 @@ public class Game implements Serializable {
      * @return A string describing the start and end dates.
      */
     public String getDateClean() {
-        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getYear() + 1900);
-
+        if (date.getMinutes() <= 9) {
+            return (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getYear() + 1900) + " " + date.getHours() + ":0" + date.getMinutes();
+        } else {
+            return (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getYear() + 1900) + " " + date.getHours() + ":" + date.getMinutes();
+        }
     }
 
     /**

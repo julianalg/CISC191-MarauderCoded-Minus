@@ -1,7 +1,9 @@
 package edu.sdccd.cisc191.template.API;
 
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +58,6 @@ public abstract class APIGetter {
             String key = (String) keyObj;
             Object value = json.get(key);
 
-            System.out.println("Key: " + key + " - Value: " + value);
 
             // Optional: if the value is a nested JSON array or another JSONObject, you can iterate them too.
             if (value instanceof JSONArray) {
@@ -65,6 +66,7 @@ public abstract class APIGetter {
                     // Here, you might need to cast item to a JSONObject if that's what it is.
                     if (item instanceof JSONObject) {
                         JSONObject nestedObj = (JSONObject) item;
+                        System.out.println(nestedObj);
                         // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
@@ -73,10 +75,17 @@ public abstract class APIGetter {
                             JSONObject homeTeam = (JSONObject) teams.get("home");
                             String awayTeamName = awayTeam.get("name").toString();
                             String homeTeamName = homeTeam.get("name").toString();
+                            String date = nestedObj.get("date").toString();
+
+                            OffsetDateTime odt = OffsetDateTime.parse(date);
+                            Instant instant = odt.toInstant();
+                            Date legacyDate = Date.from(instant);
+                            System.out.println(legacyDate);
+
 
                             System.out.println(awayTeamName + homeTeamName);
 
-                            Game newGame = new Game(awayTeamName, homeTeamName, new Date(), sport, 0, 0);
+                            Game newGame = new Game(awayTeamName, homeTeamName, legacyDate, sport, 0, 0);
 
                             games.add(newGame);
                         }
