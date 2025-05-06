@@ -20,6 +20,7 @@ public class Game implements Serializable {
 
     private String team1;
     private String team2;
+    private String sport;
     private Date date;
     private String dateClean;
     private static double team1Odd;
@@ -79,10 +80,11 @@ public class Game implements Serializable {
      * @param team1Odd The odds for team 1.
      * @param team2Odd The odds for team 2.
      */
-    public Game(String t1, String t2, Date date, double team1Odd, double team2Odd) {
+    public Game(String t1, String t2, Date date, String sport, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
         this.date = date;
+        this.sport = sport;
 
         this.team1Odd = team1Odd;
         this.team2Odd = team2Odd;
@@ -153,6 +155,8 @@ public class Game implements Serializable {
     public double getTeam1Odd() {
         return team1Odd;
     }
+
+    public String getSport() { return sport; }
 
     /**
      * Gets the betting odds for team 2.

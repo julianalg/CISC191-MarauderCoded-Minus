@@ -21,7 +21,7 @@ public class BasketballGetter extends APIGetter {
 
     public static void main(String[] args) throws Exception {
         BasketballGetter basketballGetter = new BasketballGetter();
-        System.out.println(basketballGetter.getGames());
+        System.out.println(basketballGetter.getGames("Basketball"));
     }
 
     @Override

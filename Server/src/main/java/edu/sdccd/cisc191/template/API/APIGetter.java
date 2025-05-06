@@ -31,7 +31,7 @@ public abstract class APIGetter {
         return tomorrowArg;
     }
 
-    public ArrayList<Game> getGames() throws Exception {
+    public ArrayList<Game> getGames(String sport) throws Exception {
         String fullUrl     = apiURL + getDateAsString();
         URI   requestURI  = URI.create(fullUrl);
         System.out.println(requestURI);
@@ -42,14 +42,14 @@ public abstract class APIGetter {
         JSONObject json = (JSONObject) parser.parse(response);
 
 
-        ArrayList<Game> games = parse(json);
+        ArrayList<Game> games = parse(json, sport);
 
         return games;
     }
 
     public abstract String sendRequest(URI requestURI) throws Exception;
 
-    public ArrayList<Game> parse(JSONObject json) throws ParseException {
+    public ArrayList<Game> parse(JSONObject json, String sport) throws ParseException {
         ArrayList<Game> games = new ArrayList<>();
 
         for (Object keyObj : json.keySet()) {
@@ -76,7 +76,7 @@ public abstract class APIGetter {
 
                             System.out.println(awayTeamName + homeTeamName);
 
-                            Game newGame = new Game(awayTeamName, homeTeamName, new Date(), 0, 0);
+                            Game newGame = new Game(awayTeamName, homeTeamName, new Date(), sport, 0, 0);
 
                             games.add(newGame);
                         }

@@ -180,6 +180,15 @@ public class Client extends Application {
         team2Col.setSortable(false);
         team2Col.setReorderable(false);
 
+        // Column for Sport
+        TableColumn<T, String> sportCol = new TableColumn<>("Sport");
+        sportCol.setCellValueFactory(new PropertyValueFactory<>("sport"));
+        tableView.getColumns().add(sportCol);
+        sportCol.setResizable(false);
+        sportCol.setSortable(false);
+        sportCol.setReorderable(false);
+
+
         // Column for Date
         TableColumn<T, String> dateCol = new TableColumn<>("Date");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("dateClean"));
@@ -424,7 +433,7 @@ public class Client extends Application {
      */
     public void start(Stage stage) throws Exception {
 //        System.out.println(getSizeRequest(1));
-        startConnection("localhost", 4445);
+        startConnection("localhost", 4444);
         System.out.println(getBasketballGames());
         // Test modification of user
         Map<String, Object> attributes = new HashMap<>();
