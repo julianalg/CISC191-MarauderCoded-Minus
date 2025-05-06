@@ -150,7 +150,7 @@ public class Game implements Serializable {
      *
      * @return The betting odds for team 1.
      */
-    public static double getTeam1Odd() {
+    public double getTeam1Odd() {
         return team1Odd;
     }
 
@@ -159,7 +159,7 @@ public class Game implements Serializable {
      *
      * @return The betting odds for team 2.
      */
-    public static double getTeam2Odd() {
+    public double getTeam2Odd() {
         return team2Odd;
     }
 
@@ -212,4 +212,7 @@ public class Game implements Serializable {
         this.date = startDate;
     }
 
+    public int getId() {
+        return 0;
+    }
 }
