@@ -29,7 +29,7 @@ public abstract class APIGetter {
 
         LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
+        String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
         return tomorrowArg;
     }
 
@@ -81,7 +81,6 @@ public abstract class APIGetter {
                             Instant instant = odt.toInstant();
                             Date legacyDate = Date.from(instant);
                             System.out.println(legacyDate);
-
 
                             System.out.println(awayTeamName + homeTeamName);
 
