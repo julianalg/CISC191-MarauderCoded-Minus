@@ -60,7 +60,7 @@ public class BetView extends Application {
                 Bet placedBet = new Bet(game, amount, team);
                 Client.user.addBet(placedBet);
                 try {
-                    new Client().start(stage);
+                    new UI().start(stage);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
