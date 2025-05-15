@@ -34,6 +34,11 @@ public class GameDatabase {
     // File path for storing game data
     private static final URL FILE_PATH = GameDatabase.class.getResource("games.json");
 
+    //Tree sorts by game id and odds
+    private GameBST.BinarySearchTree<Game> treeById;
+    private GameBST.BinarySearchTree<Game> treeByTeam1Odds;
+    private GameBST.BinarySearchTree<Game> treeByTeam2Odds;
+
     /**
      * Private constructor to prevent instantiation outside the class.
      * Initializes the database by either loading data from the file
@@ -87,7 +92,18 @@ public class GameDatabase {
             initializeDefaultGames();
             saveToFile();
         }
+        rebuildTrees();
     }
+
+    /**
+     * Reconstructs the BSTs from the current list of games
+     */
+    private void rebuildTrees() {
+        treeById = GameBST.buildGameIdTree(gameDatabase);
+        treeByTeam1Odds = GameBST.buildOddsTree(gameDatabase);
+        treeByTeam2Odds = GameBST.buildOddsTree(gameDatabase);
+    }
+
     /**
      * Initializes the game database with default data.
      */
@@ -102,7 +118,7 @@ public class GameDatabase {
                     .nextLong(d1.getTime(), d2.getTime()));
             gameDatabase.add(new Game(
                     String.format("Team %d", count),
-                    String.format("Team %d", count + 1), new Date(),0, 0));
+                    String.format("Team %d", count + 1), new Date(), "Basketball", 0, 0));
             count += 2;
         }
     }
@@ -143,5 +159,20 @@ public class GameDatabase {
      */
     public synchronized int getSize() {
         return gameDatabase.size();
+    }
+
+    /**
+     * Returns the BSTs sorted by game id and odds
+     */
+    public GameBST.BinarySearchTree<Game> getTreeById() {
+        return treeById;
+    }
+
+    public GameBST.BinarySearchTree<Game> getTreeByTeam1Odds() {
+        return treeByTeam1Odds;
+    }
+
+    public GameBST.BinarySearchTree<Game> getTreeByTeam2Odds() {
+        return treeByTeam2Odds;
     }
 }

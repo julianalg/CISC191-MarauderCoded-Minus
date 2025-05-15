@@ -7,7 +7,7 @@ import java.net.http.HttpResponse;
 
 public class BaseballGetter extends APIGetter{
     public BaseballGetter() {
-        apiURL = "https://v1.baseball.api-sports.io/";
+        apiURL = "https://v1.baseball.api-sports.io/games?date=";
         leagueName = "MLB";
     }
 

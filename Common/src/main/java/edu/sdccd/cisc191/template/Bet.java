@@ -82,9 +82,9 @@ public class Bet implements Serializable {
         this.betAmt = amt;
 
         if (betTeam.equalsIgnoreCase("team1")) {
-            winOdds = (int) Game.getTeam1Odd();
+            winOdds = (int) game.getTeam1Odd();
         } else if (betTeam.equalsIgnoreCase("team2")) {
-            winOdds = (int) Game.getTeam2Odd();
+            winOdds = (int) game.getTeam2Odd();
 
             if (winOdds >= 0) {
                 this.winAmt = (amt + (100 / winOdds) * amt);

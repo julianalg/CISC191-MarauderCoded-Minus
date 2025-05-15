@@ -1,6 +1,9 @@
 package edu.sdccd.cisc191.template.API;
 
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -45,14 +48,13 @@ public abstract class APIGetter {
         JSONObject json = (JSONObject) parser.parse(response);
 
 
-        ArrayList<Game> games = parse(json);
-
+        ArrayList<Game> games = parse(json, sport);
         return games;
     }
 
     public abstract String sendRequest(URI requestURI) throws Exception;
 
-    public ArrayList<Game> parse(JSONObject json) throws ParseException {
+    public ArrayList<Game> parse(JSONObject json, String sport) throws ParseException {
         ArrayList<Game> games = new ArrayList<>();
 
         for (Object keyObj : json.keySet()) {
@@ -67,25 +69,30 @@ public abstract class APIGetter {
             if (value instanceof JSONArray) {
                 JSONArray array = (JSONArray) value;
                 for (Object item : array) {
+                    // Here, you might need to cast item to a JSONObject if that's what it is.
                     if (item instanceof JSONObject) {
                         JSONObject nestedObj = (JSONObject) item;
+                        System.out.println(nestedObj);
+                        // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
-                            gameId = (long) nestedObj.get("id");
-                            System.out.println(gameId);
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
                             JSONObject awayTeam = (JSONObject) teams.get("away");
                             JSONObject homeTeam = (JSONObject) teams.get("home");
                             String awayTeamName = awayTeam.get("name").toString();
                             String homeTeamName = homeTeam.get("name").toString();
+                            String date = nestedObj.get("date").toString();
+
+                            OffsetDateTime odt = OffsetDateTime.parse(date);
+                            Instant instant = odt.toInstant();
+                            Date legacyDate = Date.from(instant);
+                            System.out.println(legacyDate);
 
                             System.out.println(awayTeamName + homeTeamName);
 
-                            Game newGame = new Game(awayTeamName, homeTeamName, new Date(), 0, 0);
+                            Game newGame = new Game(awayTeamName, homeTeamName, legacyDate, sport, 0, 0);
 
                             games.add(newGame);
-
-                            getOdd(0, gameId);
                         }
                     }
                 }
