@@ -81,6 +81,9 @@ class ClientHandler implements Runnable {
                     case "Baseball":
                         response = (request.getId() >= 0) ? getBaseball(request) : new ArrayList<Game>();
                         break;
+                    case "Bet":
+                        response = (request.getId() >= 0) ? getBet(request) : null;
+                        break;
                     default:
                         response = new IllegalArgumentException("Unknown request type");
                 }
@@ -128,6 +131,10 @@ class ClientHandler implements Runnable {
     private static ArrayList<Game> getBaseball(Request request) throws Exception {
         BaseballGetter a = new BaseballGetter();
         return a.getGames("Baseball");
+    }
+
+    private static long getBet(Request request) throws Exception {
+        
     }
 
     /**

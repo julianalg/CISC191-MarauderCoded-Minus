@@ -41,9 +41,8 @@ public class BetView extends Application {
     }
 
     public void grabOdds() {
-        switch (game.getSport()) {
-            
-        }
+        Request request = new Request()
+        Client.sendRequest()
     }
 
     /**
