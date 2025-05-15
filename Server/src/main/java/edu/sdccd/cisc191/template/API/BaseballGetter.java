@@ -39,7 +39,7 @@ public class BaseballGetter extends APIGetter{
 
     public static void main(String[] args) throws Exception {
         BaseballGetter baseballGetter = new BaseballGetter();
-        System.out.println(baseballGetter.getGames("Basketball"));
+        System.out.println(baseballGetter.getGames());
     }
 
 }

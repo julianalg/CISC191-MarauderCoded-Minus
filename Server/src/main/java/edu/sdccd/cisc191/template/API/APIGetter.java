@@ -4,6 +4,10 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,12 +33,12 @@ public abstract class APIGetter {
 
         LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
+        String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
         return tomorrowArg;
     }
 
-    public ArrayList<Game> getGames(String sport) throws Exception {
-        String fullUrl     = apiURL + getDateAsString();
+    public ArrayList<Game> getGames() throws Exception {
+        String fullUrl     = apiURL + "games?date=" + getDateAsString();
         URI   requestURI  = URI.create(fullUrl);
         System.out.println(requestURI);
 
@@ -45,7 +49,6 @@ public abstract class APIGetter {
 
 
         ArrayList<Game> games = parse(json, sport);
-
         return games;
     }
 
@@ -58,6 +61,9 @@ public abstract class APIGetter {
             String key = (String) keyObj;
             Object value = json.get(key);
 
+            long gameId;
+
+            System.out.println("Key: " + key + " - Value: " + value);
 
             // Optional: if the value is a nested JSON array or another JSONObject, you can iterate them too.
             if (value instanceof JSONArray) {
@@ -93,5 +99,31 @@ public abstract class APIGetter {
             }
         }
         return games;
+    }
+
+    public float getOdd(int team, long gameId) {
+        // Create an HttpClient instance
+        HttpClient client = HttpClient.newHttpClient();
+        String apiKey = System.getenv("API_KEY");
+        URI betURI = URI.create(apiURL + "odds?game=" + gameId + "&bookmaker=5");
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(betURI)                  // <-- pass your concatenated URI here
+                .header("x-rapidapi-host", apiURL)
+                .header("x-rapidapi-key", apiKey)
+                .GET()
+                .build();
+
+        // Make an asynchronous request similar to using JavaScript promises
+        String response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .exceptionally(e -> {
+                    System.out.println("Error: " + e.getMessage());
+                    return null;
+                })
+                .join().toString(); // Waits for the async call to complete
+
+        System.out.println(response);
+        return 0;
     }
 };
