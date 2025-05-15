@@ -1,5 +1,7 @@
 package edu.sdccd.cisc191.template;
 
+import edu.sdccd.cisc191.template.API.BaseballGetter;
+import edu.sdccd.cisc191.template.API.BasketballGetter;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -35,6 +37,13 @@ public class BetView extends Application {
         this.game = game;
         this.team = team;
         start(stage);
+        grabOdds();
+    }
+
+    public void grabOdds() {
+        switch (game.getSport()) {
+            
+        }
     }
 
     /**
@@ -47,6 +56,7 @@ public class BetView extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
+
         VBox betView = new VBox(10);
         Label bet = new Label("How much do you want to bet?");
         TextField b = new TextField();

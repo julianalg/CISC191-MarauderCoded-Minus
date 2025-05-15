@@ -32,15 +32,19 @@ public abstract class APIGetter {
         Date nextDayDate = Date.from(nextDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-        String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
+        String tomorrowArg;
+        if (tomorrowLocalDate.getDayOfMonth() < 10) {
+            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
+        } else {
+            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
+        }
         return tomorrowArg;
     }
 
-    public ArrayList<Game> getGames() throws Exception {
+    public ArrayList<Game> getGames(String sport) throws Exception {
         String fullUrl     = apiURL + "games?date=" + getDateAsString();
         URI   requestURI  = URI.create(fullUrl);
-        System.out.println(requestURI);
+//        System.out.println(requestURI);
 
         String response = sendRequest(requestURI);
 
@@ -72,9 +76,11 @@ public abstract class APIGetter {
                     // Here, you might need to cast item to a JSONObject if that's what it is.
                     if (item instanceof JSONObject) {
                         JSONObject nestedObj = (JSONObject) item;
-                        System.out.println(nestedObj);
+//                        System.out.println(nestedObj);
                         // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
+                        String gameID = nestedObj.get("id").toString();
+                        System.out.println(gameID);
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
                             JSONObject awayTeam = (JSONObject) teams.get("away");
@@ -86,11 +92,11 @@ public abstract class APIGetter {
                             OffsetDateTime odt = OffsetDateTime.parse(date);
                             Instant instant = odt.toInstant();
                             Date legacyDate = Date.from(instant);
-                            System.out.println(legacyDate);
+//                            System.out.println(legacyDate);
 
-                            System.out.println(awayTeamName + homeTeamName);
+//                            System.out.println(awayTeamName + homeTeamName);
 
-                            Game newGame = new Game(awayTeamName, homeTeamName, legacyDate, sport, 0, 0);
+                            Game newGame = new Game(awayTeamName, homeTeamName, gameID, legacyDate, sport, 0, 0);
 
                             games.add(newGame);
                         }
@@ -101,7 +107,7 @@ public abstract class APIGetter {
         return games;
     }
 
-    public float getOdd(int team, long gameId) {
+    public float getOdd(String team, long gameId) {
         // Create an HttpClient instance
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
