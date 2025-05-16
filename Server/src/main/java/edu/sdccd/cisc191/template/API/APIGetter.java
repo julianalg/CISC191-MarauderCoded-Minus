@@ -107,7 +107,7 @@ public abstract class APIGetter {
         return games;
     }
 
-    public float getOdd(String team, long gameId) {
+    public float getOdd(String team, long gameId) throws ParseException {
         // Create an HttpClient instance
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
@@ -128,7 +128,16 @@ public abstract class APIGetter {
                     return null;
                 })
                 .join().toString(); // Waits for the async call to complete
-        System.out.println(response);
+
+        parse(response);
+        return 0;
+    }
+
+    public float parse(String response) throws ParseException {
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(response);
+        JSONObject jsonResponse = (JSONObject) json.get("response");
+        System.out.println(jsonResponse.get("bookmakers"));
         return 0;
     }
 };
