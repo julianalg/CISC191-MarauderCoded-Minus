@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ClientTest {
 
-    private Client client;
+    private UI UI;
     private Stage primaryStage;
     private Scene scene;
 
@@ -39,8 +39,8 @@ public class ClientTest {
         Platform.runLater(() -> {
             try {
                 primaryStage = new Stage();
-                client = new Client();
-                client.start(primaryStage);
+                UI = new UI();
+                UI.start(primaryStage);
                 primaryStage.show();
                 scene = primaryStage.getScene();
             } catch (Exception e) {

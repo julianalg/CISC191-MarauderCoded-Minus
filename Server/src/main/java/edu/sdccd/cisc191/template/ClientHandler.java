@@ -127,7 +127,7 @@ class ClientHandler implements Runnable {
 
     private static ArrayList<Game> getBaseball(Request request) throws Exception {
         BaseballGetter a = new BaseballGetter();
-        return a.getGames("Baseball");
+        return a.getGames("Basketball");
     }
 
     /**

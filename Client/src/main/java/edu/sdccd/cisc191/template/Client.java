@@ -52,7 +52,7 @@ public class Client {
         out.flush();
 
         // read back whatever the server sent
-        Object raw = in.readObject();
+        Object raw = in. readObject();
         System.out.println("Raw: " + raw);
         System.out.println("Raw type: " + raw.getClass());
         System.out.println("Response Type: " + responseType);
@@ -163,7 +163,9 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
         //        System.out.println(getSizeRequest(1));
-        startConnection("localhost", 4444);
+        int port = 4444;
+        System.out.println("Listening on port " + port);
+        startConnection("localhost", port);
         System.out.println(getBasketballGames());
         // Test modification of user
         Map<String, Object> attributes = new HashMap<>();

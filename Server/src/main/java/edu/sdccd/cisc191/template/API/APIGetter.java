@@ -7,7 +7,6 @@ import java.time.OffsetDateTime;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,12 +31,24 @@ public abstract class APIGetter {
         Date nextDayDate = Date.from(nextDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        String dateYear = String.valueOf(tomorrowLocalDate.getYear());
+        int dateMonth = tomorrowLocalDate.getMonthValue();
+        int dateDay = tomorrowLocalDate.getDayOfMonth();
 
-        String tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
+        String tomorrowArg;
+        if (dateMonth < 10 && dateDay < 10) {
+            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
+        } else if (dateMonth >= 10 && dateDay < 10) {
+            tomorrowArg = tomorrowLocalDate.getYear() + "-" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
+        } else if (dateMonth < 10 && dateDay >= 10) {
+            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
+        } else {
+            tomorrowArg = tomorrowLocalDate.getYear() + "-" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
+        }
         return tomorrowArg;
     }
 
-    public ArrayList<Game> getGames() throws Exception {
+    public ArrayList<Game> getGames(String sport) throws Exception {
         String fullUrl     = apiURL + "games?date=" + getDateAsString();
         URI   requestURI  = URI.create(fullUrl);
         System.out.println(requestURI);

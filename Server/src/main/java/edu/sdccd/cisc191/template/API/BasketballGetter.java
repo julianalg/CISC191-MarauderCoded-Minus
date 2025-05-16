@@ -15,7 +15,7 @@ import java.util.Objects;
 
 public class BasketballGetter extends APIGetter {
     public BasketballGetter() {
-        apiURL = "https://v1.basketball.api-sports.io/games?date=";
+        apiURL = "https://v1.basketball.api-sports.io/";
         leagueName = "NBA";
     }
 

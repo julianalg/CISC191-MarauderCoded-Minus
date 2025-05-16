@@ -7,7 +7,7 @@ import java.net.http.HttpResponse;
 
 public class BaseballGetter extends APIGetter{
     public BaseballGetter() {
-        apiURL = "https://v1.baseball.api-sports.io/games?date=";
+        apiURL = "https://v1.baseball.api-sports.io/";
         leagueName = "MLB";
     }
 
@@ -39,7 +39,7 @@ public class BaseballGetter extends APIGetter{
 
     public static void main(String[] args) throws Exception {
         BaseballGetter baseballGetter = new BaseballGetter();
-        System.out.println(baseballGetter.getGames());
+        System.out.println(baseballGetter.getGames("Basketball"));
     }
 
 }
