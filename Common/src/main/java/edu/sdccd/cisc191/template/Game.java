@@ -22,7 +22,7 @@ public class Game implements Serializable {
     private String team1;
     private String team2;
     private String sport;
-    private String id;
+    private int id;
     private DateTime date;
     private String dateClean;
     private static double team1Odd;
@@ -73,16 +73,16 @@ public class Game implements Serializable {
 
     /**
      * Creates a  Game  object with betting odds loaded from an API.
-     *
+     * <p>
      * Does not calculate any odds.
      *
-     * @param t1 The name of team 1.
-     * @param t2 The name of team 2.
-     * @param date The date of the game.
+     * @param t1       The name of team 1.
+     * @param t2       The name of team 2.
+     * @param date     The date of the game.
      * @param team1Odd The odds for team 1.
      * @param team2Odd The odds for team 2.
      */
-    public Game(String t1, String t2, String id, Date givenDate, String sport, double team1Odd, double team2Odd) {
+    public Game(String t1, String t2, int id, Date givenDate, String sport, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
         this.id = id;
@@ -111,7 +111,7 @@ public class Game implements Serializable {
      * dates, and odds.
      *
      * @param obj The other object to compare with.
-     * @return  true  if the two objects are equal, otherwise  false .
+     * @return true  if the two objects are equal, otherwise  false .
      */
     @Override
     public boolean equals(Object obj) {
@@ -151,11 +151,11 @@ public class Game implements Serializable {
         return team2;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getId(String id) {
+    public int getId() {
         return id;
     }
 
@@ -168,7 +168,9 @@ public class Game implements Serializable {
         return team1Odd;
     }
 
-    public String getSport() { return sport; }
+    public String getSport() {
+        return sport;
+    }
 
     /**
      * Gets the betting odds for team 2.
@@ -190,7 +192,7 @@ public class Game implements Serializable {
 
     /**
      * Generates a clean string representation of the date range for the game.
-     *
+     * <p>
      * Offsets are because of the way java.util.Date works.
      *
      * @return A string describing the start and end dates.
@@ -230,7 +232,4 @@ public class Game implements Serializable {
         this.date = new DateTime(startDate);
     }
 
-    public int getId() {
-        return 0;
-    }
-}
+};

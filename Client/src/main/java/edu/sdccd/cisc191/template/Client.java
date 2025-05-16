@@ -133,6 +133,19 @@ public class Client {
         return null;
     }
 
+    public Float oddsModifyRequest(int id) throws IOException {
+        Client client = new Client();
+        try {
+            client.startConnection("localhost", 4444);
+            System.out.println("Sending oddsModifyRequest with ID: " + id);
+            return client.sendRequest(new Request("BaseBet", id), Float.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        stopConnection();
+        return null;
+    }
+
 
     /**
      * Retrieves an array of Game objects from the server.

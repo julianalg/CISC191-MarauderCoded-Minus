@@ -79,7 +79,7 @@ public abstract class APIGetter {
 //                        System.out.println(nestedObj);
                         // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
-                        String gameID = nestedObj.get("id").toString();
+                        int gameID = Integer.parseInt(nestedObj.get("id").toString());
                         System.out.println(gameID);
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
@@ -111,7 +111,7 @@ public abstract class APIGetter {
         // Create an HttpClient instance
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
-        URI betURI = URI.create(apiURL + "odds?game=" + gameId + "&bookmaker=5");
+        URI betURI = URI.create(apiURL + "odds?game=" + gameId);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(betURI)                  // <-- pass your concatenated URI here
@@ -128,7 +128,6 @@ public abstract class APIGetter {
                     return null;
                 })
                 .join().toString(); // Waits for the async call to complete
-
         System.out.println(response);
         return 0;
     }

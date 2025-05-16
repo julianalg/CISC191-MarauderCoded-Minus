@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 /**
  * The BetView class is a view class that creates
  * the JavaFX window seen by the User after pressing the Bet button.
@@ -40,9 +42,10 @@ public class BetView extends Application {
         grabOdds();
     }
 
-    public void grabOdds() {
-        Request request = new Request()
-        Client.sendRequest()
+    public void grabOdds() throws IOException {
+        Client client = new Client();
+        System.out.println("Grabbing odds for " + game.getId());
+        client.oddsModifyRequest(game.getId());
     }
 
     /**
