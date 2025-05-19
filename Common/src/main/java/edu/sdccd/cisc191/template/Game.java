@@ -40,6 +40,9 @@ public class Game implements Serializable {
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    public Game(String teamC, String teamD, Date startDate, Date endDate) {
+    }
+
     /**
      * Serializes a  Game  object into a JSON string.
      *

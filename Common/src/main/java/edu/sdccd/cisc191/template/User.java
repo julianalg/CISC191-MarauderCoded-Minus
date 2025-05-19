@@ -21,8 +21,14 @@ import jakarta.persistence.Id;
  *
  * @author Andy Ly, Julian Garcia
  */
+
+// Adapted from Andrew Huang repo
+
 @Entity
 public class User implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
     private int money;
