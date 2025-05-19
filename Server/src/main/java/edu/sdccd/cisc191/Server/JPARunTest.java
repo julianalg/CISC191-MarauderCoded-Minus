@@ -12,10 +12,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.ComponentScan;
+
+
 
 @SpringBootApplication
-@EnableJpaRepositories
-@EntityScan("edu.sdccd.cisc191.Common.Models")
+@EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
+@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
+@ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
 public class JPARunTest implements CommandLineRunner {
     private final UserRepository userRepository;
 
