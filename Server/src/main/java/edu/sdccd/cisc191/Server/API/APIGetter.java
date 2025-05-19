@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.template.API;
+package edu.sdccd.cisc191.Server.API;
 
 import java.net.URI;
 import java.time.Instant;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import edu.sdccd.cisc191.template.Game;
+import edu.sdccd.cisc191.Common.Game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

@@ -10,7 +10,7 @@
         <maven.compiler.target>24</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>23.0.2</javafx.version>
-        <start-class>edu.sdccd.cisc191.template.Client.Client</start-class>
+        <start-class>edu.sdccd.cisc191.Client.Client.Client</start-class>
     </properties>
     <parent>
         <groupId>edu.sdccd.cisc191.template</groupId>

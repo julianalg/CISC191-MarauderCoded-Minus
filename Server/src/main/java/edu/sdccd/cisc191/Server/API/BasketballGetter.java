@@ -1,17 +1,12 @@
-package edu.sdccd.cisc191.template.API;
+package edu.sdccd.cisc191.Server.API;
 
-import edu.sdccd.cisc191.template.Game;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+import edu.sdccd.cisc191.Common.Game;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
 
 public class BasketballGetter extends APIGetter {
     public BasketballGetter() {

@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.template;
+package edu.sdccd.cisc191.Common;
 
 import java.io.Serializable;
 import java.util.HashMap;

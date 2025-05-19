@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.template;
+package edu.sdccd.cisc191.Client;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -16,8 +16,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UI extends Application {
     // --- UI Component Builders ---

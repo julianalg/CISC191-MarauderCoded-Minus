@@ -1,6 +1,4 @@
-package edu.sdccd.cisc191.template;
-
-import edu.sdccd.cisc191.template.Game;
+package edu.sdccd.cisc191.Common;
 
 import java.util.ArrayList;
 import java.util.Comparator;

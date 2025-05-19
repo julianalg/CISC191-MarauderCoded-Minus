@@ -1,10 +1,10 @@
-package edu.sdccd.cisc191.template.controllers;
+package edu.sdccd.cisc191.Server.controllers;
 
 import java.util.List;
 
-import edu.sdccd.cisc191.template.User;
-import edu.sdccd.cisc191.template.exceptions.UserNotFoundException;
-import edu.sdccd.cisc191.template.repositories.UserRepository;
+import edu.sdccd.cisc191.Common.Models.User;
+import edu.sdccd.cisc191.Server.exceptions.UserNotFoundException;
+import edu.sdccd.cisc191.Server.repositories.UserRepository;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

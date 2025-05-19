@@ -1,7 +1,9 @@
-package edu.sdccd.cisc191.template;
+package edu.sdccd.cisc191.Server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import edu.sdccd.cisc191.Common.Game;
+import edu.sdccd.cisc191.Common.GameBST;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;

@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.template.API;
+package edu.sdccd.cisc191.Server.API;
 
 import java.net.URI;
 import java.net.http.HttpClient;

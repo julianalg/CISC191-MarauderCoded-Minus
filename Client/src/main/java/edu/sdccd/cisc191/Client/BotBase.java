@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.template;
+package edu.sdccd.cisc191.Client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
