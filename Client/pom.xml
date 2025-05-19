@@ -6,6 +6,11 @@
     <properties>
         <javafx.version>23.0.2</javafx.version>
         <junit.version>5.11.4</junit.version>
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>23.0.2</javafx.version>
+        <start-class>edu.sdccd.cisc191.template.Client.Client</start-class>
     </properties>
     <parent>
         <groupId>edu.sdccd.cisc191.template</groupId>
@@ -34,9 +39,10 @@
             <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
-
-
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
