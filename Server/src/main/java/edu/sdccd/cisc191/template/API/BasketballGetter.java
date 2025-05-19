@@ -16,12 +16,14 @@ import java.util.Objects;
 public class BasketballGetter extends APIGetter {
     public BasketballGetter() {
         apiURL = "https://v1.basketball.api-sports.io/";
-        leagueName = "NBA";
+        leagueName = "WNBA";
     }
 
     public static void main(String[] args) throws Exception {
+//        BasketballGetter basketballGetter = new BasketballGetter();
+//        System.out.println(basketballGetter.getGames("Basketball"));
         BasketballGetter basketballGetter = new BasketballGetter();
-        System.out.println(basketballGetter.getGames("Basketball"));
+        basketballGetter.getOdd(163994);
     }
 
     @Override
