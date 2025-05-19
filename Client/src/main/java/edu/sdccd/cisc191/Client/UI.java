@@ -1,5 +1,8 @@
 package edu.sdccd.cisc191.Client;
 
+import edu.sdccd.cisc191.Common.Game;
+import edu.sdccd.cisc191.Common.Models.*;
+import edu.sdccd.cisc191.Common.Bet;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;

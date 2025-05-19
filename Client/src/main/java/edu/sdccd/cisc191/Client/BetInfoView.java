@@ -1,5 +1,6 @@
 package edu.sdccd.cisc191.Client;
 
+import edu.sdccd.cisc191.Common.Bet;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;

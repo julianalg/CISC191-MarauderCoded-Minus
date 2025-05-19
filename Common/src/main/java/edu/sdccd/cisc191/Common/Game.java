@@ -80,7 +80,7 @@ public class Game implements Serializable {
      *
      * @param t1 The name of team 1.
      * @param t2 The name of team 2.
-     * @param date The date of the game.
+     * @param givenDate The date of the game.
      * @param team1Odd The odds for team 1.
      * @param team2Odd The odds for team 2.
      */
