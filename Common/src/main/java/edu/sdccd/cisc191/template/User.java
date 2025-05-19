@@ -21,6 +21,7 @@ import jakarta.persistence.Id;
  *
  * @author Andy Ly, Julian Garcia
  */
+@Entity
 public class User implements Serializable {
 
     private String name;
