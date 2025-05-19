@@ -82,34 +82,6 @@ public class Client {
             clientSocket.close();
         }
     }
-    /**
-     * Retrieves a game object from the server by the specified ID.
-     *
-     * @param id the identifier of the game to retrieve.
-     * @return the Game object if found; null otherwise.
-     * @throws IOException if an I/O error occurs during the request.
-     */
-    public Game getRequest(int id, String type) throws IOException {
-        Client client = new Client();
-
-        try {
-            client.startConnection("localhost", 4445);
-
-            // build a request object
-            Request req = new Request("Game", id);
-
-            return client.sendRequest(req, Game.class);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                client.stopConnection();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     /**
      * Modifies a user on the server with the provided attributes and returns the updated user.
@@ -133,12 +105,12 @@ public class Client {
         return null;
     }
 
-    public Float oddsModifyRequest(int id) throws IOException {
+    public String oddsModifyRequest(int id) throws IOException {
         Client client = new Client();
         try {
             client.startConnection("localhost", 4444);
             System.out.println("Sending oddsModifyRequest with ID: " + id);
-            return client.sendRequest(new Request("BaseBet", id), Float.class);
+            return client.sendRequest(new Request("BaseBet", id), String.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -107,7 +107,7 @@ public abstract class APIGetter {
         return games;
     }
 
-    public float getOdd(long gameId) throws ParseException {
+    public String getOdd(long gameId) throws ParseException {
         // Create an HttpClient instance
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
@@ -131,16 +131,14 @@ public abstract class APIGetter {
 
 //        System.out.println(response);
 
-        parseBet(response);
-        return 0;
+        return parseBet(response);
     }
 
-    public float parseBet(String response) throws ParseException {
+    public String parseBet(String response) throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
         JSONArray jsonResponse = (JSONArray) json.get("response");
         JSONObject gameObj = (JSONObject) jsonResponse.get(0);
-        System.out.println(gameObj.get("bookmakers"));
-        return 0;
+        return gameObj.get("bookmakers").toString();
     }
 };

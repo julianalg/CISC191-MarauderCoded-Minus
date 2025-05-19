@@ -7,6 +7,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 
@@ -42,10 +46,15 @@ public class BetView extends Application {
         grabOdds();
     }
 
-    public void grabOdds() throws IOException {
+    public void grabOdds() throws IOException, ParseException {
         Client client = new Client();
         System.out.println("Grabbing odds for " + game.getId());
-        client.oddsModifyRequest(game.getId());
+        String betInfo = client.oddsModifyRequest(game.getId());
+        JSONParser jsonParser = new JSONParser();
+        JSONArray betObj = (JSONArray) jsonParser.parse(betInfo);
+        JSONObject bookmaker = (JSONObject) betObj.get(0);
+        System.out.println(bookmaker.get("bets"));
+
     }
 
     /**

@@ -136,14 +136,14 @@ class ClientHandler implements Runnable {
         return a.getGames("Baseball");
     }
 
-    private static float getBaseBet(Request request) throws Exception {
+    private static String getBaseBet(Request request) throws Exception {
         long gameID = request.getId();
         System.out.println("GameID: " + gameID);
         BaseballGetter a = new BaseballGetter();
         return a.getOdd(gameID);
     }
 
-    private static float getBasketBet(Request request) throws Exception {
+    private static String getBasketBet(Request request) throws Exception {
         BasketballGetter a = new BasketballGetter();
         return a.getOdd(request.getId());
     }
