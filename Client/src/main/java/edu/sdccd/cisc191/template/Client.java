@@ -111,6 +111,28 @@ public class Client {
 
     }
 
+
+    public User userGetRequest(int id) throws IOException {
+        Client client = new Client();
+
+        try {
+            client.startConnection("localhost", 4445);
+
+            // build a request object
+            Request req = new Request("User", id);
+
+            return client.sendRequest(req, User.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                client.stopConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
     /**
      * Modifies a user on the server with the provided attributes and returns the updated user.
      *
