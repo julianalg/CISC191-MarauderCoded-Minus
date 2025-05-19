@@ -122,12 +122,12 @@ class ClientHandler implements Runnable {
 
     private static ArrayList<Game> getBasketball(Request request) throws Exception {
         BasketballGetter a = new BasketballGetter();
-        return a.getGames();
+        return a.getGames("Basketball");
     }
 
     private static ArrayList<Game> getBaseball(Request request) throws Exception {
         BaseballGetter a = new BaseballGetter();
-        return a.getGames();
+        return a.getGames("Basketball");
     }
 
     /**

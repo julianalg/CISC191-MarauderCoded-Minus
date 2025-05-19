@@ -93,7 +93,7 @@ public class BetInfoView extends Application {
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> {
             try {
-                new Client().start(stage);
+                new UI().start(stage);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

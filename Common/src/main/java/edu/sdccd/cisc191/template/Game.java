@@ -2,6 +2,7 @@ package edu.sdccd.cisc191.template;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -20,7 +21,8 @@ public class Game implements Serializable {
 
     private String team1;
     private String team2;
-    private Date date;
+    private String sport;
+    private DateTime date;
     private String dateClean;
     private static double team1Odd;
     private static double team2Odd;
@@ -79,10 +81,12 @@ public class Game implements Serializable {
      * @param team1Odd The odds for team 1.
      * @param team2Odd The odds for team 2.
      */
-    public Game(String t1, String t2, Date date, double team1Odd, double team2Odd) {
+    public Game(String t1, String t2, Date givenDate, String sport, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
-        this.date = date;
+        this.date = new DateTime(givenDate);
+        this.sport = sport;
+
 
         this.team1Odd = team1Odd;
         this.team2Odd = team2Odd;
@@ -97,7 +101,7 @@ public class Game implements Serializable {
      */
     @Override
     public String toString() {
-        return team1 + " vs. " + team2 + " on " + date.getMonth() + "/" + date.getDate() + "/" + (date.getYear() + 1900);
+        return team1 + " vs. " + team2 + " on " + date.getMonthOfYear() + "/" + date.getDayOfMonth() + "/" + date.getYear();
     }
 
     /**
@@ -150,16 +154,18 @@ public class Game implements Serializable {
      *
      * @return The betting odds for team 1.
      */
-    public static double getTeam1Odd() {
+    public double getTeam1Odd() {
         return team1Odd;
     }
+
+    public String getSport() { return sport; }
 
     /**
      * Gets the betting odds for team 2.
      *
      * @return The betting odds for team 2.
      */
-    public static double getTeam2Odd() {
+    public double getTeam2Odd() {
         return team2Odd;
     }
 
@@ -168,10 +174,9 @@ public class Game implements Serializable {
      *
      * @return The start date.
      */
-    public Date getDate() {
+    public DateTime getDate() {
         return this.date;
     }
-
 
     /**
      * Generates a clean string representation of the date range for the game.
@@ -181,8 +186,11 @@ public class Game implements Serializable {
      * @return A string describing the start and end dates.
      */
     public String getDateClean() {
-        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + (date.getYear() + 1900);
-
+        if (date.getMinuteOfHour() > 9) {
+            return date.getMonthOfYear() + "/" + date.getDayOfMonth() + "/" + date.getYear() + " " + date.getHourOfDay() + ":" + date.getMinuteOfHour();
+        } else {
+            return date.getMonthOfYear() + "/" + date.getDayOfMonth() + "/" + date.getYear() + " " + date.getHourOfDay() + ":0" + date.getMinuteOfHour();
+        }
     }
 
     /**
@@ -209,7 +217,10 @@ public class Game implements Serializable {
      * @param startDate The new start date.
      */
     public void setStartDate(Date startDate) {
-        this.date = startDate;
+        this.date = new DateTime(startDate);
     }
 
+    public int getId() {
+        return 0;
+    }
 }

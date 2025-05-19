@@ -1,18 +1,13 @@
 package edu.sdccd.cisc191.template.API;
 
-import edu.sdccd.cisc191.template.Game;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 
 public class BaseballGetter extends APIGetter{
     public BaseballGetter() {
-        apiURL = "https://v1.baseball.api-sports.io/games?date=";
+        apiURL = "https://v1.baseball.api-sports.io/";
         leagueName = "MLB";
     }
 
@@ -43,8 +38,8 @@ public class BaseballGetter extends APIGetter{
     }
 
     public static void main(String[] args) throws Exception {
-        BaseballGetter footballGetter = new BaseballGetter();
-        System.out.println(footballGetter.getGames());
+        BaseballGetter baseballGetter = new BaseballGetter();
+        System.out.println(baseballGetter.getGames("Basketball"));
     }
 
 }

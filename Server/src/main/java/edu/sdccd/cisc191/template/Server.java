@@ -30,7 +30,7 @@ public class Server {
 
         try {
             // Initialize the server to listen on port 4444 with a backlog of 4096.
-            serverSocket = new ServerSocket(4445, 4096);
+            serverSocket = new ServerSocket(4444, 4096);
 
             System.out.println("Server started on port 4444");
 
