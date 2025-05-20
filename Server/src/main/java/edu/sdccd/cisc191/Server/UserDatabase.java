@@ -133,7 +133,7 @@ public class UserDatabase implements CommandLineRunner {
             users.forEach(user -> System.out.println("User ID: " + user.getId() + ", Name: " + user.getName()));
 
             objectMapper.writeValue(writer, users);
-            System.out.println("UserDatabase saved to file.");
+            System.out.println("UserDatabase saved to file: " + getOrCreateDatabaseFile().getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
