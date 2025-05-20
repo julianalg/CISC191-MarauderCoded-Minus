@@ -4,7 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.GameBST;
+import edu.sdccd.cisc191.Common.Models.User;
+import edu.sdccd.cisc191.Server.repositories.GameRepository;
+import jakarta.annotation.PreDestroy;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,80 +37,102 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @author Andy Ly
  */
-public class GameDatabase {
+@SpringBootApplication
+@EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
+@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
+@ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
+public class GameDatabase implements CommandLineRunner {
 
     // Singleton instance
     private static GameDatabase instance;
+    private final GameRepository gameRepository;
 
-    private static final List<Game> gameDatabase = Collections.synchronizedList(new ArrayList<>());
-
-    // File path for storing game data
-    private static final URL FILE_PATH = GameDatabase.class.getResource("games.json");
+    @Value("Server/src/main/resources/games.json")
+    private String resourcePath;
 
     //Tree sorts by game id and odds
     private GameBST.BinarySearchTree<Game> treeById;
     private GameBST.BinarySearchTree<Game> treeByTeam1Odds;
     private GameBST.BinarySearchTree<Game> treeByTeam2Odds;
 
-    /**
-     * Private constructor to prevent instantiation outside the class.
-     * Initializes the database by either loading data from the file
-     * or creating a default dataset.
-     */
-    private GameDatabase() {
-        loadOrInitializeDatabase();
+
+    private File getOrCreateDatabaseFile() { // Remove static modifier
+        // First, try to get the file from resources
+        URL filePath = UserDatabase.class.getResource("/games.json");
+        if (filePath != null) {
+            try {
+                return new File(filePath.toURI());
+            } catch (Exception e) {
+                // Fall through to use the configured path
+            }
+        }
+        // If resource not found, create the file in the specified directory
+        File file = new File(resourcePath);
+        try {
+            File parentDir = file.getParentFile();
+            if (parentDir != null) {
+                parentDir.mkdirs();
+            }
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            return file;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create database file at " + resourcePath, e);
+        }
     }
 
-    /**
-     * Retrieves the singleton instance of the GameDatabase class.
-     *
-     * @return The singleton GameDatabase instance.
-     */
+    @Autowired
+    public GameDatabase(GameRepository gameRepository) {
+
+        this.gameRepository = gameRepository;
+        instance = this;
+
+    }
+
     public static synchronized GameDatabase getInstance() {
         if (instance == null) {
-            instance = new GameDatabase();
+            throw new IllegalStateException("GameDatabase instance has not been initialized yet.");
         }
         return instance;
     }
 
-    /**
-     * Loads the game database from a JSON file if it exists, or initializes
-     * it with default data if the file is not found.
-     */
-    void loadOrInitializeDatabase() {
-        File file = new File(FILE_PATH.getFile());
-        if (file.exists()) {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                // Register subtypes explicitly if necessary (optional if using annotations)
-                CollectionType listType = objectMapper.getTypeFactory()
-                        .constructCollectionType(List.class, Game.class);
-                List<Game> games = objectMapper.readValue(file, listType);
+    public static void main(String[] args) { SpringApplication.run(GameDatabase.class, args);}
 
-                gameDatabase.clear();
-                gameDatabase.addAll(games);
-                System.out.println("GameDatabase loaded from file.");
-                //this.updateDatabaseFromAPI();
-                //System.out.println("GameDatabase updated from API.");
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Failed to load GameDatabase from file. Initializing with default data.");
+
+    @Override
+    public void run(String... args) throws Exception {
+
+        loadOrInitializeDatabase();
+
+    }
+
+    void loadOrInitializeDatabase() {
+        if (gameRepository.count() == 0) {
+            File file = getOrCreateDatabaseFile();
+            if (file.exists()) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    CollectionType listType = objectMapper.getTypeFactory()
+                            .constructCollectionType(List.class, Game.class);
+                    List<Game> users = objectMapper.readValue(file, listType);
+                    gameRepository.saveAll(users);
+                    System.out.println("UserDatabase loaded from file.");
+                } catch (Exception e) {
+                    System.out.println("EXCEPTION CAUGHT");
+                    System.out.println("Failed to load UserDatabase from file. Initializing with default data.");
+                    initializeDefaultGames();
+                }
+            } else {
+                System.out.println("UserDatabase file not found. Initializing with default data.");
                 initializeDefaultGames();
-                saveToFile();
-            } //catch (ParseException e) {
-                //throw new RuntimeException(e);
-            //}
-        } else {
-            System.out.println("GameDatabase file not found. Initializing with default data.");
-            initializeDefaultGames();
-            saveToFile();
+            }
         }
-        rebuildTrees();
     }
 
     /**
      * Reconstructs the BSTs from the current list of games
-     */
+
     private void rebuildTrees() {
         treeById = GameBST.buildGameIdTree(gameDatabase);
         treeByTeam1Odds = GameBST.buildOddsTree(gameDatabase);
@@ -109,34 +142,51 @@ public class GameDatabase {
     /**
      * Initializes the game database with default data.
      */
-    private void initializeDefaultGames() {
-        // To generate a date between now and 2 years from now
-        Date d1 = new Date();
-        Date d2 = new Date(2025, 1, 1);
-        // To generate default team numbers
-        int count = 0;
-        for (int i = 0; i < 6; i++) {
-            Date randomDate = new Date(ThreadLocalRandom.current()
-                    .nextLong(d1.getTime(), d2.getTime()));
-            gameDatabase.add(new Game(
-                    String.format("Team %d", count),
-                    String.format("Team %d", count + 1), 123456, new Date(), "Basketball", 0, 0));
-            count += 2;
+
+    void loadOrInitializeDatabase() {
+        if (gameRepository.count() == 0) {
+            File file = getOrCreateDatabaseFile();
+            if (file.exists()) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    CollectionType listType = objectMapper.getTypeFactory()
+                            .constructCollectionType(List.class, User.class);
+                    List<Game> games = objectMapper.readValue(file, listType);
+                    gameRepository.saveAll(games);
+                    System.out.println("UserDatabase loaded from file.");
+                } catch (Exception e) {
+                    System.out.println("EXCEPTION CAUGHT");
+                    System.out.println("Failed to load UserDatabase from file. Initializing with default data.");
+                    initializeDefaultGames();
+                }
+            } else {
+                System.out.println("UserDatabase file not found. Initializing with default data.");
+                initializeDefaultGames();
+            }
         }
     }
 
-    /**
-     * Saves the current state of the game database to a JSON file.
-     */
-    void saveToFile() {
-        try (Writer writer = new FileWriter(FILE_PATH.getFile())) {
+    private void initializeDefaultGames() {
+        return;
+    }
+
+    @PreDestroy
+    public void saveToFile() {
+        System.out.println("Save to file method triggered");
+        try (Writer writer = new FileWriter(getOrCreateDatabaseFile())) {
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(writer, gameDatabase);
-            System.out.println("GameDatabase saved to file.");
+
+            List<Game> users = gameRepository.findAll();
+            System.out.println("Total users in database: " + users.size());
+            users.forEach(user -> System.out.println("User ID: " + user.getId() + ", Name: " + user.getName()));
+
+            objectMapper.writeValue(writer, users);
+            System.out.println("UserDatabase saved to file: " + getOrCreateDatabaseFile().getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Updates the game database from the API
@@ -145,36 +195,28 @@ public class GameDatabase {
 
     }
 
-    /**
-     * Retrieves an unmodifiable view of the game database.
-     *
-     * @return An unmodifiable List of games.
-     */
-    public synchronized List<Game> getGameDatabase() {
-        return Collections.unmodifiableList(gameDatabase);
+    public List<User> getAllUsers() {
+        return gameRepository.findAll();
     }
 
-    /**
-     * Gets the size of the game database.
-     *
-     * @return The size of the database as an Int .
-     */
-    public synchronized int getSize() {
-        return gameDatabase.size();
+    public User saveUser(User user) {
+        return gameRepository.save(user);
     }
 
-    /**
-     * Returns the BSTs sorted by game id and odds
-     */
-    public GameBST.BinarySearchTree<Game> getTreeById() {
-        return treeById;
+    public void deleteUser(User user) {
+        gameRepository.delete(user);
     }
 
-    public GameBST.BinarySearchTree<Game> getTreeByTeam1Odds() {
-        return treeByTeam1Odds;
+    public User findUserById(Long id) {
+        return gameRepository.findById(id).orElse(null);
     }
 
-    public GameBST.BinarySearchTree<Game> getTreeByTeam2Odds() {
-        return treeByTeam2Odds;
+    public User findUserByName(String name) {
+        return gameRepository.findByName(name);
     }
+
+    public long getSize() {
+        return gameRepository.count();
+    }
+
 }

@@ -27,24 +27,24 @@ import java.util.Date;
 public class JPARunGameTest implements CommandLineRunner  {
     private final GameRepository gameRepository;
 
-    public JPARunGameTest(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
-    }
+        public JPARunGameTest(GameRepository gameRepository) {
+            this.gameRepository = gameRepository;
+        }
 
-    public static void main(String[] args) {
-        SpringApplication.run(JPARunGameTest.class, args);
-    }
+        public static void main(String[] args) {
+            SpringApplication.run(JPARunGameTest.class, args);
+        }
 
 
-    public void run(String... args) throws Exception {
-        BaseballGetter baseballGetter = new BaseballGetter();
-        ArrayList<Game> games = baseballGetter.getGames("Baseball");
-        System.out.println("Total games in database: " + games.size());
+        public void run(String... args) throws Exception {
+            BaseballGetter baseballGetter = new BaseballGetter();
+            ArrayList<Game> games = baseballGetter.getGames("Baseball");
+            System.out.println("Total games in database: " + games.size());
 
-        for (Game game : games) {
-            System.out.println("Adding game " + game.getId() + " to database");
-            gameRepository.save(game);
+            for (Game game : games) {
+                System.out.println("Adding game " + game.getId() + " to database");
+                gameRepository.save(game);
+            }
         }
     }
-}
 
