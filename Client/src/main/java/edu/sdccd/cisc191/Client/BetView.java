@@ -1,6 +1,7 @@
-package edu.sdccd.cisc191.template;
+package edu.sdccd.cisc191.Client;
 
-import edu.sdccd.cisc191.Client.Client;
+import edu.sdccd.cisc191.Common.Bet;
+import edu.sdccd.cisc191.Common.Models.Game;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -48,7 +49,8 @@ public class BetView extends Application {
     public void grabOdds() throws IOException, ParseException {
         Client client = new Client();
         System.out.println("Grabbing odds for " + game.getId());
-        String betInfo = client.oddsModifyRequest(game.getId());
+        //Check for int casting later
+        String betInfo = client.oddsModifyRequest((int) game.getId());
         JSONParser jsonParser = new JSONParser();
         JSONArray betObj = (JSONArray) jsonParser.parse(betInfo);
         JSONObject bookmaker = (JSONObject) betObj.get(0);

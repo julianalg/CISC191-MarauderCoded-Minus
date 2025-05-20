@@ -159,15 +159,7 @@ class ClientHandler implements Runnable {
      * @return The  User  object corresponding to the ID, or null if not found.
      */
     private static User getUser(Request request) {
-        User response;
-
-        List<User> userDatabase = UserDatabase.getInstance().getUserDatabase();
-        if (request.getId() >= userDatabase.size()) {
-            response = null;
-        } else {
-            response = userDatabase.get(request.getId());
-        }
-        return response;
+        return UserDatabase.getInstance().findUserById((long) request.getId());
     }
 
     /**
@@ -182,7 +174,7 @@ class ClientHandler implements Runnable {
      */
     private static synchronized User handleModifyUserRequest(Request request) throws Exception {
         UserDatabase db = UserDatabase.getInstance();
-        List<User> userDatabase = db.getUserDatabase();
+        List<User> userDatabase = db.getAllUsers();
 
         User userToModify = userDatabase.get(request.getId());
 

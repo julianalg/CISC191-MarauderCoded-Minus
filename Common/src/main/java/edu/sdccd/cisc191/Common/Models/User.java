@@ -218,4 +218,9 @@ public class User implements Serializable {
     public void removeBet(Bet b) {
         bets.remove(b);
     }
+
+    // Gets the ID that the database assigns to this user
+    public Long getId() {
+        return this.id;
+    }
 }
