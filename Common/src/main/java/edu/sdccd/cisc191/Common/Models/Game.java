@@ -1,11 +1,7 @@
-package edu.sdccd.cisc191.Common.Models;
+package edu.sdccd.cisc191.template;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -21,10 +17,7 @@ import java.util.Objects;
  *
  * @author Andy Ly, Julian Garcia
  */
-@Entity
 public class Game implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private String team1;
     private String team2;
@@ -46,9 +39,6 @@ public class Game implements Serializable {
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    public Game(String teamC, String teamD, Date startDate, Date endDate) {
-    }
 
     /**
      * Serializes a  Game  object into a JSON string.
@@ -87,7 +77,7 @@ public class Game implements Serializable {
      *
      * @param t1 The name of team 1.
      * @param t2 The name of team 2.
-     * @param givenDate The date of the game.
+     * @param date The date of the game.
      * @param team1Odd The odds for team 1.
      * @param team2Odd The odds for team 2.
      */
