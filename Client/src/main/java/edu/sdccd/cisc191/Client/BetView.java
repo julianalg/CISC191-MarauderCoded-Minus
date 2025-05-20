@@ -1,12 +1,18 @@
-package edu.sdccd.cisc191.Client;
+package edu.sdccd.cisc191.template;
 
-import edu.sdccd.cisc191.Common.Bet;
-import edu.sdccd.cisc191.Common.Models.Game;
+import edu.sdccd.cisc191.template.API.BaseballGetter;
+import edu.sdccd.cisc191.template.API.BasketballGetter;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
 
 /**
  * The BetView class is a view class that creates
@@ -37,6 +43,18 @@ public class BetView extends Application {
         this.game = game;
         this.team = team;
         start(stage);
+        grabOdds();
+    }
+
+    public void grabOdds() throws IOException, ParseException {
+        Client client = new Client();
+        System.out.println("Grabbing odds for " + game.getId());
+        String betInfo = client.oddsModifyRequest(game.getId());
+        JSONParser jsonParser = new JSONParser();
+        JSONArray betObj = (JSONArray) jsonParser.parse(betInfo);
+        JSONObject bookmaker = (JSONObject) betObj.get(0);
+        System.out.println(bookmaker.get("bets"));
+
     }
 
     /**
@@ -49,6 +67,7 @@ public class BetView extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
+
         VBox betView = new VBox(10);
         Label bet = new Label("How much do you want to bet?");
         TextField b = new TextField();

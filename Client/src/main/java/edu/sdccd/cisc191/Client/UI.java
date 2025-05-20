@@ -70,18 +70,11 @@ public class UI extends Application {
         dateCol.setSortable(false);
         dateCol.setReorderable(false);
 
-        // Column for Team 1 Odds
-        TableColumn<T, String> team1OddCol = new TableColumn<>("Team 1 Odds");
-        team1OddCol.setCellValueFactory(new PropertyValueFactory<>("team1Odd"));
-        tableView.getColumns().add(team1OddCol);
-        team1OddCol.setResizable(false);
-        team1OddCol.setSortable(false);
-        team1OddCol.setReorderable(false);
 
         // Button column for betting on Team 1
-        TableColumn<T, Void> bet1Column = new TableColumn<>("Bet");
+        TableColumn<T, Void> bet1Column = new TableColumn<>("Bet Team 1");
         bet1Column.setCellFactory(column -> new TableCell<T, Void>() {
-            private final Button betButton = new Button("Bet");
+            private final Button betButton = new Button("Bet 1");
             {
                 betButton.setOnAction(event -> {
                     int index = getIndex();
@@ -112,22 +105,15 @@ public class UI extends Application {
             }
         });
         tableView.getColumns().add(bet1Column);
+        bet1Column.setPrefWidth(200);
         bet1Column.setResizable(false);
         bet1Column.setSortable(false);
         bet1Column.setReorderable(false);
 
-        // Column for Team 2 Odds
-        TableColumn<T, String> team2OddCol = new TableColumn<>("Team 2 Odds");
-        team2OddCol.setCellValueFactory(new PropertyValueFactory<>("team2Odd"));
-        tableView.getColumns().add(team2OddCol);
-        team2OddCol.setResizable(false);
-        team2OddCol.setSortable(false);
-        team2OddCol.setReorderable(false);
-
         // Button column for betting on Team 2
-        TableColumn<T, Void> bet2Column = new TableColumn<>("Bet");
+        TableColumn<T, Void> bet2Column = new TableColumn<>("Bet Team 2");
         bet2Column.setCellFactory(column -> new TableCell<T, Void>() {
-            private final Button betButton = new Button("Bet");
+            private final Button betButton = new Button("Bet 2");
             {
                 betButton.setOnAction(event -> {
                     int index = getIndex();
@@ -158,6 +144,7 @@ public class UI extends Application {
             }
         });
         tableView.getColumns().add(bet2Column);
+        bet2Column.setPrefWidth(200);
         bet2Column.setResizable(false);
         bet2Column.setSortable(false);
         bet2Column.setReorderable(false);

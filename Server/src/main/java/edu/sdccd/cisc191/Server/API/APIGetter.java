@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.Server.API;
+package edu.sdccd.cisc191.template.API;
 
 import java.net.URI;
 import java.time.Instant;
@@ -7,12 +7,13 @@ import java.time.OffsetDateTime;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import edu.sdccd.cisc191.Common.Models.Game;
+import edu.sdccd.cisc191.template.Game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,19 +32,11 @@ public abstract class APIGetter {
         Date nextDayDate = Date.from(nextDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        String dateYear = String.valueOf(tomorrowLocalDate.getYear());
-        int dateMonth = tomorrowLocalDate.getMonthValue();
-        int dateDay = tomorrowLocalDate.getDayOfMonth();
-
         String tomorrowArg;
-        if (dateMonth < 10 && dateDay < 10) {
+        if (tomorrowLocalDate.getDayOfMonth() < 10) {
             tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
-        } else if (dateMonth >= 10 && dateDay < 10) {
-            tomorrowArg = tomorrowLocalDate.getYear() + "-" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
-        } else if (dateMonth < 10 && dateDay >= 10) {
-            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
         } else {
-            tomorrowArg = tomorrowLocalDate.getYear() + "-" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
+            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
         }
         return tomorrowArg;
     }
@@ -51,7 +44,7 @@ public abstract class APIGetter {
     public ArrayList<Game> getGames(String sport) throws Exception {
         String fullUrl     = apiURL + "games?date=" + getDateAsString();
         URI   requestURI  = URI.create(fullUrl);
-        System.out.println(requestURI);
+//        System.out.println(requestURI);
 
         String response = sendRequest(requestURI);
 
@@ -83,9 +76,11 @@ public abstract class APIGetter {
                     // Here, you might need to cast item to a JSONObject if that's what it is.
                     if (item instanceof JSONObject) {
                         JSONObject nestedObj = (JSONObject) item;
-                        System.out.println(nestedObj);
+//                        System.out.println(nestedObj);
                         // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
+                        int gameID = Integer.parseInt(nestedObj.get("id").toString());
+                        System.out.println(gameID);
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
                             JSONObject awayTeam = (JSONObject) teams.get("away");
@@ -97,11 +92,11 @@ public abstract class APIGetter {
                             OffsetDateTime odt = OffsetDateTime.parse(date);
                             Instant instant = odt.toInstant();
                             Date legacyDate = Date.from(instant);
-                            System.out.println(legacyDate);
+//                            System.out.println(legacyDate);
 
-                            System.out.println(awayTeamName + homeTeamName);
+//                            System.out.println(awayTeamName + homeTeamName);
 
-                            Game newGame = new Game(awayTeamName, homeTeamName, legacyDate, sport, 0, 0);
+                            Game newGame = new Game(awayTeamName, homeTeamName, gameID, legacyDate, sport, 0, 0);
 
                             games.add(newGame);
                         }
@@ -112,11 +107,11 @@ public abstract class APIGetter {
         return games;
     }
 
-    public float getOdd(int team, long gameId) {
+    public String getOdd(long gameId) throws ParseException {
         // Create an HttpClient instance
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
-        URI betURI = URI.create(apiURL + "odds?game=" + gameId + "&bookmaker=5");
+        URI betURI = URI.create(apiURL + "odds?game=" + gameId);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(betURI)                  // <-- pass your concatenated URI here
@@ -134,7 +129,16 @@ public abstract class APIGetter {
                 })
                 .join().toString(); // Waits for the async call to complete
 
-        System.out.println(response);
-        return 0;
+//        System.out.println(response);
+
+        return parseBet(response);
+    }
+
+    public String parseBet(String response) throws ParseException {
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(response);
+        JSONArray jsonResponse = (JSONArray) json.get("response");
+        JSONObject gameObj = (JSONObject) jsonResponse.get(0);
+        return gameObj.get("bookmakers").toString();
     }
 };

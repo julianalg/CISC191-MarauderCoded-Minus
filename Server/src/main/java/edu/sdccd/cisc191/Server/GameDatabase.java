@@ -120,7 +120,7 @@ public class GameDatabase {
                     .nextLong(d1.getTime(), d2.getTime()));
             gameDatabase.add(new Game(
                     String.format("Team %d", count),
-                    String.format("Team %d", count + 1), new Date(), "Basketball", 0, 0));
+                    String.format("Team %d", count + 1), 123456, new Date(), "Basketball", 0, 0));
             count += 2;
         }
     }

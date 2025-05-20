@@ -1,22 +1,29 @@
-package edu.sdccd.cisc191.Server.API;
+package edu.sdccd.cisc191.template.API;
 
-import edu.sdccd.cisc191.Common.Models.Game;
+import edu.sdccd.cisc191.template.Game;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 public class BasketballGetter extends APIGetter {
     public BasketballGetter() {
         apiURL = "https://v1.basketball.api-sports.io/";
-        leagueName = "NBA";
+        leagueName = "WNBA";
     }
 
     public static void main(String[] args) throws Exception {
+//        BasketballGetter basketballGetter = new BasketballGetter();
+//        System.out.println(basketballGetter.getGames("Basketball"));
         BasketballGetter basketballGetter = new BasketballGetter();
-        System.out.println(basketballGetter.getGames("Basketball"));
+        basketballGetter.getOdd(163994);
     }
 
     @Override

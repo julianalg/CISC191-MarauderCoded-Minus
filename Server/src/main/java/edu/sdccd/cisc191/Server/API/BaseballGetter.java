@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.Server.API;
+package edu.sdccd.cisc191.template.API;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -39,7 +39,10 @@ public class BaseballGetter extends APIGetter{
 
     public static void main(String[] args) throws Exception {
         BaseballGetter baseballGetter = new BaseballGetter();
-        System.out.println(baseballGetter.getGames("Basketball"));
+//        System.out.println(baseballGetter.getGames("Baseball"));
+
+        baseballGetter.getOdd(163994);
+
     }
 
 }
