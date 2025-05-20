@@ -6,6 +6,8 @@ package edu.sdccd.cisc191.Server;
 // This is based on the Andrew Huang repo
 
 import edu.sdccd.cisc191.Common.Models.Game;
+import edu.sdccd.cisc191.Server.API.BaseballGetter;
+import edu.sdccd.cisc191.Server.API.BasketballGetter;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +16,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -34,11 +37,14 @@ public class JPARunGameTest implements CommandLineRunner  {
 
 
     public void run(String... args) throws Exception {
-        Game game1 = new Game("MMHS", "SRHS", new Date(), "Basketball", 10, 10);
-        gameRepository.save(game1);
+        BaseballGetter baseballGetter = new BaseballGetter();
+        ArrayList<Game> games = baseballGetter.getGames("Baseball");
+        System.out.println("Total games in database: " + games.size());
 
-        Game game2 = new Game("MBHS", "UCHS", new Date(), "Basketball", 10, 10);
-        gameRepository.save(game2);
+        for (Game game : games) {
+            System.out.println("Adding game " + game.getId() + " to database");
+            gameRepository.save(game);
+        }
     }
 }
 
