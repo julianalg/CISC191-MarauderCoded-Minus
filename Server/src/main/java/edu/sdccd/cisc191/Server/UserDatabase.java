@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,34 +35,42 @@ public class UserDatabase implements CommandLineRunner {
 
     private static UserDatabase instance;
     private final UserRepository userRepository;
-    private static final String RESOURCE_PATH = "resources/users.json";
-    private static File getOrCreateDatabaseFile() {
-        // First, try to get the file
-        URL filePath = UserDatabase.class.getResource("users.json");
+    
+    @Value("${app.database.file-path}")
+    private String resourcePath; // Changed from static to instance field
+    
+    private File getOrCreateDatabaseFile() { // Remove static modifier
+        // First, try to get the file from resources
+        URL filePath = UserDatabase.class.getResource("/users.json");
         if (filePath != null) {
-            return new File(filePath.getFile());
+            try {
+                return new File(filePath.toURI());
+            } catch (Exception e) {
+                // Fall through to use the configured path
+            }
         }
 
-        // If resource not found, create the file in the resources directory
-        File file = new File(RESOURCE_PATH);
+        // If resource not found, create the file in the specified directory
+        File file = new File(resourcePath);
         try {
-            // Create parent directories if they don't exist
-            file.getParentFile().mkdirs();
+            File parentDir = file.getParentFile();
+            if (parentDir != null) {
+                parentDir.mkdirs();
+            }
             if (!file.exists()) {
                 file.createNewFile();
             }
             return file;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create database file", e);
+            throw new RuntimeException("Failed to create database file at " + resourcePath, e);
         }
     }
 
-    // Constructor for the UserDatabase class.
     @Autowired
     public UserDatabase(UserRepository userRepository) {
         this.userRepository = userRepository;
         instance = this;
-        loadOrInitializeDatabase();
+        // Remove loadOrInitializeDatabase() from constructor since it's called in run()
     }
 
     // Not sure if this is the right way to handle this...
