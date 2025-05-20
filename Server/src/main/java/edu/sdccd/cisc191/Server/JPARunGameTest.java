@@ -7,6 +7,7 @@ package edu.sdccd.cisc191.Server;
 
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -18,9 +19,9 @@ import java.util.Date;
 
 @SpringBootApplication
 @EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
-@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
+@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"}) 
 @ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
-public class JPARunGameTest {
+public class JPARunGameTest implements CommandLineRunner  {
     private final GameRepository gameRepository;
 
     public JPARunGameTest(GameRepository gameRepository) {
@@ -40,3 +41,4 @@ public class JPARunGameTest {
         gameRepository.save(game2);
     }
 }
+

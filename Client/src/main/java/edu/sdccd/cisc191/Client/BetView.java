@@ -1,7 +1,6 @@
 package edu.sdccd.cisc191.template;
 
-import edu.sdccd.cisc191.template.API.BaseballGetter;
-import edu.sdccd.cisc191.template.API.BasketballGetter;
+import edu.sdccd.cisc191.Client.Client;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;

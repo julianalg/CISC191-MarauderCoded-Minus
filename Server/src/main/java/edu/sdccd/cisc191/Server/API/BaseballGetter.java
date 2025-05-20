@@ -1,11 +1,11 @@
-package edu.sdccd.cisc191.template.API;
+package edu.sdccd.cisc191.Server.API;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class BaseballGetter extends APIGetter{
+public class BaseballGetter extends APIGetter {
     public BaseballGetter() {
         apiURL = "https://v1.baseball.api-sports.io/";
         leagueName = "MLB";

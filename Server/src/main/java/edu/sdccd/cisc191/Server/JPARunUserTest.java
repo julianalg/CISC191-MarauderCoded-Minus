@@ -7,6 +7,7 @@ package edu.sdccd.cisc191.Server;
 
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -19,7 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
 @EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
 @ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
-public class JPARunUserTest {
+public class JPARunUserTest implements CommandLineRunner {
     private final UserRepository userRepository;
 
     public JPARunUserTest(UserRepository userRepository) {
@@ -30,7 +31,7 @@ public class JPARunUserTest {
         SpringApplication.run(JPARunUserTest.class, args);
     }
 
-
+    @Override
     public void run(String... args) throws Exception {
         User alice = new User("Alice", 1000);
         userRepository.save(alice);

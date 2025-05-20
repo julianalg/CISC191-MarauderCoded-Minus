@@ -1,7 +1,8 @@
-package edu.sdccd.cisc191.template;
+package edu.sdccd.cisc191.Common.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.*;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -17,11 +18,20 @@ import java.util.Objects;
  *
  * @author Andy Ly, Julian Garcia
  */
+@Entity
+@Table(name = "\"game\"")   // keeps lower-case in H2
 public class Game implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     private String team1;
     private String team2;
     private String sport;
+    @Lob                                 // tells JPA it’s a Large Object
+    @Column(name = "date",
+            columnDefinition = "BLOB")   // or VARBINARY(1024) etc.
     private DateTime date;
     private String dateClean;
     private static double team1Odd;
@@ -39,6 +49,30 @@ public class Game implements Serializable {
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Creates a  Game  object with betting odds loaded from an API.
+     * <p>
+     * Does not calculate any odds.
+     *
+     * @param t1       The name of team 1.
+     * @param t2       The name of team 2.
+     * @param date     The date of the game.
+     * @param team1Odd The odds for team 1.
+     * @param team2Odd The odds for team 2.
+     */
+    public Game(String t1, String t2, int id, Date givenDate, String sport, double team1Odd, double team2Odd) {
+        this.team1 = t1;
+        this.team2 = t2;
+        this.id = id;
+        this.date = new DateTime(givenDate);
+        this.sport = sport;
+
+
+        this.team1Odd = team1Odd;
+        this.team2Odd = team2Odd;
+        this.dateClean = this.getDateClean();
+    }
 
     /**
      * Serializes a  Game  object into a JSON string.
@@ -220,7 +254,7 @@ public class Game implements Serializable {
         this.date = new DateTime(startDate);
     }
 
-    public int getId() {
-        return 0;
+    public long getId() {
+        return this.id;
     }
 }

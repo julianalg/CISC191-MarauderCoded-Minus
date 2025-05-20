@@ -57,7 +57,7 @@ public class GameBST {
     }
 
     public static BinarySearchTree<Game> buildGameIdTree(List<Game> games) {
-        BinarySearchTree<Game> treeById = new BinarySearchTree<>(Comparator.comparingInt(Game::getId));
+        BinarySearchTree<Game> treeById = new BinarySearchTree<>(Comparator.comparingLong(Game::getId));
         for (Game game : games) {
             treeById.insert(game);
         }
