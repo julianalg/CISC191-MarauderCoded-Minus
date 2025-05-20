@@ -1,7 +1,7 @@
 package edu.sdccd.cisc191.Client;
 
 import edu.sdccd.cisc191.Common.Bet;
-import edu.sdccd.cisc191.Common.Game;
+import edu.sdccd.cisc191.Common.Models.Game;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;

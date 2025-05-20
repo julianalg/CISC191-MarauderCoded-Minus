@@ -1,5 +1,7 @@
 package edu.sdccd.cisc191.Common;
 
+import edu.sdccd.cisc191.Common.Models.Game;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

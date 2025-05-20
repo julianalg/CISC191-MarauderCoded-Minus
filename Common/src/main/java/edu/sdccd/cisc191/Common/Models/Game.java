@@ -1,7 +1,11 @@
-package edu.sdccd.cisc191.Common;
+package edu.sdccd.cisc191.Common.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -17,7 +21,10 @@ import java.util.Objects;
  *
  * @author Andy Ly, Julian Garcia
  */
+@Entity
 public class Game implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private String team1;
     private String team2;

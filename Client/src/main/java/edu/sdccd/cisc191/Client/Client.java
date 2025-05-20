@@ -1,6 +1,6 @@
 package edu.sdccd.cisc191.Client;
 
-import edu.sdccd.cisc191.Common.Game;
+import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
 

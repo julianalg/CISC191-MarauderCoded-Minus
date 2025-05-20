@@ -1,6 +1,6 @@
 package edu.sdccd.cisc191.Server.API;
 
-import edu.sdccd.cisc191.Common.Game;
+import edu.sdccd.cisc191.Common.Models.Game;
 
 import java.net.URI;
 import java.net.http.HttpClient;

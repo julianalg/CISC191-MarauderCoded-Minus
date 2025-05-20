@@ -1,7 +1,7 @@
 package edu.sdccd.cisc191.Server;
 
 import edu.sdccd.cisc191.Common.Bet;
-import edu.sdccd.cisc191.Common.Game;
+import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Request;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Server.API.BasketballGetter;

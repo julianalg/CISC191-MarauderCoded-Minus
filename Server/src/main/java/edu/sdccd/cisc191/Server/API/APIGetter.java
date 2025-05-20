@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import edu.sdccd.cisc191.Common.Game;
+import edu.sdccd.cisc191.Common.Models.Game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

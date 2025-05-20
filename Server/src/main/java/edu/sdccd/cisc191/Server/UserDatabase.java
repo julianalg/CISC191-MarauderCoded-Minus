@@ -14,6 +14,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import edu.sdccd.cisc191.Server.repositories.UserRepository;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.ComponentScan;
+
+
+
 /**
  * A singleton class that manages a database of users. It provides
  * functionalities for loading, saving, and accessing user data stored
@@ -25,6 +34,11 @@ import java.util.UUID;
  *
  * @author Andy Ly
  */
+
+@SpringBootApplication
+@EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
+@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
+@ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
 public class UserDatabase {
 
     // Singleton instance
@@ -35,6 +49,16 @@ public class UserDatabase {
 
     // File path for storing user data
     private static final URL FILE_PATH = UserDatabase.class.getResource("Users.json");
+
+    private UserRepository userRepository;
+
+    private UserDatabase(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(JPARunUserTest.class, args);
+    }
 
     /**
      * Private constructor to prevent instantiation outside the class.
