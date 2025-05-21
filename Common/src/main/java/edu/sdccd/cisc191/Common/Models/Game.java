@@ -73,7 +73,7 @@ public class Game implements Serializable {
      * @param team1Odd   Decimal odds for team 1
      * @param team2Odd   Decimal odds for team 2
      */
-    public Game(String t1, String t2, int id, Date givenDate, String sport, double team1Odd, double team2Odd) {
+    public Game(String t1, String t2, long id, Date givenDate, String sport, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
         this.id = id;

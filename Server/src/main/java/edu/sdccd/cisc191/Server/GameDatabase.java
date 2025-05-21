@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.io.FileWriter;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -104,6 +105,14 @@ public class GameDatabase implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        BaseballGetter baseballGetter = new BaseballGetter();
+        ArrayList<Game> games = baseballGetter.getGames("Baseball");
+        System.out.println("Total games in database: " + games.size());
+
+        for (Game game : games) {
+            System.out.println("Adding game " + game.getId() + " to database");
+            this.saveUser(game);
+        }
 
         loadOrInitializeDatabase();
 

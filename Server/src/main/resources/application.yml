@@ -5,7 +5,7 @@ server:
   port: 9090
 spring:
   application:
-    name: JPARunTest
+    name: UserDatabase
   h2:
     console:
       enabled: true

@@ -3,9 +3,20 @@ package edu.sdccd.cisc191.Client;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
@@ -40,6 +51,7 @@ public class Client {
         out = new ObjectOutputStream(clientSocket.getOutputStream());
         in = new ObjectInputStream(clientSocket.getInputStream());
     }
+
 
     /**
      * Sends a request to the server and returns a response of the expected type.
@@ -177,28 +189,40 @@ public class Client {
         int port = 4444;
         System.out.println("Listening on port " + port);
         startConnection("localhost", port);
-        System.out.println(getBasketballGames());
         // Test modification of user
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("Name", "John");
         attributes.put("Money", 9999);
 
-//        System.out.println(userModifyRequest(2, attributes));
+        HttpClient client = HttpClient.newHttpClient();
 
-//        Game[] response = getGames();
-//        System.out.println(response);
-        // Fetch games
-        ArrayList<Game> basketballGames = getBasketballGames();
-        ArrayList<Game> baseballGames = getBaseballGames();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/games"))
+                .GET() // or .POST(HttpRequest.BodyPublishers.ofString("your JSON"))
+                .build();
 
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status: " + response.statusCode());
+//        System.out.println("Body: " + response.body());
+
+        JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) jsonParser.parse(response.body());
         ArrayList<Game> allGames = new ArrayList<>();
-        allGames.addAll(basketballGames);
-        allGames.addAll(baseballGames);
-        System.out.println(allGames);
+
+//        System.out.println(jsonArray);
+        for (Object obj : jsonArray) {
+            JSONObject jsonObject = (JSONObject) obj;
+            System.out.println(jsonObject);
+            Instant instant = Instant.parse(jsonObject.get("gameDate").toString());
+            Date date = Date.from(instant);
+            Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), 0, 0);
+            allGames.add(game);
+        }
 
         new UI();
         UI.init(allGames, user);
-
+//
 
     }
 

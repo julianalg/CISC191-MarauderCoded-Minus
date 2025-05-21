@@ -1,5 +1,12 @@
 package edu.sdccd.cisc191.Server;
 
+import edu.sdccd.cisc191.Common.Models.Game;
+import edu.sdccd.cisc191.Server.repositories.GameRepository;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
 import java.net.*;
 import java.io.*;
 
@@ -15,6 +22,10 @@ import java.io.*;
  * @author Andy Ly
  * @see ClientHandler
  */
+@SpringBootApplication
+@EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
+@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
+@ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
 public class Server {
 
     /**
@@ -25,8 +36,10 @@ public class Server {
      * @param args Command-line arguments (not used in this application).
      */
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = null;
+
+        GameDatabase.main(args);
 
         try {
             // Initialize the server to listen on port 4444 with a backlog of 4096.
