@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.io.FileWriter;
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -121,6 +122,7 @@ public class GameDatabase implements CommandLineRunner {
      * Initializes the game database with default data.
      */
 
+
     void loadOrInitializeDatabase() throws Exception {
 
         updateDatabaseFromAPI();
@@ -133,6 +135,16 @@ public class GameDatabase implements CommandLineRunner {
                     CollectionType listType = objectMapper.getTypeFactory()
                             .constructCollectionType(List.class, User.class);
                     List<Game> games = objectMapper.readValue(file, listType);
+
+                    for (Game game : games) {
+                        Instant inputInstant = Instant.parse(game.getGameDate().toString());
+                        Instant now = Instant.now();
+                        if (inputInstant.isBefore(now)) {
+                            games.remove(game); // Remove game from database if in the past
+                        } else {
+                            System.out.println("The date is in the future.");
+                        }
+                    }
                     gameRepository.saveAll(games);
                     System.out.println("UserDatabase loaded from file.");
                 } catch (Exception e) {
