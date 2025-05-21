@@ -7,10 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.sdccd.cisc191.Common.Bet;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 /**
  * Represents a user in the system, holding information about their
@@ -26,6 +23,7 @@ import jakarta.persistence.Id;
 // Adapted from Andrew Huang repo
 
 @Entity
+@Table(name="users")
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

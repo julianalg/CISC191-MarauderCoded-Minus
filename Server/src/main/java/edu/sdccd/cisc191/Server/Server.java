@@ -40,6 +40,7 @@ public class Server {
         ServerSocket serverSocket = null;
 
         GameDatabase.main(args);
+        UserDatabase.main(args);
 
         try {
             // Initialize the server to listen on port 4444 with a backlog of 4096.

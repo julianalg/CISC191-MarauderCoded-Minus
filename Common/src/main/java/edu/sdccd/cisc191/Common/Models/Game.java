@@ -37,6 +37,7 @@ class JacksonConfig {
     }
 }
 @Entity
+@Table(name = "games")
 public class Game implements Serializable {
 
     @Id
