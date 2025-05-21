@@ -105,15 +105,6 @@ public class GameDatabase implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        BaseballGetter baseballGetter = new BaseballGetter();
-        ArrayList<Game> games = baseballGetter.getGames("Baseball");
-        System.out.println("Total games in database: " + games.size());
-
-        for (Game game : games) {
-            System.out.println("Adding game " + game.getId() + " to database");
-            this.saveUser(game);
-        }
-
         loadOrInitializeDatabase();
 
     }
@@ -130,7 +121,10 @@ public class GameDatabase implements CommandLineRunner {
      * Initializes the game database with default data.
      */
 
-    void loadOrInitializeDatabase() {
+    void loadOrInitializeDatabase() throws Exception {
+
+        updateDatabaseFromAPI();
+
         if (gameRepository.count() == 0) {
             File file = getOrCreateDatabaseFile();
             if (file.exists()) {
@@ -151,6 +145,7 @@ public class GameDatabase implements CommandLineRunner {
                 initializeDefaultGames();
             }
         }
+        saveToFile();
     }
 
     private void initializeDefaultGames() {
