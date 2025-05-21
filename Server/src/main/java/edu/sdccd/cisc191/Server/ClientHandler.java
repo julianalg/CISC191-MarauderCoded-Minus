@@ -121,7 +121,7 @@ class ClientHandler implements Runnable {
     private static Game getGame(Request request) {
         Game response;
 
-        List<Game> gameDatabase = GameDatabase.getInstance().getGameDatabase();
+        List<Game> gameDatabase = GameDatabase.getInstance().getAllGames();
         if (request.getId() >= gameDatabase.size()) {
             response = null;
         } else {

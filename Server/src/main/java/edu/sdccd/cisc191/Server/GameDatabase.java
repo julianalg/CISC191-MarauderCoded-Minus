@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.GameBST;
 import edu.sdccd.cisc191.Common.Models.User;
+import edu.sdccd.cisc191.Server.API.BaseballGetter;
+import edu.sdccd.cisc191.Server.API.BasketballGetter;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import jakarta.annotation.PreDestroy;
 import org.json.simple.parser.ParseException;
@@ -106,30 +108,6 @@ public class GameDatabase implements CommandLineRunner {
         loadOrInitializeDatabase();
 
     }
-
-    void loadOrInitializeDatabase() {
-        if (gameRepository.count() == 0) {
-            File file = getOrCreateDatabaseFile();
-            if (file.exists()) {
-                try {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    CollectionType listType = objectMapper.getTypeFactory()
-                            .constructCollectionType(List.class, Game.class);
-                    List<Game> users = objectMapper.readValue(file, listType);
-                    gameRepository.saveAll(users);
-                    System.out.println("UserDatabase loaded from file.");
-                } catch (Exception e) {
-                    System.out.println("EXCEPTION CAUGHT");
-                    System.out.println("Failed to load UserDatabase from file. Initializing with default data.");
-                    initializeDefaultGames();
-                }
-            } else {
-                System.out.println("UserDatabase file not found. Initializing with default data.");
-                initializeDefaultGames();
-            }
-        }
-    }
-
     /**
      * Reconstructs the BSTs from the current list of games
 
@@ -176,11 +154,11 @@ public class GameDatabase implements CommandLineRunner {
         try (Writer writer = new FileWriter(getOrCreateDatabaseFile())) {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            List<Game> users = gameRepository.findAll();
-            System.out.println("Total users in database: " + users.size());
-            users.forEach(user -> System.out.println("User ID: " + user.getId() + ", Name: " + user.getName()));
+            List<Game> games = gameRepository.findAll();
+            System.out.println("Total users in database: " + games.size());
+            games.forEach(user -> System.out.println("Game ID: " + user.getId() + ", Game: " + user.toString()));
 
-            objectMapper.writeValue(writer, users);
+            objectMapper.writeValue(writer, games);
             System.out.println("UserDatabase saved to file: " + getOrCreateDatabaseFile().getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
@@ -191,28 +169,40 @@ public class GameDatabase implements CommandLineRunner {
     /**
      * Updates the game database from the API
      */
-    void updateDatabaseFromAPI() throws ParseException {
+    void updateDatabaseFromAPI() throws Exception {
+        BaseballGetter baseballGetter = new BaseballGetter();
+        ArrayList<Game> baseballGames = baseballGetter.getGames("Baseball");
+        System.out.println("Total games in database: " + baseballGames.size());
 
+        for (Game game : baseballGames) {
+            System.out.println("Adding game " + game.getId() + " to database");
+            gameRepository.save(game);
+        }
+
+        BasketballGetter basketballGetter = new BasketballGetter();
+        ArrayList<Game> basketballGames = basketballGetter.getGames("Basketball");
+        System.out.println("Total games in database: " + basketballGames.size());
+
+        for (Game game : basketballGames) {
+            System.out.println("Adding game " + game.getId() + " to database");
+            gameRepository.save(game);
+        }
     }
 
-    public List<User> getAllUsers() {
+    public List<Game> getAllGames() {
         return gameRepository.findAll();
     }
 
-    public User saveUser(User user) {
-        return gameRepository.save(user);
+    public Game saveUser(Game game) {
+        return gameRepository.save(game);
     }
 
-    public void deleteUser(User user) {
-        gameRepository.delete(user);
+    public void deleteUser(Game game) {
+        gameRepository.delete(game);
     }
 
-    public User findUserById(Long id) {
+    public Game findUserById(Long id) {
         return gameRepository.findById(id).orElse(null);
-    }
-
-    public User findUserByName(String name) {
-        return gameRepository.findByName(name);
     }
 
     public long getSize() {
