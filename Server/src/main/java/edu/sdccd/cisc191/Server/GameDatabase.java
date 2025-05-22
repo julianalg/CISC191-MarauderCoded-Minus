@@ -56,5 +56,10 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
         BasketballGetter basketballGetter = new BasketballGetter();
         ArrayList<Game> basketballGames = basketballGetter.getGames("Basketball");
         repository.saveAll(basketballGames);
+        System.out.println("Game Database updated from API.");
+        System.out.println("Game Database contents:");
+        for (Game game : repository.findAll()) {
+            System.out.println(game);
+        }
     }
 }
