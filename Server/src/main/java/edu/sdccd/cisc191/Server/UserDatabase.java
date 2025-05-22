@@ -6,20 +6,12 @@ import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PreDestroy;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +20,7 @@ import java.util.UUID;
 
 // This class was meant to be a singleton, not sure if its still true after making it
 // a springboot database
+@Component
 public class UserDatabase {
 
     private final UserRepository userRepository;
@@ -35,18 +28,9 @@ public class UserDatabase {
     @Value("${app.database.file-path}")
     private String resourcePath; // Changed from static to instance field
     
-    private File getOrCreateDatabaseFile() { // Remove static modifier
-        // First, try to get the file from resources
-        URL filePath = UserDatabase.class.getResource("/users.json");
-        if (filePath != null) {
-            try {
-                return new File(filePath.toURI());
-            } catch (Exception e) {
-                // Fall through to use the configured path
-            }
-        }
-
-        // If resource not found, create the file in the specified directory
+    private File getOrCreateDatabaseFile() {
+        System.out.println("Resource path: " + resourcePath);
+        if (resourcePath == null) { throw new RuntimeException("app.database.file-path not configured");}
         File file = new File(resourcePath);
         try {
             File parentDir = file.getParentFile();
@@ -62,6 +46,9 @@ public class UserDatabase {
         }
     }
 
+    // Autowire annotation should tell Spring to run this
+    // Thereby injecting the right value into resourcePath
+    @Autowired
     public UserDatabase(UserRepository userRepository) {
         this.userRepository = userRepository;
 

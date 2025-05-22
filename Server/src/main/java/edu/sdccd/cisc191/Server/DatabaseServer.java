@@ -4,6 +4,7 @@ import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
 import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,13 +23,19 @@ import java.util.List;
 @SpringBootApplication
 @EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
 @EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
-@ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
+@ComponentScan(basePackages = {
+        "edu.sdccd.cisc191.Server.controllers",
+        "edu.sdccd.cisc191.Server.repositories",
+        "edu.sdccd.cisc191.Server"
+        })
+
 public class DatabaseServer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
     private final GameDatabase gameDatabase;
     private final UserDatabase userDatabase;
 
+    @Autowired
     public DatabaseServer(UserRepository userRepository, GameRepository gameRepository) throws IOException {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
