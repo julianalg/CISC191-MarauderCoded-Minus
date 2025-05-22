@@ -21,6 +21,3 @@ spring:
         globally_quoted_identifiers: true
     hibernate:
       ddl-auto: create-drop
-app:
-  database:
-    file-path: ./Server/src/main/resources/users.json

@@ -36,11 +36,11 @@ public class DatabaseServer implements CommandLineRunner {
     private final UserDatabase userDatabase;
 
     @Autowired
-    public DatabaseServer(UserRepository userRepository, GameRepository gameRepository) throws IOException {
+    public DatabaseServer(UserRepository userRepository, GameRepository gameRepository, GameDatabase gameDatabase, UserDatabase userDatabase) throws IOException {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
-        this.gameDatabase = new GameDatabase(gameRepository);
-        this.userDatabase = new UserDatabase(userRepository);
+        this.gameDatabase = gameDatabase;
+        this.userDatabase = userDatabase;
     }
 
     public static void main(String[] args) {
@@ -51,28 +51,13 @@ public class DatabaseServer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("App is running...");
-
-        gameDatabase.updateDatabaseFromAPI();
-        userDatabase.loadOrInitializeDatabase();
     }
 
     @PreDestroy
-    public void saveAllToFiles(){
+    public void saveAllToFiles() {
 
         gameDatabase.saveToFile();
         userDatabase.saveToFile();
 
-    }
-
-    public List<Game> getGames() {
-        return gameDatabase.getAllGames();
-    }
-
-    public GameDatabase getGameDBInstance() {
-        return gameDatabase;
-    }
-
-    public UserDatabase getUserDBInstance() {
-        return userDatabase;
     }
 }
