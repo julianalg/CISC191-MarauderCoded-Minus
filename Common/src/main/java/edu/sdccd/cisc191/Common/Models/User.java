@@ -8,6 +8,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,7 +42,7 @@ public class User implements Serializable {
     //TODO: resolve the IDE warning here...
     @JoinColumn(name = "user_id")
     @ToString.Exclude
-    private ArrayList<Bet> bets = new ArrayList<>();
+    private List<Bet> bets = new ArrayList<>();
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
