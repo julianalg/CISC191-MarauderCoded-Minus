@@ -18,7 +18,6 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
 
     protected final R repository;
     protected final Class<T> entityClass;
-    private String filePathPrefix;
 
     protected GenericDatabase(R repository, Class<T> entityClass) {
         this.repository = repository;
@@ -56,14 +55,13 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
                     ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                         objectMapper.registerModule(new JodaModule());
 
-
                     CollectionType listType = objectMapper.getTypeFactory()
                             .constructCollectionType(List.class, entityClass);
 
                     List<T> entities = objectMapper.readValue(file, listType);
                     System.out.println("Loaded " + entities.size() + " " + getEntityName() + " entities from file.");
                     repository.saveAll(entities);
-//                    System.out.println(getEntityName() + " Database loaded from file.");
+                    System.out.println(getEntityName() + " Database loaded from file.");
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("Failed to load " + getEntityName() + " Database from file. Initializing with default data.");
