@@ -255,22 +255,15 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
         User user = getMainUser();
-        Bet bet = new Bet(new Game("1", "2", new Date(), "Basketball", 1, 2), 10, "1");
-        addBetToMainUser(bet, user);
-//        updateMainUserMoney(3);
-        //        System.out.println(getSizeRequest(1));
-//        int port = 4444;
-//        System.out.println("Listening on port " + port);
-//        startConnection("localhost", port);
-//        // Test modification of user
-//        Map<String, Object> attributes = new HashMap<>();
-//        attributes.put("Name", "John");
-//        attributes.put("Money", 9999);
-//
-//        ArrayList<Game> allGames = Client.getGames();
-//
-//        new UI();
-//        UI.init(allGames, user);
+        Bet bet = new Bet(new Game("1", "2", 99999, new Date(), "Basketball", 1, 2), 10, "1");
+        Bet bet2  = new Bet(new Game("6", "8", 99999, new Date(), "Basketball", 22, 88), 10, "1");
+
+        updateMainUserMoney(3);
+
+        ArrayList<Game> allGames = Client.getGames();
+
+        new UI();
+        UI.init(allGames, user);
 
 
     }

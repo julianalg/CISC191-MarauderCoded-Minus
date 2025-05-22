@@ -53,7 +53,6 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
                 System.out.println("Contents:\n" + Files.readString(file.toPath()));
                 try {
                     ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                        objectMapper.registerModule(new JodaModule());
 
                     CollectionType listType = objectMapper.getTypeFactory()
                             .constructCollectionType(List.class, entityClass);
