@@ -1,7 +1,9 @@
 package edu.sdccd.cisc191.Server;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -51,13 +53,19 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
             if (file.exists()) {
                 System.out.println("Contents:\n" + Files.readString(file.toPath()));
                 try {
-                    ObjectMapper objectMapper = new ObjectMapper();
+                    ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                        objectMapper.registerModule(new JodaModule());
+
+
                     CollectionType listType = objectMapper.getTypeFactory()
                             .constructCollectionType(List.class, entityClass);
+
                     List<T> entities = objectMapper.readValue(file, listType);
-                    repository.saveAll(entities);
-                    System.out.println(getEntityName() + " Database loaded from file.");
+                    System.out.println("Loaded " + entities.size() + " " + getEntityName() + " entities from file.");
+//                    repository.saveAll(entities);
+//                    System.out.println(getEntityName() + " Database loaded from file.");
                 } catch (Exception e) {
+                    e.printStackTrace();
                     System.out.println("Failed to load " + getEntityName() + " Database from file. Initializing with default data.");
                     initializeDefaultEntities();
                 }
