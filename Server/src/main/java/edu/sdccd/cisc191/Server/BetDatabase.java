@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191.server;
+package edu.sdccd.cisc191.Server;
 
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;

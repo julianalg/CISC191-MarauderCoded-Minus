@@ -4,7 +4,7 @@ import edu.sdccd.cisc191.Common.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Request;
 import edu.sdccd.cisc191.Common.Models.User;
-import edu.sdccd.cisc191.server.BetDatabase;
+import edu.sdccd.cisc191.Server.BetDatabase;
 import edu.sdccd.cisc191.Server.API.BasketballGetter;
 import edu.sdccd.cisc191.Server.API.BaseballGetter;
 

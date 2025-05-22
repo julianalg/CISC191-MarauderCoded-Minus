@@ -50,6 +50,7 @@ public class Server {
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = null;
         GameRepository gameRepository = new GameRepository() {
+            // What the fuck is this
             @Override
             public void flush() {
 
