@@ -62,7 +62,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
 
                     List<T> entities = objectMapper.readValue(file, listType);
                     System.out.println("Loaded " + entities.size() + " " + getEntityName() + " entities from file.");
-//                    repository.saveAll(entities);
+                    repository.saveAll(entities);
 //                    System.out.println(getEntityName() + " Database loaded from file.");
                 } catch (Exception e) {
                     e.printStackTrace();
