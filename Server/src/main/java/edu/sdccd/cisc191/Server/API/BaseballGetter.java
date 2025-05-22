@@ -37,12 +37,4 @@ public class BaseballGetter extends APIGetter {
 
     }
 
-    public static void main(String[] args) throws Exception {
-        BaseballGetter baseballGetter = new BaseballGetter();
-//        System.out.println(baseballGetter.getGames("Baseball"));
-
-        baseballGetter.getOdd(163994);
-
-    }
-
 }
