@@ -27,7 +27,6 @@ public class Client {
     /**
      * A static user representing the client user. Initialized with name "Chase" and money 1000000.
      */
-    public static User user = new User("Chase", 1000000);
 
     /**
      * The socket used to connect to the server.
@@ -163,37 +162,7 @@ public class Client {
      * @return an array of Game objects.
      * @throws IOException if an I/O error occurs during retrieval.
      */
-    private Game[] getGames() throws Exception {
-        int size = sendRequest(new Request("GetSize", 1), Integer.class);
-        Game[] games = new Game[size];
-        for (int i = 0; i < size; i++) {
-            games[i] = sendRequest(new Request("Game", 1), Game.class);
-        }
-        return games;
-    }
-
-    private static ArrayList<Game> getBasketballGames() throws Exception {
-        ArrayList<Game> basketballGames;
-        basketballGames = sendRequest(new Request("Basketball", 1), ArrayList.class);
-        return basketballGames;
-    }
-
-    private static ArrayList<Game> getBaseballGames() throws Exception {
-        ArrayList<Game> baseballGames;
-        baseballGames = sendRequest(new Request("Baseball", 1), ArrayList.class);
-        return baseballGames;
-    }
-
-    public static void main(String[] args) throws Exception {
-        //        System.out.println(getSizeRequest(1));
-        int port = 4444;
-        System.out.println("Listening on port " + port);
-        startConnection("localhost", port);
-        // Test modification of user
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("Name", "John");
-        attributes.put("Money", 9999);
-
+    private static Game[] getGames() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -219,6 +188,63 @@ public class Client {
             Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), 0, 0);
             allGames.add(game);
         }
+
+        return allGames.toArray(new Game[0]);
+    }
+
+    private static User getUser(int id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/user/0"))
+                .GET() // or .POST(HttpRequest.BodyPublishers.ofString("your JSON"))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status: " + response.statusCode());
+//        System.out.println("Body: " + response.body());
+
+        JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) jsonParser.parse(response.body());
+        ArrayList<Game> allGames = new ArrayList<>();
+
+//        System.out.println(jsonArray);
+        for (Object obj : jsonArray) {
+            JSONObject jsonObject = (JSONObject) obj;
+            System.out.println(jsonObject);
+            Instant instant = Instant.parse(jsonObject.get("gameDate").toString());
+            Date date = Date.from(instant);
+            Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), 0, 0);
+            allGames.add(game);
+        }
+
+
+    }
+
+    private static ArrayList<Game> getBasketballGames() throws Exception {
+        ArrayList<Game> basketballGames;
+        basketballGames = sendRequest(new Request("Basketball", 1), ArrayList.class);
+        return basketballGames;
+    }
+
+    private static ArrayList<Game> getBaseballGames() throws Exception {
+        ArrayList<Game> baseballGames;
+        baseballGames = sendRequest(new Request("Baseball", 1), ArrayList.class);
+        return baseballGames;
+    }
+
+    public static void main(String[] args) throws Exception {
+        //        System.out.println(getSizeRequest(1));
+        int port = 4444;
+        System.out.println("Listening on port " + port);
+        startConnection("localhost", port);
+        // Test modification of user
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("Name", "John");
+        attributes.put("Money", 9999);
+
+        Game[] allGames = Client.getGames();
 
         new UI();
         UI.init(allGames, user);

@@ -57,7 +57,7 @@ public class GameDatabase {
 
     private File getOrCreateDatabaseFile() { // Remove static modifier
         // First, try to get the file from resources
-        URL filePath = UserDatabase.class.getResource("/games.json");
+        URL filePath = GameDatabase.class.getResource("/games.json");
         if (filePath != null) {
             try {
                 return new File(filePath.toURI());
@@ -84,11 +84,6 @@ public class GameDatabase {
     public GameDatabase(GameRepository gameRepository) {
 
         this.gameRepository = gameRepository;
-        try {
-            loadOrInitializeDatabase();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -128,14 +123,14 @@ public class GameDatabase {
                         }
                     }
                     gameRepository.saveAll(games);
-                    System.out.println("UserDatabase loaded from file.");
+                    System.out.println("GameDatabase loaded from file.");
                 } catch (Exception e) {
                     System.out.println("EXCEPTION CAUGHT");
-                    System.out.println("Failed to load UserDatabase from file. Initializing with default data.");
+                    System.out.println("Failed to load GameDatabase from file. Initializing with default data.");
                     initializeDefaultGames();
                 }
             } else {
-                System.out.println("UserDatabase file not found. Initializing with default data.");
+                System.out.println("GameDatabase file not found. Initializing with default data.");
                 initializeDefaultGames();
             }
         }
@@ -156,7 +151,7 @@ public class GameDatabase {
             List<Game> games = gameRepository.findAll();
             System.out.println("Total users in database: " + games.size());
             objectMapper.writeValue(writer, games);
-            System.out.println("UserDatabase saved to file: " + getOrCreateDatabaseFile().getAbsolutePath());
+            System.out.println("GameDatabase saved to file: " + getOrCreateDatabaseFile().getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -171,7 +166,7 @@ public class GameDatabase {
         ArrayList<Game> baseballGames = baseballGetter.getGames("Baseball");
 
         for (Game game : baseballGames) {
-            System.out.println("Adding game " + game.getId() + " to database");
+//            System.out.println("Adding game " + game.getId() + " to database");
             gameRepository.save(game);
         }
 
@@ -179,11 +174,11 @@ public class GameDatabase {
         ArrayList<Game> basketballGames = basketballGetter.getGames("Basketball");
 
         for (Game game : basketballGames) {
-            System.out.println("Adding game " + game.getId() + " to database");
+//            System.out.println("Adding game " + game.getId() + " to database");
             gameRepository.save(game);
         }
 
-        System.out.println("Total games in database: " + baseballGames.size());
+//        System.out.println("Total games in database: " + baseballGames.size());
 
     }
 

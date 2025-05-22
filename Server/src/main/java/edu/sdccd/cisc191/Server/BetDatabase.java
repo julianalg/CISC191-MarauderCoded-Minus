@@ -50,6 +50,7 @@ public class BetDatabase implements CommandLineRunner {
         System.out.println("App is running...");
 
         gameDatabase.updateDatabaseFromAPI();
+        userDatabase.loadOrInitializeDatabase();
     }
 
     @PreDestroy

@@ -42,6 +42,8 @@ public class Game implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long dbId;
+
     private long id;
 
     private String team1;

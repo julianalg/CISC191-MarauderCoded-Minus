@@ -63,10 +63,9 @@ public class UserDatabase {
 
     public UserDatabase(UserRepository userRepository) {
         this.userRepository = userRepository;
-        loadOrInitializeDatabase();
     }
 
-    void loadOrInitializeDatabase() {
+    public void loadOrInitializeDatabase() {
         if (userRepository.count() == 0) {
             File file = getOrCreateDatabaseFile();
             if (file.exists()) {
@@ -75,6 +74,10 @@ public class UserDatabase {
                     CollectionType listType = objectMapper.getTypeFactory()
                             .constructCollectionType(List.class, User.class);
                     List<User> users = objectMapper.readValue(file, listType);
+                    System.out.println("Total users in file: " + users.size());
+                    for (User user : users) {
+                        System.out.println("User ID: " + user.getId() + ", Name: " + user.getName());
+                    }
                     userRepository.saveAll(users);
                     System.out.println("UserDatabase loaded from file.");
                 } catch (Exception e) {
