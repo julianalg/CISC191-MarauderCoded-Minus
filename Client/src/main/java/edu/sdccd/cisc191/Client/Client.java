@@ -1,5 +1,7 @@
 package edu.sdccd.cisc191.Client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.sdccd.cisc191.Common.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
@@ -227,34 +229,49 @@ public class Client {
 
     }
 
-    private static ArrayList<Game> getBasketballGames() throws Exception {
-        ArrayList<Game> basketballGames;
-        basketballGames = sendRequest(new Request("Basketball", 1), ArrayList.class);
-        return basketballGames;
+    private static void addBetToMainUser(Bet bet, User user) throws Exception {
+        // Add the new bet to the user's existing list
+        user.addBet(bet);
+
+        // Use Jackson to convert the entire User object to JSON
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBody = mapper.writeValueAsString(user);
+
+        System.out.println("Sending JSON: " + jsonBody); // Debug print
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/users/1"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status Code: " + response.statusCode());
+        System.out.println("Response Body: " + response.body());
     }
 
-    private static ArrayList<Game> getBaseballGames() throws Exception {
-        ArrayList<Game> baseballGames;
-        baseballGames = sendRequest(new Request("Baseball", 1), ArrayList.class);
-        return baseballGames;
-    }
 
     public static void main(String[] args) throws Exception {
         User user = getMainUser();
-        updateMainUserMoney(3);
+        Bet bet = new Bet(new Game("1", "2", new Date(), "Basketball", 1, 2), 10, "1");
+        addBetToMainUser(bet, user);
+//        updateMainUserMoney(3);
         //        System.out.println(getSizeRequest(1));
-        int port = 4444;
-        System.out.println("Listening on port " + port);
-        startConnection("localhost", port);
-        // Test modification of user
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("Name", "John");
-        attributes.put("Money", 9999);
-
-        ArrayList<Game> allGames = Client.getGames();
-
-        new UI();
-        UI.init(allGames, user);
+//        int port = 4444;
+//        System.out.println("Listening on port " + port);
+//        startConnection("localhost", port);
+//        // Test modification of user
+//        Map<String, Object> attributes = new HashMap<>();
+//        attributes.put("Name", "John");
+//        attributes.put("Money", 9999);
+//
+//        ArrayList<Game> allGames = Client.getGames();
+//
+//        new UI();
+//        UI.init(allGames, user);
 
 
     }

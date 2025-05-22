@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.sdccd.cisc191.Common.Bet;
 import jakarta.persistence.*;
+import lombok.Setter;
 
 /**
  * Represents a user in the system, holding information about their
@@ -33,6 +34,7 @@ public class User implements Serializable {
     private long money;
     private int moneyLine; // Money placed in active bets but not yet resolved
     private int moneyBet; // Money available for future bets
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private ArrayList<Bet> bets = new ArrayList<>();
 
     @JsonIgnore
@@ -193,9 +195,6 @@ public class User implements Serializable {
      *
      * @return A list of active bets.
      */
-    public ArrayList<Bet> getBets() {
-        return bets;
-    }
 
     /**
      * Adds a new bet to the user's list of active bets and updates the money balance accordingly.
@@ -221,4 +220,12 @@ public class User implements Serializable {
     public Long getId() {
         return this.id;
     }
+
+    public void setId(Long id) {
+    }
+
+    public ArrayList<Bet> getBets() {
+        return bets;
+    }
+
 }
