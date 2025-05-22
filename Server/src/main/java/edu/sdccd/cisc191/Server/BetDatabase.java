@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.FluentQuery;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -33,7 +34,7 @@ public class BetDatabase implements CommandLineRunner {
     private final GameDatabase gameDatabase;
     private final UserDatabase userDatabase;
 
-    public BetDatabase(UserRepository userRepository, GameRepository gameRepository) {
+    public BetDatabase(UserRepository userRepository, GameRepository gameRepository) throws IOException {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
         this.gameDatabase = new GameDatabase(gameRepository);

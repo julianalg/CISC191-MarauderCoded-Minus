@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,12 +64,16 @@ public class UserDatabase {
 
     public UserDatabase(UserRepository userRepository) {
         this.userRepository = userRepository;
+
     }
 
-    public void loadOrInitializeDatabase() {
+    public void loadOrInitializeDatabase() throws IOException {
+
         if (userRepository.count() == 0) {
             File file = getOrCreateDatabaseFile();
+            System.out.println("Loading from: " + file.getAbsolutePath());
             if (file.exists()) {
+                System.out.println("Contents:\n" + Files.readString(file.toPath()));
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
                     CollectionType listType = objectMapper.getTypeFactory()
