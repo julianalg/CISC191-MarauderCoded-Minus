@@ -31,16 +31,16 @@ import java.util.List;
 
 public class DatabaseServer implements CommandLineRunner {
     private final UserRepository userRepository;
-    //private final GameRepository gameRepository;
-   // private final GameDatabase gameDatabase;
+    private final GameRepository gameRepository;
+    private final GameDatabase gameDatabase;
     private final UserDatabase userDatabase;
 
     @Autowired
-    public DatabaseServer(UserRepository userRepository, GameRepository gameRepository) throws IOException {
+    public DatabaseServer(UserRepository userRepository, GameRepository gameRepository, GameDatabase gameDatabase, UserDatabase userDatabase) throws IOException {
         this.userRepository = userRepository;
-        //this.gameRepository = gameRepository;
-        //this.gameDatabase = new GameDatabase(gameRepository);
-        this.userDatabase = new UserDatabase(userRepository);
+        this.gameRepository = gameRepository;
+        this.gameDatabase = gameDatabase;
+        this.userDatabase = userDatabase;
     }
 
     public static void main(String[] args) {
@@ -56,7 +56,7 @@ public class DatabaseServer implements CommandLineRunner {
     @PreDestroy
     public void saveAllToFiles() {
 
-        //gameDatabase.saveToFile();
+        gameDatabase.saveToFile();
         userDatabase.saveToFile();
 
     }

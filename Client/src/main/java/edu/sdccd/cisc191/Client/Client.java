@@ -1,10 +1,10 @@
 package edu.sdccd.cisc191.Client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,7 +16,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
@@ -162,7 +161,7 @@ public class Client {
      * @return an array of Game objects.
      * @throws IOException if an I/O error occurs during retrieval.
      */
-    private static Game[] getGames() throws Exception {
+    private static ArrayList<Game> getGames() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -189,66 +188,83 @@ public class Client {
             allGames.add(game);
         }
 
-        return allGames.toArray(new Game[0]);
+        return allGames;
     }
 
-    private static User getUser(int id) throws Exception {
+    private static User getMainUser() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:9090/user/0"))
+                .uri(URI.create("http://localhost:9090/users/1"))
                 .GET() // or .POST(HttpRequest.BodyPublishers.ofString("your JSON"))
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         System.out.println("Status: " + response.statusCode());
-//        System.out.println("Body: " + response.body());
+        System.out.println("Body: " + response.body());
 
         JSONParser jsonParser = new JSONParser();
-        JSONArray jsonArray = (JSONArray) jsonParser.parse(response.body());
-        ArrayList<Game> allGames = new ArrayList<>();
-
-//        System.out.println(jsonArray);
-        for (Object obj : jsonArray) {
-            JSONObject jsonObject = (JSONObject) obj;
-            System.out.println(jsonObject);
-            Instant instant = Instant.parse(jsonObject.get("gameDate").toString());
-            Date date = Date.from(instant);
-            Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), 0, 0);
-            allGames.add(game);
-        }
-
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(response.body());
+        return new User((String) jsonObject.get("name"), (long) jsonObject.get("money"));
 
     }
 
-    private static ArrayList<Game> getBasketballGames() throws Exception {
-        ArrayList<Game> basketballGames;
-        basketballGames = sendRequest(new Request("Basketball", 1), ArrayList.class);
-        return basketballGames;
+    private static void updateMainUserMoney(long money) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        String jsonBody = "{\"id\": 1, \"name\": \"Chase\", \"money\": " + money + "}";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/users/1"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status Code: " + response.statusCode());
+        System.out.println("Response Body: " + response.body());
+
     }
 
-    private static ArrayList<Game> getBaseballGames() throws Exception {
-        ArrayList<Game> baseballGames;
-        baseballGames = sendRequest(new Request("Baseball", 1), ArrayList.class);
-        return baseballGames;
+    private static void addBetToMainUser(Bet bet, User user) throws Exception {
+        // Add the new bet to the user's existing list
+        user.addBet(bet);
+
+        // Use Jackson to convert the entire User object to JSON
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBody = mapper.writeValueAsString(user);
+
+        System.out.println("Sending JSON: " + jsonBody); // Debug print
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/users/1"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status Code: " + response.statusCode());
+        System.out.println("Response Body: " + response.body());
     }
+
 
     public static void main(String[] args) throws Exception {
-        //        System.out.println(getSizeRequest(1));
-        int port = 4444;
-        System.out.println("Listening on port " + port);
-        startConnection("localhost", port);
-        // Test modification of user
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("Name", "John");
-        attributes.put("Money", 9999);
+        User user = getMainUser();
+        Bet bet = new Bet(new Game("1", "2", 99999, new Date(), "Basketball", 1, 2), 10, "1");
+        Bet bet2  = new Bet(new Game("6", "8", 99999, new Date(), "Basketball", 22, 88), 10, "1");
 
-        Game[] allGames = Client.getGames();
+        updateMainUserMoney(3);
+
+        ArrayList<Game> allGames = Client.getGames();
 
         new UI();
         UI.init(allGames, user);
-//
+
 
     }
 

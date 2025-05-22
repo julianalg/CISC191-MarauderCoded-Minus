@@ -15,9 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 public class UserDatabase extends GenericDatabase<User, Long, UserRepository> {
     
     @Autowired
-    public UserDatabase(UserRepository userRepository, 
-                       @Value("${app.database.file-path-prefix}") String filePathPrefix) throws IOException {
-        super(userRepository, User.class, filePathPrefix);
+    public UserDatabase(UserRepository userRepository) throws Exception {
+        super(userRepository, User.class);
         loadOrInitializeDatabase();
     }
 

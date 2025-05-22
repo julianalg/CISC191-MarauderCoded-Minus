@@ -2,7 +2,7 @@ package edu.sdccd.cisc191.Client;
 
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Request;
-import edu.sdccd.cisc191.Common.Bet;
+import edu.sdccd.cisc191.Common.Models.Bet;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

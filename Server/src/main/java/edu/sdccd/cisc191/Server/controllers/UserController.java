@@ -49,13 +49,14 @@ class UserController {
 
     @PutMapping("/users/{id}")
     User replaceUser(@RequestBody User newUser, @PathVariable Long id) {
-
         return repository.findById(id)
                 .map(user -> {
                     user.setName(newUser.getName());
+                    user.setMoney((int) newUser.getMoney());
                     return repository.save(user);
                 })
                 .orElseGet(() -> {
+                    newUser.setId(id);
                     return repository.save(newUser);
                 });
     }
