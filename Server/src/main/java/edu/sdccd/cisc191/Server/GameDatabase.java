@@ -51,11 +51,22 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
     public void updateDatabaseFromAPI() throws Exception {
         BaseballGetter baseballGetter = new BaseballGetter();
         ArrayList<Game> baseballGames = baseballGetter.getGames("Baseball");
+
+        // Validation, think about replacing with stream operation
+        // Removes games already in our database.
+        for(Game game: repository.findAll()) {
+            baseballGames.remove(game);
+        }
         repository.saveAll(baseballGames);
 
         BasketballGetter basketballGetter = new BasketballGetter();
         ArrayList<Game> basketballGames = basketballGetter.getGames("Basketball");
+
+        for(Game game: repository.findAll()) {
+            basketballGames.remove(game);
+        }
         repository.saveAll(basketballGames);
+
         System.out.println("Game Database updated from API.");
         System.out.println("Game Database contents:");
         for (Game game : repository.findAll()) {
