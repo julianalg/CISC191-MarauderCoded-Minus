@@ -178,9 +178,9 @@ public class Bet implements Serializable {
      */
     public User updateUser(User user) {
         if (fulfillment) {
-            user.setMoney(user.getMoney() + winAmt);
+            user.setMoney((int) (user.getMoney() + winAmt));
         } else {
-            user.setMoney(user.getMoney() - winAmt);
+            user.setMoney((int) (user.getMoney() - winAmt));
         }
         return user;
     }

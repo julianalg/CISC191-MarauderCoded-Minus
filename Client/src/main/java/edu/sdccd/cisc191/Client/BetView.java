@@ -78,9 +78,9 @@ public class BetView extends Application {
 
         b1.setOnAction(evt -> {
             Integer amount = Integer.parseInt(b.getText());
-            if (Client.user.getMoneyBet() >= amount) {
+            if (0 >= amount) {
                 Bet placedBet = new Bet(game, amount, team);
-                Client.user.addBet(placedBet);
+//                Client.user.addBet(placedBet);
                 try {
                     new UI().start(stage);
                 } catch (Exception e) {
@@ -93,7 +93,7 @@ public class BetView extends Application {
                 dialog.setTitle("Marauder Bets");
                 ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
                 //Setting the content of the dialog
-                dialog.setContentText("This is more money than you have available to bet! $" + Client.user.getMoneyBet());
+//                dialog.setContentText("This is more money than you have available to bet! $" + Client.user.getMoneyBet());
                 //Adding buttons to the dialog pane
                 dialog.getDialogPane().getButtonTypes().add(type);
                 dialog.showAndWait();

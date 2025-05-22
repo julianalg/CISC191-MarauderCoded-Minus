@@ -30,7 +30,7 @@ public class User implements Serializable {
     private Long id;
 
     private String name;
-    private int money;
+    private long money;
     private int moneyLine; // Money placed in active bets but not yet resolved
     private int moneyBet; // Money available for future bets
     private ArrayList<Bet> bets = new ArrayList<>();
@@ -75,11 +75,11 @@ public class User implements Serializable {
      * @param name The name of the user.
      * @param money The initial amount of money the user has.
      */
-    public User(String name, int money) {
+    public User(String name, long money) {
         this.name = name;
         this.money = money;
         this.moneyLine = 0;
-        this.moneyBet = money;
+        this.moneyBet = Math.toIntExact(money);
     }
 
     /**
@@ -158,7 +158,7 @@ public class User implements Serializable {
      *
      * @return The user's total money.
      */
-    public int getMoney() {
+    public long getMoney() {
         return money;
     }
 

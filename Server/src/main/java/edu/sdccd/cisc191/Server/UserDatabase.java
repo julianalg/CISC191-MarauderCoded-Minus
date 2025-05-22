@@ -98,6 +98,7 @@ public class UserDatabase {
     }
 
     private void initializeDefaultUsers() {
+        System.out.println("Initializing default users...");
         List<User> defaultUsers = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             String userId = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
