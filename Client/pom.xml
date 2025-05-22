@@ -6,6 +6,11 @@
     <properties>
         <javafx.version>23.0.2</javafx.version>
         <junit.version>5.11.4</junit.version>
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>23.0.2</javafx.version>
+        <start-class>edu.sdccd.cisc191.Client.Client.Client</start-class>
     </properties>
     <parent>
         <groupId>edu.sdccd.cisc191.template</groupId>
@@ -35,18 +40,20 @@
             <classifier>win</classifier>
         </dependency>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.14.0</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.sdccd.cisc191.template</groupId>
+            <artifactId>Server</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
