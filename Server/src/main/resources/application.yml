@@ -23,4 +23,4 @@ spring:
       ddl-auto: create-drop
 app:
   database:
-    file-path: ${user.dir}/Server/src/main/resources/users.json
+    file-path-prefix: ./Server/src/main/resources/

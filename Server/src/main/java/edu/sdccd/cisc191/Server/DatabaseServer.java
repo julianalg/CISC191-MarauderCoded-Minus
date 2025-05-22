@@ -31,15 +31,15 @@ import java.util.List;
 
 public class DatabaseServer implements CommandLineRunner {
     private final UserRepository userRepository;
-    private final GameRepository gameRepository;
-    private final GameDatabase gameDatabase;
+    //private final GameRepository gameRepository;
+   // private final GameDatabase gameDatabase;
     private final UserDatabase userDatabase;
 
     @Autowired
     public DatabaseServer(UserRepository userRepository, GameRepository gameRepository) throws IOException {
         this.userRepository = userRepository;
-        this.gameRepository = gameRepository;
-        this.gameDatabase = new GameDatabase(gameRepository);
+        //this.gameRepository = gameRepository;
+        //this.gameDatabase = new GameDatabase(gameRepository);
         this.userDatabase = new UserDatabase(userRepository);
     }
 
@@ -51,28 +51,13 @@ public class DatabaseServer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("App is running...");
-
-        gameDatabase.updateDatabaseFromAPI();
-        userDatabase.loadOrInitializeDatabase();
     }
 
     @PreDestroy
-    public void saveAllToFiles(){
+    public void saveAllToFiles() {
 
-        gameDatabase.saveToFile();
+        //gameDatabase.saveToFile();
         userDatabase.saveToFile();
 
-    }
-
-    public List<Game> getGames() {
-        return gameDatabase.getAllGames();
-    }
-
-    public GameDatabase getGameDBInstance() {
-        return gameDatabase;
-    }
-
-    public UserDatabase getUserDBInstance() {
-        return userDatabase;
     }
 }
