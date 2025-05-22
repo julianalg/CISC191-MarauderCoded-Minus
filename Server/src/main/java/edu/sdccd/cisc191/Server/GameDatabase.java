@@ -100,9 +100,9 @@ public class GameDatabase {
      * Initializes the game database with default data.
      */
 
-
+    // What happened here bro... Why are we removing games from the database??
+    // Why is this method never called...?
     public void loadOrInitializeDatabase() throws Exception {
-
 
         if (gameRepository.count() == 0) {
             File file = getOrCreateDatabaseFile();
