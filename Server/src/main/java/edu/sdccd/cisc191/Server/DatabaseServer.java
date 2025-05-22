@@ -56,7 +56,7 @@ public class DatabaseServer implements CommandLineRunner {
     @PreDestroy
     public void saveAllToFiles() {
 
-        //gameDatabase.saveToFile();
+        gameDatabase.saveToFile();
         userDatabase.saveToFile();
 
     }

@@ -18,10 +18,9 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
     protected final Class<T> entityClass;
     private String filePathPrefix;
 
-    protected GenericDatabase(R repository, Class<T> entityClass, String filePathPrefix) {
+    protected GenericDatabase(R repository, Class<T> entityClass) {
         this.repository = repository;
         this.entityClass = entityClass;
-        this.filePathPrefix = filePathPrefix;
     }
 
     protected File getOrCreateDatabaseFile() {
@@ -45,7 +44,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
             throw new RuntimeException("Failed to create database file at " + resourcePath, e);
         }
     }
-    public void loadOrInitializeDatabase() throws IOException {
+    public void loadOrInitializeDatabase() throws Exception {
         if (repository.count() == 0) {
             File file = getOrCreateDatabaseFile();
             System.out.println("Loading from: " + file.getAbsolutePath());
@@ -101,7 +100,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
         return repository.count();
     }
 
-    protected abstract void initializeDefaultEntities();
+    protected abstract void initializeDefaultEntities() throws Exception;
     protected abstract String getFileName();
     protected abstract String getEntityName();
 }
