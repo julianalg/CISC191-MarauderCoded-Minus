@@ -41,14 +41,9 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @author Andy Ly
  */
-@SpringBootApplication
-@EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
-@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
-@ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
-public class GameDatabase implements CommandLineRunner {
+public class GameDatabase {
 
     // Singleton instance
-    private static GameDatabase instance;
     private final GameRepository gameRepository;
 
     @Value("Server/src/main/resources/games.json")
@@ -86,29 +81,17 @@ public class GameDatabase implements CommandLineRunner {
         }
     }
 
-    @Autowired
     public GameDatabase(GameRepository gameRepository) {
 
         this.gameRepository = gameRepository;
-        instance = this;
-
-    }
-
-    public static synchronized GameDatabase getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("GameDatabase instance has not been initialized yet.");
+        try {
+            loadOrInitializeDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return instance;
-    }
-
-    public static void main(String[] args) { SpringApplication.run(GameDatabase.class, args);}
-
-
-    @Override
-    public void run(String... args) throws Exception {
-        loadOrInitializeDatabase();
 
     }
+
     /**
      * Reconstructs the BSTs from the current list of games
 
@@ -123,9 +106,8 @@ public class GameDatabase implements CommandLineRunner {
      */
 
 
-    void loadOrInitializeDatabase() throws Exception {
+    public void loadOrInitializeDatabase() throws Exception {
 
-        updateDatabaseFromAPI();
 
         if (gameRepository.count() == 0) {
             File file = getOrCreateDatabaseFile();
@@ -157,6 +139,8 @@ public class GameDatabase implements CommandLineRunner {
                 initializeDefaultGames();
             }
         }
+
+
         saveToFile();
     }
 
@@ -164,7 +148,6 @@ public class GameDatabase implements CommandLineRunner {
         return;
     }
 
-    @PreDestroy
     public void saveToFile() {
         System.out.println("Save to file method triggered");
         try (Writer writer = new FileWriter(getOrCreateDatabaseFile())) {
@@ -172,8 +155,6 @@ public class GameDatabase implements CommandLineRunner {
 
             List<Game> games = gameRepository.findAll();
             System.out.println("Total users in database: " + games.size());
-            games.forEach(user -> System.out.println("Game ID: " + user.getId() + ", Game: " + user.toString()));
-
             objectMapper.writeValue(writer, games);
             System.out.println("UserDatabase saved to file: " + getOrCreateDatabaseFile().getAbsolutePath());
         } catch (IOException e) {
@@ -185,10 +166,9 @@ public class GameDatabase implements CommandLineRunner {
     /**
      * Updates the game database from the API
      */
-    void updateDatabaseFromAPI() throws Exception {
+    public void updateDatabaseFromAPI() throws Exception {
         BaseballGetter baseballGetter = new BaseballGetter();
         ArrayList<Game> baseballGames = baseballGetter.getGames("Baseball");
-        System.out.println("Total games in database: " + baseballGames.size());
 
         for (Game game : baseballGames) {
             System.out.println("Adding game " + game.getId() + " to database");
@@ -197,13 +177,16 @@ public class GameDatabase implements CommandLineRunner {
 
         BasketballGetter basketballGetter = new BasketballGetter();
         ArrayList<Game> basketballGames = basketballGetter.getGames("Basketball");
-        System.out.println("Total games in database: " + basketballGames.size());
 
         for (Game game : basketballGames) {
             System.out.println("Adding game " + game.getId() + " to database");
             gameRepository.save(game);
         }
+
+        System.out.println("Total games in database: " + baseballGames.size());
+
     }
+
 
     public List<Game> getAllGames() {
         return gameRepository.findAll();

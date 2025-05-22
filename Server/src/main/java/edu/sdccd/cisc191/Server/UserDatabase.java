@@ -27,13 +27,8 @@ import java.util.UUID;
 
 // This class was meant to be a singleton, not sure if its still true after making it
 // a springboot database
-@SpringBootApplication
-@EnableJpaRepositories("edu.sdccd.cisc191.Server.repositories")
-@EntityScan(basePackages = {"edu.sdccd.cisc191.Common.Models"})
-@ComponentScan(basePackages = {"edu.sdccd.cisc191.Server.controllers", "edu.sdccd.cisc191.Server.repositories"})
-public class UserDatabase implements CommandLineRunner {
+public class UserDatabase {
 
-    private static UserDatabase instance;
     private final UserRepository userRepository;
     
     @Value("${app.database.file-path}")
@@ -66,31 +61,9 @@ public class UserDatabase implements CommandLineRunner {
         }
     }
 
-    @Autowired
     public UserDatabase(UserRepository userRepository) {
         this.userRepository = userRepository;
-        instance = this;
-        // Remove loadOrInitializeDatabase() from constructor since it's called in run()
-    }
-
-    // Not sure if this is the right way to handle this...
-    // What does instantiating this with a userRepository even do???
-    public static synchronized UserDatabase getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("UserDatabase instance has not been initialized yet.");
-        }
-        return instance;
-    }
-
-    // Responsible for booting up our database
-    public static void main(String[] args) { SpringApplication.run(UserDatabase.class, args); }
-
-    // This should load the database on startup from a file...?
-    @Override
-    public void run(String... args) throws Exception {
-
-       loadOrInitializeDatabase();
-
+        loadOrInitializeDatabase();
     }
 
     void loadOrInitializeDatabase() {
@@ -131,7 +104,6 @@ public class UserDatabase implements CommandLineRunner {
 
     }
 
-    @PreDestroy
     public void saveToFile() {
         System.out.println("Save to file method triggered");
         try (Writer writer = new FileWriter(getOrCreateDatabaseFile())) {

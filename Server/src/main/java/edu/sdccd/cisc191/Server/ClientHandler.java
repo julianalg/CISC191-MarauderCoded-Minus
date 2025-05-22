@@ -4,6 +4,7 @@ import edu.sdccd.cisc191.Common.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Request;
 import edu.sdccd.cisc191.Common.Models.User;
+import edu.sdccd.cisc191.server.BetDatabase;
 import edu.sdccd.cisc191.Server.API.BasketballGetter;
 import edu.sdccd.cisc191.Server.API.BaseballGetter;
 
@@ -23,9 +24,11 @@ import java.util.*;
  * @see Server
  * @see Request
  */
+
 class ClientHandler implements Runnable {
 
     private ServerSocket serverSocket; // Server socket for incoming connections
+    private static BetDatabase database;
     private Socket clientSocket; // Socket for communicating with the client
     ObjectOutputStream out; // Output stream to send responses to the client
     ObjectInputStream  in; // Input stream to receive requests from the client
@@ -34,17 +37,18 @@ class ClientHandler implements Runnable {
      * Creates a new  ClientHandler  for a given client socket.
      *
      * @param socket The client socket to be handled.
-     */
-    public ClientHandler(Socket socket) throws IOException {
+     * */
+    public ClientHandler(Socket socket, BetDatabase betDatabase) throws IOException {
         this.clientSocket = socket;
+        this.database = betDatabase;
     }
 
 
     /**
      * Executes the thread to handle client communication.
      * Processes incoming JSON-encoded requests, determines their type,
-     * and routes them to the appropriate handler methods.
-     */
+     * and routes them to the appropriate handler methods.**/
+
     @Override
     public void run() {
         System.out.println("Passed duties on to ClientHandler...");
@@ -68,7 +72,7 @@ class ClientHandler implements Runnable {
                 Object response;
                 switch (request.getRequestType()) {
                     case "GetSize":
-                        response = (request.getId() == 1) ? GameDatabase.getInstance().getSize() : UserDatabase.getInstance().getSize();
+                        response = (request.getId() == 1) ? 0 : 0;
                         break;
                     case "Game":
                         response = (request.getId() >= 0) ? getGame(request) : null;
@@ -117,11 +121,12 @@ class ClientHandler implements Runnable {
      *
      * @param request The client request containing the game ID.
      * @return The  Game  object corresponding to the ID, or null if not found.
-     */
+     * */
+
     private static Game getGame(Request request) {
         Game response;
 
-        List<Game> gameDatabase = GameDatabase.getInstance().getAllGames();
+        List<Game> gameDatabase = database.getGames();
         if (request.getId() >= gameDatabase.size()) {
             response = null;
         } else {
@@ -156,10 +161,10 @@ class ClientHandler implements Runnable {
      * Retrieves the user associated with the given request ID.
      *
      * @param request The client request containing the user ID.
-     * @return The  User  object corresponding to the ID, or null if not found.
-     */
+     * @return The  User  object corresponding to the ID, or null if not found.*/
+
     private static User getUser(Request request) {
-        return UserDatabase.getInstance().findUserById((long) request.getId());
+        return database.getUserDBInstance().findUserById((long) request.getId());
     }
 
     /**
@@ -170,10 +175,10 @@ class ClientHandler implements Runnable {
      *
      * @param request The client request containing details of the modifications.
      * @return The modified  User  object.
-     * @throws Exception If an error occurs during modification.
-     */
+     * @throws Exception If an error occurs during modification.*/
+
     private static synchronized User handleModifyUserRequest(Request request) throws Exception {
-        UserDatabase db = UserDatabase.getInstance();
+        UserDatabase db = database.getUserDBInstance();
         List<User> userDatabase = db.getAllUsers();
 
         User userToModify = userDatabase.get(request.getId());
