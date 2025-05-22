@@ -53,7 +53,6 @@ class UserController {
                 .map(user -> {
                     user.setName(newUser.getName());
                     user.setMoney((int) newUser.getMoney());
-                    user.setBets(newUser.getBets());
                     return repository.save(user);
                 })
                 .orElseGet(() -> {

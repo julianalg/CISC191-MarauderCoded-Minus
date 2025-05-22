@@ -1,9 +1,8 @@
-package edu.sdccd.cisc191.Common;
+package edu.sdccd.cisc191.Common.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.sdccd.cisc191.Common.Models.Game;
-import edu.sdccd.cisc191.Common.Models.User;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -20,8 +19,12 @@ import java.util.Random;
  * @see Game
  * @see User
  */
+@Entity
+@Table(name = "bets")          // if you want a specific table name
 public class Bet implements Serializable {
 
+    @ManyToOne
+    @JoinColumn(name = "game_db_id")
     private Game game;
     private String betTeam;
     private int betAmt;
@@ -29,13 +32,16 @@ public class Bet implements Serializable {
     private int winOdds;
 
     private final int numHours = 10; // Number of hours to track odds
-    private final double[][] winOddsOvertime = new double[numHours][2]; // Array to track odds over time
 
     private boolean fulfillment;
     private final long currentEpochSeconds = System.currentTimeMillis() / 1000; // Current time in seconds
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * Serializes a  Bet  object into a JSON string.
@@ -93,14 +99,6 @@ public class Bet implements Serializable {
             } else {
                 this.winAmt = (amt + Math.abs((winOdds / 100) * amt));
             }
-        }
-
-        // Populate winOddsOvertime with odds and timestamps
-        for (int j = 0; j < numHours; j++) {
-            long timeStamp = currentEpochSeconds - (j * 3600L); // Decrement by hours
-            double odd = calculateOddsForGameAtTime(timeStamp);
-            winOddsOvertime[j][0] = odd;
-            winOddsOvertime[j][1] = timeStamp;
         }
     }
 
@@ -166,9 +164,6 @@ public class Bet implements Serializable {
      *
      * @return A 2D array representing odds and timestamps.
      */
-    public double[][] getWinOddsOvertime() {
-        return winOddsOvertime;
-    }
 
     /**
      * Updates the user's money based on the outcome of the bet.
@@ -235,5 +230,13 @@ public class Bet implements Serializable {
     @Override
     public String toString() {
         return "Bet on " + game + " for " + betAmt;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

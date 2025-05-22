@@ -1,7 +1,7 @@
 package edu.sdccd.cisc191.Client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.sdccd.cisc191.Common.Bet;
+import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
@@ -10,7 +10,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
