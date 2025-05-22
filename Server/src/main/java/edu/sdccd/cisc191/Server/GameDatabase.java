@@ -57,6 +57,7 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
         for(Game game: repository.findAll()) {
             baseballGames.remove(game);
         }
+        System.out.println("Found " + baseballGames.size() + " new baseball games." );
         repository.saveAll(baseballGames);
 
         BasketballGetter basketballGetter = new BasketballGetter();
@@ -65,6 +66,7 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
         for(Game game: repository.findAll()) {
             basketballGames.remove(game);
         }
+        System.out.println("Found " + basketballGames.size() + " new basketball games." );
         repository.saveAll(basketballGames);
 
         System.out.println("Game Database updated from API.");
