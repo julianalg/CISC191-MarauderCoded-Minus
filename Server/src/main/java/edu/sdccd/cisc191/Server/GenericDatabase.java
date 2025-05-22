@@ -25,28 +25,24 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
     }
 
     protected File getOrCreateDatabaseFile() {
-        String resourcePath = filePathPrefix + getFileName();
+        // Get the project root directory
+        String projectDir = System.getProperty("user.dir");
+        // Construct the path to src/main/resources
+        String resourcePath = projectDir + "/Server/src/main/resources/" + getFileName();
         System.out.println("Resource path: " + resourcePath);
-        // Try to get the file from resources first
+        
+        File file = new File(resourcePath);
         try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource(getFileName()).getFile());
-            return file;
-        } catch (Exception e) {
-            // If resource file doesn't exist, create it in resources directory
-            File file = new File(resourcePath);
-            try {
-                File parentDir = file.getParentFile();
-                if (parentDir != null) {
-                    parentDir.mkdirs();
-                }
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                return file;
-            } catch (IOException ioE) {
-                throw new RuntimeException("Failed to create database file at " + resourcePath, ioE);
+            File parentDir = file.getParentFile();
+            if (parentDir != null) {
+                parentDir.mkdirs();
             }
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            return file;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create database file at " + resourcePath, e);
         }
     }
     public void loadOrInitializeDatabase() throws IOException {
