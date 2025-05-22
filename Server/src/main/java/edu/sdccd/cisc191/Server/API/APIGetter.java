@@ -79,7 +79,7 @@ public abstract class APIGetter {
                         // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
                         int gameID = Integer.parseInt(nestedObj.get("id").toString());
-                        System.out.println(gameID);
+//                        System.out.println(gameID);
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
                             JSONObject awayTeam = (JSONObject) teams.get("away");

@@ -2,6 +2,12 @@ package edu.sdccd.cisc191.Common.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.joda.deser.DateTimeDeserializer;
+import com.fasterxml.jackson.datatype.joda.ser.DateTimeSerializer;
 import jakarta.persistence.*;
 import org.joda.time.DateTime;
 
@@ -18,54 +24,63 @@ import java.util.Objects;
  *
  * @author Andy Ly, Julian Garcia
  */
+
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+class JacksonConfig {
+    @Bean
+    public JodaModule jodaModule() {
+        return new JodaModule();
+    }
+}
 @Entity
-@Table(name = "\"game\"")   // keeps lower-case in H2
+@Table(name = "games")
 public class Game implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long dbId;
+
     private long id;
 
     private String team1;
     private String team2;
     private String sport;
-    @Lob                                 // tells JPA it’s a Large Object
-    @Column(name = "date",
-            columnDefinition = "BLOB")   // or VARBINARY(1024) etc.
-    private DateTime date;
+
+    // Legendary 4 decorator field
+    @Column(name = "game_date", length = 1024) // enough for the 279-byte blob
+    @Lob                                       // makes it a BLOB in most DBs
+    @JsonSerialize(using = DateTimeSerializer.class)
+    @JsonDeserialize(using = DateTimeDeserializer.class)
+    private DateTime gameDate;
+
     private String dateClean;
     private static double team1Odd;
     private static double team2Odd;
-    public static boolean getSelectedTeam;
-    public static boolean getTeam1;
-    public static boolean getTeam2;
-    public double team1Wager;
-    public double team2Wager;
-    public double betPool;
-    public double team1PayoutRatio;
-    public double team2PayoutRatio;
-    public double team1ProfitFactor;
-    public double team2ProfitFactor;
 
     @JsonIgnore
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JodaModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
 
     /**
-     * Creates a  Game  object with betting odds loaded from an API.
-     * <p>
-     * Does not calculate any odds.
+     * Constructor for a Game.
      *
-     * @param t1       The name of team 1.
-     * @param t2       The name of team 2.
-     * @param date     The date of the game.
-     * @param team1Odd The odds for team 1.
-     * @param team2Odd The odds for team 2.
+     * @param t1         Team 1 name
+     * @param t2         Team 2 name
+     * @param id         Internal game ID
+     * @param givenDate  Date of the game
+     * @param sport      Sport (e.g., "NFL")
+     * @param team1Odd   Decimal odds for team 1
+     * @param team2Odd   Decimal odds for team 2
      */
-    public Game(String t1, String t2, int id, Date givenDate, String sport, double team1Odd, double team2Odd) {
+    public Game(String t1, String t2, long id, Date givenDate, String sport, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
         this.id = id;
-        this.date = new DateTime(givenDate);
+        this.gameDate = new DateTime(givenDate);
         this.sport = sport;
 
 
@@ -118,7 +133,7 @@ public class Game implements Serializable {
     public Game(String t1, String t2, Date givenDate, String sport, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
-        this.date = new DateTime(givenDate);
+        this.gameDate = new DateTime(givenDate);
         this.sport = sport;
 
 
@@ -135,7 +150,7 @@ public class Game implements Serializable {
      */
     @Override
     public String toString() {
-        return team1 + " vs. " + team2 + " on " + date.getMonthOfYear() + "/" + date.getDayOfMonth() + "/" + date.getYear();
+        return team1 + " vs. " + team2 + " on " + gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear();
     }
 
     /**
@@ -158,7 +173,7 @@ public class Game implements Serializable {
 
         boolean team1Equals = Objects.equals(this.team1, game.getTeam1());
         boolean team2Equals = Objects.equals(this.team2, game.getTeam2());
-        boolean startDateEquals = this.date.compareTo(game.getDate()) == 0;
+        boolean startDateEquals = this.gameDate.compareTo(game.getGameDate()) == 0;
         boolean team1OddEquals = Math.abs(this.team1Odd - game.getTeam1Odd()) < 0.0001;
         boolean team2OddEquals = Math.abs(this.team2Odd - game.getTeam2Odd()) < 0.0001;
 
@@ -208,8 +223,8 @@ public class Game implements Serializable {
      *
      * @return The start date.
      */
-    public DateTime getDate() {
-        return this.date;
+    public DateTime getGameDate() {
+        return this.gameDate;
     }
 
     /**
@@ -220,10 +235,10 @@ public class Game implements Serializable {
      * @return A string describing the start and end dates.
      */
     public String getDateClean() {
-        if (date.getMinuteOfHour() > 9) {
-            return date.getMonthOfYear() + "/" + date.getDayOfMonth() + "/" + date.getYear() + " " + date.getHourOfDay() + ":" + date.getMinuteOfHour();
+        if (gameDate.getMinuteOfHour() > 9) {
+            return gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear() + " " + gameDate.getHourOfDay() + ":" + gameDate.getMinuteOfHour();
         } else {
-            return date.getMonthOfYear() + "/" + date.getDayOfMonth() + "/" + date.getYear() + " " + date.getHourOfDay() + ":0" + date.getMinuteOfHour();
+            return gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear() + " " + gameDate.getHourOfDay() + ":0" + gameDate.getMinuteOfHour();
         }
     }
 
@@ -251,7 +266,7 @@ public class Game implements Serializable {
      * @param startDate The new start date.
      */
     public void setStartDate(Date startDate) {
-        this.date = new DateTime(startDate);
+        this.gameDate = new DateTime(startDate);
     }
 
     public long getId() {

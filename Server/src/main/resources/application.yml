@@ -1,17 +1,14 @@
-#This yml file was gleened from Andrew Huang's template and the following:
-#https://www.geeksforgeeks.org/spring-boot-database-integration-jpa-hibernate-mysql-h2/
-#https://www.geeksforgeeks.org/spring-boot-with-h2-database/
 server:
   port: 9090
 spring:
   application:
-    name: JPARunTest
+    name: UserDatabase
   h2:
     console:
       enabled: true
       path: /h2-console
   datasource:
-    url: jdbc:h2:file:./JPARunTest;DB_CLOSE_ON_EXIT=FALSE;
+    url: jdbc:h2:file:./DatabaseServer;DB_CLOSE_ON_EXIT=FALSE;
     driverClassName: org.h2.Driver
     username: sa
     password: password
@@ -24,7 +21,3 @@ spring:
         globally_quoted_identifiers: true
     hibernate:
       ddl-auto: create-drop
-app:
-  database:
-    file-path:
-      Server/src/main/resources/users.json
