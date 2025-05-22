@@ -19,11 +19,11 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
     public GameDatabase(GameRepository gameRepository) throws Exception {
         super(gameRepository, Game.class);
         loadOrInitializeDatabase();
-        try {
+        /*try {
             updateDatabaseFromAPI();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
         System.out.println("Game Database loaded.");
         System.out.println("Game Database contents:");
         for (Game game : repository.findAll()) {
