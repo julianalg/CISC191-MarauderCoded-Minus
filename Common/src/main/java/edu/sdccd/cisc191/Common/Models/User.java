@@ -1,12 +1,14 @@
 package edu.sdccd.cisc191.Common.Models;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a user in the system, holding information about their
@@ -19,10 +21,12 @@ import jakarta.persistence.*;
  * @author Andy Ly, Julian Garcia
  */
 
-// Adapted from Andrew Huang repo
 
 @Entity
 @Table(name="users")
+@Getter
+@Setter
+@ToString
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +38,9 @@ public class User implements Serializable {
     private int moneyBet; // Money available for future bets
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    //TODO: resolve the IDE warning here...
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private ArrayList<Bet> bets = new ArrayList<>();
 
     @JsonIgnore
@@ -102,78 +108,6 @@ public class User implements Serializable {
     }
 
     /**
-     * Retrieves the amount of money currently in active bets.
-     *
-     * @return The amount of money in active bets.
-     */
-    public int getMoneyLine() {
-        return moneyLine;
-    }
-
-    /**
-     * Sets the amount of money currently in active bets.
-     *
-     * @param moneyLine The new amount of money in active bets.
-     */
-    public void setMoneyLine(int moneyLine) {
-        this.moneyLine = moneyLine;
-    }
-
-    /**
-     * Retrieves the amount of money available for future bets.
-     *
-     * @return The amount of money available for future bets.
-     */
-    public int getMoneyBet() {
-        return moneyBet;
-    }
-
-    /**
-     * Sets the amount of money available for future bets.
-     *
-     * @param moneyBet The new amount of money available for future bets.
-     */
-    public void setMoneyBet(int moneyBet) {
-        this.moneyBet = moneyBet;
-    }
-
-    /**
-     * Retrieves the user's name.
-     *
-     * @return The user's name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the user's name.
-     *
-     * @param name The new name of the user.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Retrieves the user's total money.
-     *
-     * @return The user's total money.
-     */
-    public long getMoney() {
-        return money;
-    }
-
-    /**
-     * Sets the user's total money.
-     *
-     * @param amt The amount of money to add to the user's balance.
-     */
-    public void setMoney(int amt) {
-        this.money = amt;
-    }
-
-    /**
      * Increments the user's total money.
      *
      * @param amt The amount of money to add to the user's balance.
@@ -190,11 +124,6 @@ public class User implements Serializable {
     public void decrMoney(int amt) {
         this.money -= amt;
     }
-    /**
-     * Retrieves the list of active bets for the user.
-     *
-     * @return A list of active bets.
-     */
 
     /**
      * Adds a new bet to the user's list of active bets and updates the money balance accordingly.
@@ -216,19 +145,20 @@ public class User implements Serializable {
         bets.remove(b);
     }
 
-    // Gets the ID that the database assigns to this user
-    public Long getId() {
-        return this.id;
+    // IDE auto-generated code
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        User user = (User) o;
+        return getId() != null && Objects.equals(getId(), user.getId());
     }
 
-    public void setId(Long id) {
-    }
-
-    public ArrayList<Bet> getBets() {
-        return bets;
-    }
-
-    public void setBets(ArrayList<Bet> bets) {
-        this.bets = bets;
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

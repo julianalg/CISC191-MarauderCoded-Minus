@@ -3,8 +3,11 @@ package edu.sdccd.cisc191.Common.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -14,6 +17,7 @@ import java.util.Random;
  *
  *  The class supports JSON serialization and deserialization for integration
  * with external systems and persistent storage.
+ * The annotations autogenerate getters and setters for all fields.
  *
  * @author Brian Tran, Andy Ly, Julian Garcia
  * @see Game
@@ -21,6 +25,8 @@ import java.util.Random;
  */
 @Entity
 @Table(name = "bets")          // if you want a specific table name
+@Getter
+@Setter
 public class Bet implements Serializable {
 
     @ManyToOne
@@ -35,6 +41,7 @@ public class Bet implements Serializable {
 
     private boolean fulfillment;
     private final long currentEpochSeconds = System.currentTimeMillis() / 1000; // Current time in seconds
+    private final Random random = new Random();
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -74,7 +81,6 @@ public class Bet implements Serializable {
         // Default constructor for deserialization purposes
     }
 
-    private final Random random = new Random();
 
     /**
      * Constructs a new  Bet  with specified game, bet amount, and team.
@@ -114,56 +120,9 @@ public class Bet implements Serializable {
         return 1 + random.nextInt(100); // Generate a random value between 1 and 100
     }
 
-    /**
-     * Gets the potential winnings for the bet.
-     *
-     * @return The winning amount.
-     */
-    public int getWinAmt() {
-        return winAmt;
-    }
-
-    /**
-     * Sets the potential winnings for the bet.
-     *
-     * @param winAmt The winning amount to set.
-     */
-    public void setWinAmt(int winAmt) {
-        this.winAmt = winAmt;
-    }
-
-    /**
-     * Gets the game associated with the bet.
-     *
-     * @return The associated game.
-     */
-    public Game getGame() {
-        return game;
-    }
-
-    /**
-     * Sets the game associated with the bet.
-     *
-     * @param game The game to set.
-     */
-    public void setGame(Game game) {
-        this.game = game;
-    }
-
-    /**
-     * Gets the odds of winning the bet.
-     *
-     * @return The odds of winning as a percentage.
-     */
     public double getWinOdds() {
         return winOdds;
     }
-
-    /**
-     * Gets the odds tracked over a 10-hour period.
-     *
-     * @return A 2D array representing odds and timestamps.
-     */
 
     /**
      * Updates the user's money based on the outcome of the bet.
@@ -196,33 +155,6 @@ public class Bet implements Serializable {
     }
 
     /**
-     * Gets the team being bet on.
-     *
-     * @return The team being bet on.
-     */
-    public String getBetTeam() {
-        return betTeam;
-    }
-
-    /**
-     * Gets the bet amount.
-     *
-     * @return The bet amount.
-     */
-    public int getBetAmt() {
-        return betAmt;
-    }
-
-    /**
-     * Sets the bet amount.
-     *
-     * @param betAmt The amount of money to set for the bet.
-     */
-    public void setBetAmt(int betAmt) {
-        this.betAmt = betAmt;
-    }
-
-    /**
      * Converts the  Bet  object into a string representation.
      *
      * @return A string describing the bet.
@@ -232,11 +164,20 @@ public class Bet implements Serializable {
         return "Bet on " + game + " for " + betAmt;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    // IDE generated code to compare the bets
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Bet bet = (Bet) o;
+        return getId() != null && Objects.equals(getId(), bet.getId());
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }
