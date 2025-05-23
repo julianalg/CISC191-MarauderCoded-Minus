@@ -44,6 +44,7 @@ public class Game implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long dbId;
 
+    @Column(name = "api_id", unique = true)
     private long id;
 
     private String team1;
