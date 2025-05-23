@@ -2,16 +2,13 @@ package edu.sdccd.cisc191.Server.controllers;
 
 import java.util.List;
 
+import edu.sdccd.cisc191.Common.Models.Bet;
+import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Server.exceptions.UserNotFoundException;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.transaction.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 // Pulled straight from andrew huang repo
 
@@ -65,4 +62,26 @@ class UserController {
     void deleteUser(@PathVariable Long id) {
         repository.deleteById(id);
     }
+
+    @PatchMapping("/{id}/bets")
+    @Transactional
+    public User addBet(
+            @PathVariable Long id,
+            @RequestBody IncomingBetDTO dto      // ← see below
+    ) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        // 1. fetch the managed Game
+        Game game = repository.findById(dto.getGameId())
+                .orElseThrow(() -> new GameNotFoundException(dto.getGameId()));
+
+        // 2. build a new Bet instance
+        Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam());
+
+        // 3. add & save
+        user.addBet(bet);
+        return repository.save(user);
+    }
+
 }

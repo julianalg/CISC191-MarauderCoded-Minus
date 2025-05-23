@@ -228,25 +228,27 @@ public class Client {
 
     }
 
-    private static void addBetToMainUser(Bet bet, User user) throws Exception {
-        // Add the new bet to the user's existing list
-        user.addBet(bet);
-
-        // Use Jackson to convert the entire User object to JSON
+    private static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        String jsonBody = mapper.writeValueAsString(user);
+        // build only the DTO fields
+        Map<String,Object> dto = Map.of(
+                "gameId", gameId,
+                "betTeam", betTeam,
+                "betAmt", betAmt
+        );
+        String jsonBody = mapper.writeValueAsString(dto);
 
-        System.out.println("Sending JSON: " + jsonBody); // Debug print
+        System.out.println("PATCH body: " + jsonBody);
 
         HttpClient client = HttpClient.newHttpClient();
-
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:9090/users/1"))
+                .uri(URI.create("http://localhost:9090/users/" + userId + "/bets"))
                 .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
 
         System.out.println("Status Code: " + response.statusCode());
         System.out.println("Response Body: " + response.body());
@@ -258,6 +260,7 @@ public class Client {
         Bet bet = new Bet(new Game("1", "2", 99999, new Date(), "Basketball", 1, 2), 10, "1");
         Bet bet2  = new Bet(new Game("6", "8", 99999, new Date(), "Basketball", 22, 88), 10, "1");
 
+        patchAddBetToMainUser(bet, 1L);
 
         ArrayList<Game> allGames = Client.getGames();
 
