@@ -257,10 +257,11 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
         User user = getMainUser();
+        Game game = new Game("1", "2", 99999, new Date(), "Basketball", 1, 2);
         Bet bet = new Bet(new Game("1", "2", 99999, new Date(), "Basketball", 1, 2), 10, "1");
         Bet bet2  = new Bet(new Game("6", "8", 99999, new Date(), "Basketball", 22, 88), 10, "1");
 
-        patchAddBetToMainUser(bet, 1L);
+        patchAddBetToMainUser(1L, 164029L, "Seattle Mariners", 10);
 
         ArrayList<Game> allGames = Client.getGames();
 

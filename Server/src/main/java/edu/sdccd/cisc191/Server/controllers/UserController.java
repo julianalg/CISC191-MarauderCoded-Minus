@@ -2,10 +2,13 @@ package edu.sdccd.cisc191.Server.controllers;
 
 import java.util.List;
 
+import edu.sdccd.cisc191.Common.IncomingBetDTO;
 import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
+import edu.sdccd.cisc191.Server.exceptions.GameNotFoundException;
 import edu.sdccd.cisc191.Server.exceptions.UserNotFoundException;
+import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +19,11 @@ import org.springframework.web.bind.annotation.*;
 class UserController {
 
     private final UserRepository repository;
+    private final GameRepository gRepository;
 
-    UserController(UserRepository repository) {
+    UserController(UserRepository repository, GameRepository gameRepository) {
         this.repository = repository;
+        this.gRepository = gameRepository;
     }
 
 
@@ -73,8 +78,8 @@ class UserController {
                 .orElseThrow(() -> new UserNotFoundException(id));
 
         // 1. fetch the managed Game
-        Game game = repository.findById(dto.getGameId())
-                .orElseThrow(() -> new GameNotFoundException(dto.getGameId()));
+        Game game = gRepository.findById(dto.getGameId())
+                .orElseThrow(() -> new GameNotFoundException(id));
 
         // 2. build a new Bet instance
         Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam());
