@@ -1,6 +1,6 @@
 package edu.sdccd.cisc191.Client;
 
-import edu.sdccd.cisc191.Common.Bet;
+import edu.sdccd.cisc191.Common.Models.Bet;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
@@ -76,32 +76,9 @@ public class BetInfoView extends Application {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Win Odds");
 
-        // Assume bet.getWinOddsOvertime() returns a double[][] where each element is [odd, timestamp]
-        double[][] oddsData = bet.getWinOddsOvertime();
-        // Iterate over each pair in the data array.
-        for (int i = 0; i < oddsData.length; i++) {
-            double odd = oddsData[i][0];
-            // The timestamp is stored as seconds since epoch.
-            long timestamp = (long) oddsData[i][1];
-            // Format the timestamp (multiply by 1000 to convert to milliseconds).
-            String timeLabel = new SimpleDateFormat("HH:mm").format(new Date(timestamp * 1000));
-            series.getData().add(new XYChart.Data<>(timeLabel, odd));
-        }
 
-        // Add the series to the chart.
-        lineChart.getData().add(series);
 
-        Button backButton = new Button("Back");
-        backButton.setOnAction(e -> {
-            try {
-                new UI().start(stage);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        backButton.getStyleClass().add("primary-button");
-
-        root.getChildren().addAll(betInfo, money, lineChart, backButton);
+        root.getChildren().addAll(betInfo, money, lineChart);
 
         Scene scene = new Scene(root, 800, 600);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
