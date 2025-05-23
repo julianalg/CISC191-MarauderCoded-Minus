@@ -1,9 +1,6 @@
 package edu.sdccd.cisc191.Server.controllers;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import edu.sdccd.cisc191.Common.IncomingBetDTO;
 import edu.sdccd.cisc191.Common.Models.Bet;
@@ -98,30 +95,37 @@ class UserController {
     @GetMapping("/updateAllBets")
     @Transactional
     public String updateAllBets() throws ParseException {
-        System.out.println("updateAllBets method triggered");
         User[] users = repository.findAll().toArray(new User[0]);
         for (User user : users) {
-            System.out.println("cowabungaUser: " + user.getName());
+            int dbId = Math.toIntExact(user.getId());
+            List<Bet> toRemove = new ArrayList<>();
             List<Bet> betList = user.getBets();
-            for (Bet bet : betList) {
-                System.out.println("cowabungaBet: " + bet.toString());
+            System.out.println("Processing user: " + user.getName() + " with " + betList.size() + " bets. cowabunga");
+            System.out.println("Bets" + betList + "cowabunga");
+            Iterator<Bet> it = betList.iterator();
+            while (it.hasNext()) {
+                Bet bet = it.next();
                 Game betGame = bet.getGame();
                 DateTime gameDate = betGame.getGameDate();
-                System.out.println("cowabungaGameDate: " + gameDate);
                 if (gameDate.isBefore(new DateTime(new Date()))) {
                     if (Objects.equals(betGame.getSport(), "Baseball")) {
-                        System.out.println("cowabungaSucess!");
                         BaseballGetter baseballGetter = new BaseballGetter();
                         String winner = baseballGetter.getWinner(betGame.getId());
                         if (winner.equals(bet.getBetTeam())) {
-                            System.out.println("cowabunga User " + user.getName() + " won " + bet.getBetAmt() + " on game " + betGame.getId());
+                            user.setMoney(user.getMoney() + bet.getWinAmt());
                         } else {
-                            System.out.println("cowabunga User " + user.getName() + " lost " + bet.getBetAmt() + " on game " + betGame.getId());
+                            user.setMoney(user.getMoney() - bet.getBetAmt());
                         }
+
+                        toRemove.add(bet);
 
                     }
                 }
             }
+
+            // one single mutation & save
+            user.getBets().removeAll(toRemove);
+            replaceUser(user, (long) dbId);
         }
         return "Bad things have happened here";
     }

@@ -48,6 +48,7 @@ public abstract class APIGetter {
 //        System.out.println(requestURI);
 
         String response = sendRequest(requestURI);
+        System.out.println(response);
 
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
