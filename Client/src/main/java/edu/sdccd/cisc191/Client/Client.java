@@ -242,7 +242,7 @@ public class Client {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:9090/users/" + userId + "/bets"))
+                .uri(URI.create("http://localhost:9090/" + userId + "/bets"))
                 .header("Content-Type", "application/json")
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
@@ -261,7 +261,7 @@ public class Client {
         Bet bet = new Bet(new Game("1", "2", 99999, new Date(), "Basketball", 1, 2), 10, "1");
         Bet bet2  = new Bet(new Game("6", "8", 99999, new Date(), "Basketball", 22, 88), 10, "1");
 
-        patchAddBetToMainUser(1L, 164029L, "Seattle Mariners", 10);
+        patchAddBetToMainUser(1L, 1L, "Seattle Mariners", 10);
 
         ArrayList<Game> allGames = Client.getGames();
 

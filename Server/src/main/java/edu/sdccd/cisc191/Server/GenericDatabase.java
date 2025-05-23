@@ -46,6 +46,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
             throw new RuntimeException("Failed to create database file at " + resourcePath, e);
         }
     }
+
     public void loadOrInitializeDatabase() throws Exception {
         if (repository.count() == 0) {
             File file = getOrCreateDatabaseFile();
@@ -73,6 +74,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
             }
         }
     }
+
     @Transactional
     public void saveToFile() {
         System.out.println("Save to file method triggered");

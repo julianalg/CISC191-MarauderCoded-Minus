@@ -43,7 +43,7 @@ public abstract class APIGetter {
     }
 
     public ArrayList<Game> getGames(String sport) throws Exception {
-        String fullUrl = apiURL + "games?date=" + "2025-05-21";
+        String fullUrl = apiURL + "games?date=" + "2025-05-22";
         URI requestURI = URI.create(fullUrl);
 //        System.out.println(requestURI);
 

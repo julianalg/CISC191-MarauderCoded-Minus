@@ -1,6 +1,7 @@
 package edu.sdccd.cisc191.Server.controllers;
 
 import edu.sdccd.cisc191.Common.Models.Game;
+import edu.sdccd.cisc191.Server.exceptions.GameNotFoundException;
 import edu.sdccd.cisc191.Server.exceptions.UserNotFoundException;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ class GameController {
     Game one(@PathVariable Long id) {
 
         return repository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new GameNotFoundException(id));
     }
 
 //    @PutMapping("/users/{id}")
@@ -49,5 +50,7 @@ class GameController {
     void deleteUser(@PathVariable Long id) {
         repository.deleteById(id);
     }
+
+
 
 }

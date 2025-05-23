@@ -1,16 +1,22 @@
 package edu.sdccd.cisc191.Server.controllers;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import edu.sdccd.cisc191.Common.IncomingBetDTO;
 import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
+import edu.sdccd.cisc191.Server.API.BaseballGetter;
 import edu.sdccd.cisc191.Server.exceptions.GameNotFoundException;
 import edu.sdccd.cisc191.Server.exceptions.UserNotFoundException;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.joda.time.DateTime;
+import org.json.simple.parser.ParseException;
 import org.springframework.web.bind.annotation.*;
 
 // Pulled straight from andrew huang repo
@@ -79,7 +85,7 @@ class UserController {
 
         // 1. fetch the managed Game
         Game game = gRepository.findById(dto.getGameId())
-                .orElseThrow(() -> new GameNotFoundException(id));
+                .orElseThrow(() -> new GameNotFoundException(dto.getGameId()));
 
         // 2. build a new Bet instance
         Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam());
@@ -89,4 +95,34 @@ class UserController {
         return repository.save(user);
     }
 
+    @GetMapping("/updateAllBets")
+    @Transactional
+    public String updateAllBets() throws ParseException {
+        System.out.println("updateAllBets method triggered");
+        User[] users = repository.findAll().toArray(new User[0]);
+        for (User user : users) {
+            System.out.println("cowabungaUser: " + user.getName());
+            List<Bet> betList = user.getBets();
+            for (Bet bet : betList) {
+                System.out.println("cowabungaBet: " + bet.toString());
+                Game betGame = bet.getGame();
+                DateTime gameDate = betGame.getGameDate();
+                System.out.println("cowabungaGameDate: " + gameDate);
+                if (gameDate.isBefore(new DateTime(new Date()))) {
+                    if (Objects.equals(betGame.getSport(), "Baseball")) {
+                        System.out.println("cowabungaSucess!");
+                        BaseballGetter baseballGetter = new BaseballGetter();
+                        String winner = baseballGetter.getWinner(betGame.getId());
+                        if (winner.equals(bet.getBetTeam())) {
+                            System.out.println("cowabunga User " + user.getName() + " won " + bet.getBetAmt() + " on game " + betGame.getId());
+                        } else {
+                            System.out.println("cowabunga User " + user.getName() + " lost " + bet.getBetAmt() + " on game " + betGame.getId());
+                        }
+
+                    }
+                }
+            }
+        }
+        return "Bad things have happened here";
+    }
 }
