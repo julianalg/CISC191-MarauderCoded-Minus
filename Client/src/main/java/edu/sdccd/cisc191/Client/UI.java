@@ -81,7 +81,7 @@ public class UI extends Application {
                     if (index >= 0 && index < getTableView().getItems().size()) {
                         T game = getTableView().getItems().get(index);
                         try {
-                            new BetView().betView(stage, game, game.getTeam1());
+                            new BetView().betView(stage, game, game.getTeam1(), user);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -120,7 +120,7 @@ public class UI extends Application {
                     if (index >= 0 && index < getTableView().getItems().size()) {
                         T game = getTableView().getItems().get(index);
                         try {
-                            new BetView().betView(stage, game, game.getTeam2());
+                            new BetView().betView(stage, game, game.getTeam2(), user);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }

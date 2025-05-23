@@ -228,7 +228,7 @@ public class Client {
 
     }
 
-    private static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt) throws Exception {
+    public static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         // build only the DTO fields
         Map<String,Object> dto = Map.of(

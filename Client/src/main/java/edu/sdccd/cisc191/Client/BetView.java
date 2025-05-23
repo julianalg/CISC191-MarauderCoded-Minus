@@ -2,6 +2,7 @@ package edu.sdccd.cisc191.Client;
 
 import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
+import edu.sdccd.cisc191.Common.Models.User;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -30,6 +31,8 @@ public class BetView extends Application {
      */
     String team;
 
+    User user;
+
     /**
      * Initializes the bet view with the specified stage, game, and team.
      * It sets up the necessary data and starts the JavaFX application.
@@ -39,9 +42,10 @@ public class BetView extends Application {
      * @param team  the team on which the bet is being placed.
      * @throws Exception if an error occurs during initialization.
      */
-    public void betView(Stage stage, Game game, String team) throws Exception {
+    public void betView(Stage stage, Game game, String team, User user) throws Exception {
         this.game = game;
         this.team = team;
+        this.user = user;
         start(stage);
         grabOdds();
     }
@@ -79,9 +83,13 @@ public class BetView extends Application {
 
         b1.setOnAction(evt -> {
             Integer amount = Integer.parseInt(b.getText());
-            if (0 >= amount) {
-                Bet placedBet = new Bet(game, amount, team);
-//                Client.user.addBet(placedBet);
+            if (user.getMoneyBet() >= amount) {
+                Client client = new Client();
+                try {
+                    client.patchAddBetToMainUser(1L, game.getDbId(), team, amount);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 try {
                     new UI().start(stage);
                 } catch (Exception e) {
@@ -94,7 +102,7 @@ public class BetView extends Application {
                 dialog.setTitle("Marauder Bets");
                 ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
                 //Setting the content of the dialog
-//                dialog.setContentText("This is more money than you have available to bet! $" + Client.user.getMoneyBet());
+                dialog.setContentText("This is more money than you have available to bet! $" + user.getMoneyBet());
                 //Adding buttons to the dialog pane
                 dialog.getDialogPane().getButtonTypes().add(type);
                 dialog.showAndWait();
