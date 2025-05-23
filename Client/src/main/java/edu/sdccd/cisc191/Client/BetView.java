@@ -1,6 +1,6 @@
 package edu.sdccd.cisc191.Client;
 
-import edu.sdccd.cisc191.Common.Bet;
+import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -73,14 +73,15 @@ public class BetView extends Application {
         Label bet = new Label("How much do you want to bet?");
         TextField b = new TextField();
         Button b1 = new Button("Place Bet");
+        Button b2 = new Button("Cancel");
 
-        betView.getChildren().addAll(bet, b, b1);
+        betView.getChildren().addAll(bet, b, b1, b2);
 
         b1.setOnAction(evt -> {
             Integer amount = Integer.parseInt(b.getText());
-            if (Client.user.getMoneyBet() >= amount) {
+            if (0 >= amount) {
                 Bet placedBet = new Bet(game, amount, team);
-                Client.user.addBet(placedBet);
+//                Client.user.addBet(placedBet);
                 try {
                     new UI().start(stage);
                 } catch (Exception e) {
@@ -93,10 +94,18 @@ public class BetView extends Application {
                 dialog.setTitle("Marauder Bets");
                 ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
                 //Setting the content of the dialog
-                dialog.setContentText("This is more money than you have available to bet! $" + Client.user.getMoneyBet());
+//                dialog.setContentText("This is more money than you have available to bet! $" + Client.user.getMoneyBet());
                 //Adding buttons to the dialog pane
                 dialog.getDialogPane().getButtonTypes().add(type);
                 dialog.showAndWait();
+            }
+        });
+        b2.setOnAction(evt -> {
+            UI ui = new UI();
+            try {
+                ui.start(stage);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         });
         stage.setScene(new Scene(betView, 200, 300));

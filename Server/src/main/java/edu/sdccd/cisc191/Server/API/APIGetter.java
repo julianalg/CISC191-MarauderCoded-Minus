@@ -19,9 +19,11 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public abstract class APIGetter {
-     String apiURL;
-     String leagueName;
-    public APIGetter() {}
+    String apiURL;
+    String leagueName;
+
+    public APIGetter() {
+    }
 
     public String getDateAsString() {
         Date today = new Date(); // current date
@@ -41,11 +43,12 @@ public abstract class APIGetter {
     }
 
     public ArrayList<Game> getGames(String sport) throws Exception {
-        String fullUrl     = apiURL + "games?date=" + getDateAsString();
-        URI   requestURI  = URI.create(fullUrl);
+        String fullUrl = apiURL + "games?date=" + "2025-05-22";
+        URI requestURI = URI.create(fullUrl);
 //        System.out.println(requestURI);
 
         String response = sendRequest(requestURI);
+        System.out.println(response);
 
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
@@ -79,9 +82,9 @@ public abstract class APIGetter {
                         // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
                         int gameID = Integer.parseInt(nestedObj.get("id").toString());
-//                        System.out.println(gameID);
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
+                            System.out.println(gameID);
                             JSONObject awayTeam = (JSONObject) teams.get("away");
                             JSONObject homeTeam = (JSONObject) teams.get("home");
                             String awayTeamName = awayTeam.get("name").toString();
@@ -140,4 +143,51 @@ public abstract class APIGetter {
         JSONObject gameObj = (JSONObject) jsonResponse.get(0);
         return gameObj.get("bookmakers").toString();
     }
-};
+
+    public String getWinner(long id) throws ParseException {
+        HttpClient client = HttpClient.newHttpClient();
+        String apiKey = System.getenv("API_KEY");
+        URI betURI = URI.create(apiURL + "/games?id=" + id);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(betURI)                  // <-- pass your concatenated URI here
+                .header("x-rapidapi-host", apiURL)
+                .header("x-rapidapi-key", apiKey)
+                .GET()
+                .build();
+
+        // Make an asynchronous request similar to using JavaScript promises
+        String response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .exceptionally(e -> {
+                    System.out.println("Error: " + e.getMessage());
+                    return null;
+                })
+                .join().toString(); // Waits for the async call to complete
+
+//        System.out.println(response);
+
+        JSONParser parser = new JSONParser();
+        JSONObject obj = (JSONObject) parser.parse(response);
+        JSONArray jsonResponse = (JSONArray) obj.get("response");
+        JSONObject gameObj = (JSONObject) jsonResponse.get(0);
+        JSONObject teams = (JSONObject) gameObj.get("teams");
+        JSONObject awayTeam = (JSONObject) teams.get("away");
+        JSONObject homeTeam = (JSONObject) teams.get("home");
+        String homeTeamName = homeTeam.get("name").toString();
+        String awayTeamName = awayTeam.get("name").toString();
+        JSONObject scores = (JSONObject) gameObj.get("scores");
+
+        JSONObject awayTeamStats = (JSONObject) scores.get("away");
+        int awayTeamScore = Integer.parseInt(awayTeamStats.get("total").toString());
+        JSONObject homeTeamStats = (JSONObject) scores.get("home");
+        int homeTeamScore = Integer.parseInt(homeTeamStats.get("total").toString());
+
+        if (awayTeamScore > homeTeamScore) {
+            return awayTeamName;
+        } else {
+            return homeTeamName;
+        }
+//        return parseBet(response);
+    }
+}

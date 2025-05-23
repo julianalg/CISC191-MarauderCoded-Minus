@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -45,6 +46,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
             throw new RuntimeException("Failed to create database file at " + resourcePath, e);
         }
     }
+
     public void loadOrInitializeDatabase() throws Exception {
         if (repository.count() == 0) {
             File file = getOrCreateDatabaseFile();
@@ -53,7 +55,6 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
                 System.out.println("Contents:\n" + Files.readString(file.toPath()));
                 try {
                     ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                        objectMapper.registerModule(new JodaModule());
 
                     CollectionType listType = objectMapper.getTypeFactory()
                             .constructCollectionType(List.class, entityClass);
@@ -74,11 +75,19 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
         }
     }
 
+    @Transactional
     public void saveToFile() {
         System.out.println("Save to file method triggered");
         try (Writer writer = new FileWriter(getOrCreateDatabaseFile())) {
             ObjectMapper objectMapper = new ObjectMapper();
+            // Force initialization of lazy collections while the session is still open
             List<T> entities = repository.findAll();
+            // Initialize any lazy collections
+            entities.forEach(entity -> {
+                if (entity != null) {
+                    org.hibernate.Hibernate.initialize(entity);
+                }
+            });
             objectMapper.writeValue(writer, entities);
             System.out.println(getEntityName() + " Database saved to file: " + getOrCreateDatabaseFile().getAbsolutePath());
         } catch (IOException e) {

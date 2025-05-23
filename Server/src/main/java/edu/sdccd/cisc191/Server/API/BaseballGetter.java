@@ -37,12 +37,13 @@ public class BaseballGetter extends APIGetter {
 
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         BaseballGetter baseballGetter = new BaseballGetter();
-//        System.out.println(baseballGetter.getGames("Baseball"));
-
-        baseballGetter.getOdd(163994);
-
+        try {
+            System.out.println(baseballGetter.getGames("Baseball"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
