@@ -161,7 +161,7 @@ public class Client {
      * @return an array of Game objects.
      * @throws IOException if an I/O error occurs during retrieval.
      */
-    private static ArrayList<Game> getGames() throws Exception {
+    static ArrayList<Game> getGames() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -210,7 +210,7 @@ public class Client {
 
     }
 
-    private static void updateMainUserMoney(long money) throws Exception {
+    static void updateMainUserMoney(long money) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         String jsonBody = "{\"id\": 1, \"name\": \"Chase\", \"money\": " + money + "}";
@@ -228,7 +228,7 @@ public class Client {
 
     }
 
-    private static void addBetToMainUser(Bet bet, User user) throws Exception {
+    static void addBetToMainUser(Bet bet, User user) throws Exception {
         // Add the new bet to the user's existing list
         user.addBet(bet);
 

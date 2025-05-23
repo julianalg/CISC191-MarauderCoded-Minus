@@ -74,7 +74,7 @@ public class User implements Serializable {
      * Default constructor for  User .
      * Required for JSON serialization/deserialization.
      */
-    protected User() {
+    public User() {
         // Default constructor for deserialization purposes
     }
 

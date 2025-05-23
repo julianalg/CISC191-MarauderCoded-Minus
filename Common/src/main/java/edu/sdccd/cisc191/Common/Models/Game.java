@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -115,7 +116,7 @@ public class Game implements Serializable {
      * Default constructor for  Game .
      * Required for JSON serialization/deserialization.
      */
-    protected Game() {
+    public Game() {
         // Default constructor for deserialization purposes
     }
 
@@ -141,4 +142,6 @@ public class Game implements Serializable {
         }
     }
 
+    public void setDate(LocalDateTime now) {
+    }
 }
