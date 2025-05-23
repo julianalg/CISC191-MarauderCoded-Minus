@@ -258,7 +258,6 @@ public class Client {
         Bet bet = new Bet(new Game("1", "2", 99999, new Date(), "Basketball", 1, 2), 10, "1");
         Bet bet2  = new Bet(new Game("6", "8", 99999, new Date(), "Basketball", 22, 88), 10, "1");
 
-        updateMainUserMoney(3);
 
         ArrayList<Game> allGames = Client.getGames();
 

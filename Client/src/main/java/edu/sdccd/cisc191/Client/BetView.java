@@ -73,8 +73,9 @@ public class BetView extends Application {
         Label bet = new Label("How much do you want to bet?");
         TextField b = new TextField();
         Button b1 = new Button("Place Bet");
+        Button b2 = new Button("Cancel");
 
-        betView.getChildren().addAll(bet, b, b1);
+        betView.getChildren().addAll(bet, b, b1, b2);
 
         b1.setOnAction(evt -> {
             Integer amount = Integer.parseInt(b.getText());
@@ -97,6 +98,14 @@ public class BetView extends Application {
                 //Adding buttons to the dialog pane
                 dialog.getDialogPane().getButtonTypes().add(type);
                 dialog.showAndWait();
+            }
+        });
+        b2.setOnAction(evt -> {
+            UI ui = new UI();
+            try {
+                ui.start(stage);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         });
         stage.setScene(new Scene(betView, 200, 300));
