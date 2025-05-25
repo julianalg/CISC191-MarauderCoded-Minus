@@ -210,7 +210,22 @@ public class Client {
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.body());
-        return new User((String) jsonObject.get("name"), (long) jsonObject.get("money"));
+        JSONArray bets = (JSONArray) jsonObject.get("bets");
+        User mainUser = new User((String) jsonObject.get("name"), (long) jsonObject.get("money"));
+        for (Object obj : bets) {
+            JSONObject bet = (JSONObject) obj;
+            JSONObject game = (JSONObject) bet.get("game");
+//            System.out.println(game);
+            String iso = game.get("gameDate").toString();
+            Instant instant = Instant.parse(iso);
+            Date date = Date.from(instant);
+            Game betGame = new Game((String) game.get("team1"), (String) game.get("team2"), (Long) game.get("id"), date, (String) game.get("sport"), (Long) game.get("dbId"));
+            Bet newBet = new Bet(betGame, Math.toIntExact((Long) bet.get("betAmt")), (String) bet.get("betTeam"), Math.toIntExact((Long) bet.get("winAmt")));
+            mainUser.addBet(newBet);
+            System.out.println("Bet: " + newBet);
+        }
+
+        return mainUser;
 
     }
 
