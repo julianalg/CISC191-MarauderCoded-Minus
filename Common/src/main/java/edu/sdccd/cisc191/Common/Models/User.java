@@ -3,9 +3,12 @@ package edu.sdccd.cisc191.Common.Models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,6 +26,13 @@ import java.util.Objects;
  * @author Andy Ly, Julian Garcia
  */
 
+@Configuration
+class JacksonConfigUser {
+    @Bean
+    public JodaModule jodaModule() {
+        return new JodaModule();
+    }
+}
 
 @Entity
 @Table(name="users")

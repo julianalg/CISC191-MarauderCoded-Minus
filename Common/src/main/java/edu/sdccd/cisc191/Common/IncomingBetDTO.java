@@ -4,11 +4,13 @@ public class IncomingBetDTO {
     private Long gameId;
     private String betTeam;
     private int betAmt;
+    private int winAmt;
 
-    public IncomingBetDTO(Long gameId, String betTeam, int betAmt) {
+    public IncomingBetDTO(Long gameId, String betTeam, int betAmt, int winAmt) {
         this.gameId = gameId;
         this.betTeam = betTeam;
         this.betAmt = betAmt;
+        this.winAmt = winAmt;
     }
 
     public int getBetAmt() {
@@ -33,6 +35,14 @@ public class IncomingBetDTO {
 
     public void setGameId(Long gameId) {
         this.gameId = gameId;
+    }
+
+    public int getWinAmt() {
+        return winAmt;
+    }
+
+    public void setWinAmt(int winAmt) {
+        this.winAmt = winAmt;
     }
 
 

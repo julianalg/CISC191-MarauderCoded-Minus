@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import edu.sdccd.cisc191.Common.Models.Game;
@@ -43,7 +44,7 @@ public abstract class APIGetter {
     }
 
     public ArrayList<Game> getGames(String sport) throws Exception {
-        String fullUrl = apiURL + "games?date=" + "2025-05-22";
+        String fullUrl = apiURL + "games?date=" + getDateAsString();
         URI requestURI = URI.create(fullUrl);
 //        System.out.println(requestURI);
 
@@ -140,7 +141,7 @@ public abstract class APIGetter {
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
         JSONArray jsonResponse = (JSONArray) json.get("response");
-        JSONObject gameObj = (JSONObject) jsonResponse.get(0);
+        JSONObject gameObj = (JSONObject) jsonResponse.getFirst();
         return gameObj.get("bookmakers").toString();
     }
 
@@ -167,26 +168,31 @@ public abstract class APIGetter {
 
 //        System.out.println(response);
 
-        JSONParser parser = new JSONParser();
-        JSONObject obj = (JSONObject) parser.parse(response);
-        JSONArray jsonResponse = (JSONArray) obj.get("response");
-        JSONObject gameObj = (JSONObject) jsonResponse.get(0);
-        JSONObject teams = (JSONObject) gameObj.get("teams");
-        JSONObject awayTeam = (JSONObject) teams.get("away");
-        JSONObject homeTeam = (JSONObject) teams.get("home");
-        String homeTeamName = homeTeam.get("name").toString();
-        String awayTeamName = awayTeam.get("name").toString();
-        JSONObject scores = (JSONObject) gameObj.get("scores");
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject obj = (JSONObject) parser.parse(response);
+            JSONArray jsonResponse = (JSONArray) obj.get("response");
+            JSONObject gameObj = (JSONObject) jsonResponse.getFirst();
+            JSONObject teams = (JSONObject) gameObj.get("teams");
+            JSONObject awayTeam = (JSONObject) teams.get("away");
+            JSONObject homeTeam = (JSONObject) teams.get("home");
+            String homeTeamName = homeTeam.get("name").toString();
+            String awayTeamName = awayTeam.get("name").toString();
+            JSONObject scores = (JSONObject) gameObj.get("scores");
 
-        JSONObject awayTeamStats = (JSONObject) scores.get("away");
-        int awayTeamScore = Integer.parseInt(awayTeamStats.get("total").toString());
-        JSONObject homeTeamStats = (JSONObject) scores.get("home");
-        int homeTeamScore = Integer.parseInt(homeTeamStats.get("total").toString());
+            JSONObject awayTeamStats = (JSONObject) scores.get("away");
+            int awayTeamScore = Integer.parseInt(awayTeamStats.get("total").toString());
+            JSONObject homeTeamStats = (JSONObject) scores.get("home");
+            int homeTeamScore = Integer.parseInt(homeTeamStats.get("total").toString());
 
-        if (awayTeamScore > homeTeamScore) {
-            return awayTeamName;
-        } else {
-            return homeTeamName;
+            if (awayTeamScore > homeTeamScore) {
+                return awayTeamName;
+            } else {
+                return homeTeamName;
+            }
+        } catch (IndexOutOfBoundsException | NoSuchElementException e) {
+            System.out.println("IndexOutOfBoundsException, presumably game is outside API call radius");
+            return "Drop";
         }
 //        return parseBet(response);
     }

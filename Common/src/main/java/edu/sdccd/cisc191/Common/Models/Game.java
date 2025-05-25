@@ -1,6 +1,8 @@
 package edu.sdccd.cisc191.Common.Models;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -28,7 +30,7 @@ import java.util.Date;
  */
 
 @Configuration
-class JacksonConfig {
+class JacksonConfigGame {
     @Bean
     public JodaModule jodaModule() {
         return new JodaModule();
@@ -36,13 +38,14 @@ class JacksonConfig {
 }
 @Entity
 @Table(name = "games")
-@Getter
-@Setter
+@Getter @Setter
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Game implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long dbId;
+    private Long dbId;
 
     @Column(name = "api_id", unique = true)
     private long id;
@@ -91,6 +94,27 @@ public class Game implements Serializable {
     }
 
     /**
+     * Constructor for a Game.
+     *
+     * @param t1         Team 1 name
+     * @param t2         Team 2 name
+     * @param id         Internal game ID
+     * @param givenDate  Date of the game
+     * @param sport      Sport (e.g., "NFL")
+     */
+    public Game(String t1, String t2, long id, Date givenDate, String sport, long dbId) {
+        this.team1 = t1;
+        this.team2 = t2;
+        this.id = id;
+        this.gameDate = new DateTime(givenDate);
+        this.sport = sport;
+        this.dbId = dbId;
+
+        this.dateClean = this.getDateClean();
+    }
+
+
+    /**
      * Serializes a  Game  object into a JSON string.
      *
      * @param customer The  Game  object to serialize.
@@ -99,17 +123,6 @@ public class Game implements Serializable {
      */
     public static String toJSON(Game customer) throws Exception {
         return objectMapper.writeValueAsString(customer);
-    }
-
-    /**
-     * Deserializes a JSON string into a  Game  object.
-     *
-     * @param input The JSON string to deserialize.
-     * @return A  Game  object created from the JSON string.
-     * @throws Exception If deserialization fails.
-     */
-    public static Game fromJSON(String input) throws Exception {
-        return objectMapper.readValue(input, Game.class);
     }
 
     /**
@@ -141,5 +154,4 @@ public class Game implements Serializable {
             return gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear() + " " + gameDate.getHourOfDay() + ":0" + gameDate.getMinuteOfHour();
         }
     }
-
 }

@@ -85,7 +85,7 @@ class UserController {
                 .orElseThrow(() -> new GameNotFoundException(dto.getGameId()));
 
         // 2. build a new Bet instance
-        Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam());
+        Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam(), dto.getWinAmt());
 
         // 3. add & save
         user.addBet(bet);
@@ -113,6 +113,8 @@ class UserController {
                         String winner = baseballGetter.getWinner(betGame.getId());
                         if (winner.equals(bet.getBetTeam())) {
                             user.setMoney(user.getMoney() + bet.getWinAmt());
+                        } else if (winner.equals("Drop")) {
+                            System.out.println("Bet outside of API call radius");
                         } else {
                             user.setMoney(user.getMoney() - bet.getBetAmt());
                         }
