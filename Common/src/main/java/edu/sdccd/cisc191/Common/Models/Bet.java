@@ -43,6 +43,16 @@ public class Bet implements Serializable {
     private final long currentEpochSeconds = System.currentTimeMillis() / 1000; // Current time in seconds
     private final Random random = new Random();
 
+    /**
+     * -- GETTER --
+     *  Gets the odds tracked over a 10-hour period.
+     *
+     * @return A 2D array representing odds and timestamps.
+     */
+    @Transient
+    private final double[][] winOddsOvertime = new double[numHours][2]; // Array to track odds over time
+
+
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -90,23 +100,23 @@ public class Bet implements Serializable {
      * @param amt The amount of money being bet.
      * @param betTeam The team being bet on.
      */
-    public Bet(Game g, int amt, String betTeam) {
+    public Bet(Game g, int amt, String betTeam, int winAmt) {
         this.game = g;
         this.betTeam = betTeam;
         this.betAmt = amt;
+        this.winAmt = winAmt;
 
-        if (betTeam.equalsIgnoreCase("team1")) {
-            winOdds = (int) game.getTeam1Odd();
-        } else if (betTeam.equalsIgnoreCase("team2")) {
-            winOdds = (int) game.getTeam2Odd();
 
-            if (winOdds >= 0) {
-                this.winAmt = (amt + (100 / winOdds) * amt);
-            } else {
-                this.winAmt = (amt + Math.abs((winOdds / 100) * amt));
-            }
+        // Populate winOddsOvertime with odds and timestamps
+        for (int j = 0; j < numHours; j++) {
+            long timeStamp = currentEpochSeconds - (j * 3600L); // Decrement by hours
+            double odd = calculateOddsForGameAtTime(timeStamp);
+            winOddsOvertime[j][0] = odd;
+            winOddsOvertime[j][1] = timeStamp;
         }
+
     }
+
 
 
 
@@ -175,6 +185,7 @@ public class Bet implements Serializable {
         Bet bet = (Bet) o;
         return getId() != null && Objects.equals(getId(), bet.getId());
     }
+
 
     @Override
     public final int hashCode() {

@@ -141,19 +141,21 @@ public class Client {
         return null;
     }
 
-    public String oddsModifyRequest(int id) throws IOException {
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending oddsModifyRequest with ID: " + id);
-            return client.sendRequest(new Request("BaseBet", id), String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        stopConnection();
-        return null;
-    }
+    public static String getOdds(int gameId, String sport) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
 
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/games/odds/" + sport + "/" + gameId))
+                .GET() // or .POST(HttpRequest.BodyPublishers.ofString("your JSON"))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status: " + response.statusCode());
+//        System.out.println("Body: " + response.body());
+
+        return response.body();
+    }
 
     /**
      * Retrieves an array of Game objects from the server.
@@ -184,7 +186,7 @@ public class Client {
             System.out.println(jsonObject);
             Instant instant = Instant.parse(jsonObject.get("gameDate").toString());
             Date date = Date.from(instant);
-            Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), 0, 0);
+            Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), (long) jsonObject.get("dbId"));
             allGames.add(game);
         }
 
@@ -228,13 +230,14 @@ public class Client {
 
     }
 
-    public static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt) throws Exception {
+    public static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt, int winAmt) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         // build only the DTO fields
         Map<String,Object> dto = Map.of(
                 "gameId", gameId,
                 "betTeam", betTeam,
-                "betAmt", betAmt
+                "betAmt", betAmt,
+                "winAmt", winAmt
         );
         String jsonBody = mapper.writeValueAsString(dto);
 
@@ -257,11 +260,6 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
         User user = getMainUser();
-
-        patchAddBetToMainUser(1L, 1L, "Seattle Mariners", 10);
-        patchAddBetToMainUser(1L, 2L, "Pittsburgh Pirates", 20);
-        patchAddBetToMainUser(1L, 3L, "Chicago Cubs", 90);
-
 
         ArrayList<Game> allGames = Client.getGames();
 
