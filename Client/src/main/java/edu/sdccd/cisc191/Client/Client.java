@@ -5,6 +5,8 @@ import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -163,7 +165,7 @@ public class Client {
      * @return an array of Game objects.
      * @throws IOException if an I/O error occurs during retrieval.
      */
-    private static ArrayList<Game> getGames() throws Exception {
+    public static ArrayList<Game> getGames() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -183,7 +185,7 @@ public class Client {
 //        System.out.println(jsonArray);
         for (Object obj : jsonArray) {
             JSONObject jsonObject = (JSONObject) obj;
-            System.out.println(jsonObject);
+//            System.out.println(jsonObject);
             Instant instant = Instant.parse(jsonObject.get("gameDate").toString());
             Date date = Date.from(instant);
             Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), (long) jsonObject.get("dbId"));
@@ -193,7 +195,7 @@ public class Client {
         return allGames;
     }
 
-    private static User getMainUser() throws Exception {
+    public static User getMainUser() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -258,15 +260,8 @@ public class Client {
     }
 
 
-    public static void main(String[] args) throws Exception {
-        User user = getMainUser();
-
-        ArrayList<Game> allGames = Client.getGames();
-
-        new UI();
-        UI.init(allGames, user);
-
-
+    public static void main(String[] args) {
+        Application.launch(UI.class, args);
     }
 
 

@@ -49,6 +49,7 @@ public class BetView extends Application {
      */
     public void betView(Stage stage, Game game, String team, User user) throws Exception {
         this.game = game;
+        System.out.println(team + " is the team");
         this.team = team;
         this.user = user;
         start(stage);

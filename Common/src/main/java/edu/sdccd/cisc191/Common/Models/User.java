@@ -111,7 +111,7 @@ public class User implements Serializable {
     public boolean checkBet(Game game) {
         for (Bet bet : bets) {
             boolean result = bet.getGame().equals(game);
-            System.out.println("Checking bet: " + bet.getGame() + " with game: " + game + " Result: " + result);
+//            System.out.println("Checking bet: " + bet.getGame() + " with game: " + game + " Result: " + result);
             if (result) {
                 return true;
             }
