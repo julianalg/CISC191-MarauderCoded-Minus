@@ -30,7 +30,7 @@ import java.util.Random;
 public class Bet implements Serializable {
 
     @ManyToOne
-    @JoinColumn(name = "game_db_id")
+    @JoinColumn(name = "game_db_id", unique = true)
     private Game game;
     private String betTeam;
     private int betAmt;
