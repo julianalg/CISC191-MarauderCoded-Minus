@@ -37,4 +37,13 @@ public class BaseballGetter extends APIGetter {
 
     }
 
+    public static void main(String[] args) {
+        BaseballGetter baseballGetter = new BaseballGetter();
+        try {
+            System.out.println(baseballGetter.getGames("Baseball"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

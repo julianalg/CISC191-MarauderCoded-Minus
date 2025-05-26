@@ -5,6 +5,7 @@ import edu.sdccd.cisc191.Server.API.BaseballGetter;
 import edu.sdccd.cisc191.Server.API.BasketballGetter;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -19,11 +20,11 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
     public GameDatabase(GameRepository gameRepository) throws Exception {
         super(gameRepository, Game.class);
         loadOrInitializeDatabase();
-        /*try {
+        try {
             updateDatabaseFromAPI();
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
         System.out.println("Game Database loaded.");
         System.out.println("Game Database contents:");
         for (Game game : repository.findAll()) {
@@ -52,22 +53,26 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
         BaseballGetter baseballGetter = new BaseballGetter();
         ArrayList<Game> baseballGames = baseballGetter.getGames("Baseball");
 
-        // Validation, think about replacing with stream operation
-        // Removes games already in our database.
-        for(Game game: repository.findAll()) {
-            baseballGames.remove(game);
-        }
         System.out.println("Found " + baseballGames.size() + " new baseball games." );
-        repository.saveAll(baseballGames);
+        for (Game game : baseballGames) {
+            try {
+                repository.save(game);
+            } catch (DataIntegrityViolationException e) {
+                System.out.println("Game " + game.getId() + " already exists in database.");
+            }
+        }
 
         BasketballGetter basketballGetter = new BasketballGetter();
         ArrayList<Game> basketballGames = basketballGetter.getGames("Basketball");
 
-        for(Game game: repository.findAll()) {
-            basketballGames.remove(game);
-        }
         System.out.println("Found " + basketballGames.size() + " new basketball games." );
-        repository.saveAll(basketballGames);
+        for (Game game : basketballGames) {
+            try {
+                repository.save(game);
+            } catch (DataIntegrityViolationException e) {
+                System.out.println("Game " + game.getId() + " already exists in database.");
+            }
+        }
 
         System.out.println("Game Database updated from API.");
         System.out.println("Game Database contents:");

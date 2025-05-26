@@ -31,7 +31,7 @@ public class UI extends Application {
      * @param stage the Stage on which the TableView is displayed.
      * @return a TableView populated with game data.
      */
-    private <T extends Game> TableView<T> createGameTableView(T[] games, Stage stage) {
+    private <T extends Game> TableView<T> createGameTableView(T[] games, User user, Stage stage) {
         TableView<T> tableView = new TableView<>();
 
         // Column for Team 1
@@ -81,7 +81,7 @@ public class UI extends Application {
                     if (index >= 0 && index < getTableView().getItems().size()) {
                         T game = getTableView().getItems().get(index);
                         try {
-                            new BetView().betView(stage, game, game.getTeam1());
+                            new BetView().betView(stage, game, game.getTeam1(), user);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -98,7 +98,7 @@ public class UI extends Application {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
                         T game = getTableView().getItems().get(index);
-                        betButton.setDisable(user.checkBet(game));
+//                        betButton.setDisable(user.checkBet(game));
                     }
                     setGraphic(betButton);
                 }
@@ -120,7 +120,7 @@ public class UI extends Application {
                     if (index >= 0 && index < getTableView().getItems().size()) {
                         T game = getTableView().getItems().get(index);
                         try {
-                            new BetView().betView(stage, game, game.getTeam2());
+                            new BetView().betView(stage, game, game.getTeam2(), user);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -137,7 +137,7 @@ public class UI extends Application {
                     int index = getIndex();
                     if (index >= 0 && index < getTableView().getItems().size()) {
                         T game = getTableView().getItems().get(index);
-                        betButton.setDisable(user.checkBet(game));
+//                        betButton.setDisable(user.checkBet(game));
                     }
                     setGraphic(betButton);
                 }
@@ -243,19 +243,6 @@ public class UI extends Application {
         return betList;
     }
 
-    static ArrayList<Game> allGames;
-    static User user;
-
-    /**
-     * The main entry point for the client application.
-     * Launches the JavaFX application.
-     */
-    public static void init(ArrayList<Game> games, User u) throws IOException {
-        System.out.println("Helloooo");
-        allGames = games;
-        user = u;
-        launch();// Run this Application.
-    }
 
     @Override
     /**
@@ -267,15 +254,19 @@ public class UI extends Application {
      * @throws Exception if an error occurs during initialization.
      */
     public void start(Stage stage) throws Exception {
+        User mainUser = Client.getMainUser();
+        ArrayList<Game> allGames  = Client.getGames();
+        Client.updateBets();
+
         // Build the main layout
         System.out.println(allGames);
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(20));
 
         // Create UI components
-        TableView<Game> gameTable = createGameTableView(allGames.toArray(new Game[0]), stage);
-        HBox userInfoBox = createUserInfoBox(user);
-        HBox betListBox = createBetListBox(stage, user);
+        TableView<Game> gameTable = createGameTableView(allGames.toArray(new Game[0]), mainUser, stage);
+        HBox userInfoBox = createUserInfoBox(mainUser);
+        HBox betListBox = createBetListBox(stage, mainUser);
 
         // Assemble components into the BorderPane
         borderPane.setCenter(gameTable);

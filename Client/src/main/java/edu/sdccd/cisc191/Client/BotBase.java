@@ -170,7 +170,7 @@ public class BotBase {
         if (teamSelect == 1) team = game.getTeam1(); else team = game.getTeam2();
 
         // Create a new Bet object using the updated constructor, casting the double to int
-        Bet newBet = new Bet(game, (int) betAmt, team);
+        Bet newBet = new Bet(game, (int) betAmt, team, (int) (betAmt * 2.25));
         System.out.println("Bot placed bet: " + newBet);
     }
 

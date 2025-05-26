@@ -22,8 +22,13 @@ public class UserDatabase extends GenericDatabase<User, Long, UserRepository> {
 
     @Override
     protected void initializeDefaultEntities() {
+        // Push user with ID 1 to be the primary user
+        User primaryUser = new User("Chase", 1000);
+        repository.save(primaryUser);
+
+        // Generate random other users
         List<User> defaultUsers = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             String userId = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
             defaultUsers.add(new User(userId, (int) (Math.random() * 1000)));
         }

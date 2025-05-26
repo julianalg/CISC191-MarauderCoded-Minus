@@ -5,6 +5,8 @@ import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -141,19 +143,21 @@ public class Client {
         return null;
     }
 
-    public String oddsModifyRequest(int id) throws IOException {
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending oddsModifyRequest with ID: " + id);
-            return client.sendRequest(new Request("BaseBet", id), String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        stopConnection();
-        return null;
-    }
+    public static String getOdds(int gameId, String sport) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
 
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/games/odds/" + sport + "/" + gameId))
+                .GET() // or .POST(HttpRequest.BodyPublishers.ofString("your JSON"))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status: " + response.statusCode());
+//        System.out.println("Body: " + response.body());
+
+        return response.body();
+    }
 
     /**
      * Retrieves an array of Game objects from the server.
@@ -161,7 +165,7 @@ public class Client {
      * @return an array of Game objects.
      * @throws IOException if an I/O error occurs during retrieval.
      */
-    static ArrayList<Game> getGames() throws Exception {
+    public static ArrayList<Game> getGames() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -181,17 +185,17 @@ public class Client {
 //        System.out.println(jsonArray);
         for (Object obj : jsonArray) {
             JSONObject jsonObject = (JSONObject) obj;
-            System.out.println(jsonObject);
+//            System.out.println(jsonObject);
             Instant instant = Instant.parse(jsonObject.get("gameDate").toString());
             Date date = Date.from(instant);
-            Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), 0, 0);
+            Game game = new Game((String) jsonObject.get("team1"), (String) jsonObject.get("team2"), (long) jsonObject.get("id"), date, (String) jsonObject.get("sport"), (long) jsonObject.get("dbId"));
             allGames.add(game);
         }
 
         return allGames;
     }
 
-    private static User getMainUser() throws Exception {
+    public static User getMainUser() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -206,11 +210,26 @@ public class Client {
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.body());
-        return new User((String) jsonObject.get("name"), (long) jsonObject.get("money"));
+        JSONArray bets = (JSONArray) jsonObject.get("bets");
+        User mainUser = new User((String) jsonObject.get("name"), (long) jsonObject.get("money"));
+        for (Object obj : bets) {
+            JSONObject bet = (JSONObject) obj;
+            JSONObject game = (JSONObject) bet.get("game");
+//            System.out.println(game);
+            String iso = game.get("gameDate").toString();
+            Instant instant = Instant.parse(iso);
+            Date date = Date.from(instant);
+            Game betGame = new Game((String) game.get("team1"), (String) game.get("team2"), (Long) game.get("id"), date, (String) game.get("sport"), (Long) game.get("dbId"));
+            Bet newBet = new Bet(betGame, Math.toIntExact((Long) bet.get("betAmt")), (String) bet.get("betTeam"), Math.toIntExact((Long) bet.get("winAmt")));
+            mainUser.addBet(newBet);
+            System.out.println("Bet: " + newBet);
+        }
+
+        return mainUser;
 
     }
 
-    static void updateMainUserMoney(long money) throws Exception {
+    private static void updateMainUserMoney(long money) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         String jsonBody = "{\"id\": 1, \"name\": \"Chase\", \"money\": " + money + "}";
@@ -228,44 +247,49 @@ public class Client {
 
     }
 
-    static void addBetToMainUser(Bet bet, User user) throws Exception {
-        // Add the new bet to the user's existing list
-        user.addBet(bet);
-
-        // Use Jackson to convert the entire User object to JSON
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonBody = mapper.writeValueAsString(user);
-
-        System.out.println("Sending JSON: " + jsonBody); // Debug print
-
+    public static void updateBets() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:9090/users/1"))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .uri(URI.create("http://localhost:9090/updateAllBets"))
+                .GET()
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status Code (update bets on app open): " + response.statusCode());
+    }
+
+    public static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt, int winAmt) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        // build only the DTO fields
+        Map<String,Object> dto = Map.of(
+                "gameId", gameId,
+                "betTeam", betTeam,
+                "betAmt", betAmt,
+                "winAmt", winAmt
+        );
+        String jsonBody = mapper.writeValueAsString(dto);
+
+        System.out.println("PATCH body: " + jsonBody);
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/" + userId + "/bets"))
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
 
         System.out.println("Status Code: " + response.statusCode());
         System.out.println("Response Body: " + response.body());
     }
 
 
-    public static void main(String[] args) throws Exception {
-        User user = getMainUser();
-        Bet bet = new Bet(new Game("1", "2", 99999, new Date(), "Basketball", 1, 2), 10, "1");
-        Bet bet2  = new Bet(new Game("6", "8", 99999, new Date(), "Basketball", 22, 88), 10, "1");
-
-        updateMainUserMoney(3);
-
-        ArrayList<Game> allGames = Client.getGames();
-
-        new UI();
-        UI.init(allGames, user);
-
-
+    public static void main(String[] args) {
+        Application.launch(UI.class, args);
     }
 
 
