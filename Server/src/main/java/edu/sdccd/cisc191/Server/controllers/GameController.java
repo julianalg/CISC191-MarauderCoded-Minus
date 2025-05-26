@@ -51,7 +51,6 @@ class GameController {
         repository.deleteById(id);
     }
 
-    // Existing odds endpoint remains unchanged
     @GetMapping("/games/odds/{sport}/{id}")
     String getOdds(@PathVariable String sport, @PathVariable Long id) throws ParseException {
         return switch (sport) {
