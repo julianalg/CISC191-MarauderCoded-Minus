@@ -102,6 +102,8 @@ public class User implements Serializable {
         this.moneyBet = Math.toIntExact(money);
     }
 
+
+
     /**
      * Checks if the user has an active bet on the specified game.
      *

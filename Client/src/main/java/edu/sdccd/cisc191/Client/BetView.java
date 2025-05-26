@@ -53,44 +53,19 @@ public class BetView extends Application {
         this.team = team;
         this.user = user;
         start(stage);
-        grabOdds();
     }
 
-    public void grabOdds() throws IOException, ParseException, InterruptedException {
+    public double grabOdds(int homeOrAway) throws IOException, ParseException, InterruptedException {
         Client client = new Client();
         System.out.println("Grabbing odds for " + game.getId());
         //Check for int casting later
         try {
-            String betInfo = client.getOdds((int) game.getId(), game.getSport());
-            System.out.println(betInfo);
-
-            String json = betInfo;
-
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(json);
-
-            for (JsonNode bookmaker : root) {
-                String bookName = bookmaker.get("name").asText();
-                JsonNode bets = bookmaker.get("bets");
-                JsonNode firstBet = bets.get(0);
-
-                    if ("Home/Away".equals(firstBet.get("name").asText())) {
-                        JsonNode values = firstBet.get("values");
-                        // assume values[0] is Home, values[1] is Away
-                        homeOddStat = Double.parseDouble(values.get(0).get("odd").asText());
-                        awayOddStat = Double.parseDouble(values.get(1).get("odd").asText());
-                        System.out.printf(
-                                "%s → Home: %s, Away: %s%n",
-                                bookName, homeOddStat, awayOddStat
-                        );
-                        break; // stop scanning other markets for this bookmaker
-                    }
-            }
+            double betInfo = client.getOdds((int) game.getId(), game.getSport(), homeOrAway);
+            return betInfo;
         } catch (Exception e) {
             System.out.println("Error grabbing odds"  + e.getMessage());
-            homeOddStat = 2.25;
-            awayOddStat = 2.25;
-        }
+            return 2.25;
+            }
         }
 
     /**
@@ -116,9 +91,21 @@ public class BetView extends Application {
             Integer amount = Integer.parseInt(b.getText());
             int winAmt;
             if (team.equals(game.getTeam1())) {
-                winAmt = (int) (amount * homeOddStat);
+                double odds;
+                try {
+                    odds = this.grabOdds(0);
+                } catch (IOException | InterruptedException | ParseException e) {
+                    throw new RuntimeException(e);
+                }
+                winAmt = (int) (amount * odds);
             } else {
-                winAmt = (int) (amount * awayOddStat);
+                double odds;
+                try {
+                    odds = this.grabOdds(1);
+                } catch (IOException | ParseException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                winAmt = (int) (amount * odds);
             }
             if (user.getMoneyBet() >= amount) {
                 //Creating a dialog
