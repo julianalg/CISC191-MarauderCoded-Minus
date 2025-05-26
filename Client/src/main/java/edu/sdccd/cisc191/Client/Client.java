@@ -247,6 +247,19 @@ public class Client {
 
     }
 
+    public static void updateBets() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/updateAllBets"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status Code (update bets on app open): " + response.statusCode());
+    }
+
     public static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt, int winAmt) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         // build only the DTO fields

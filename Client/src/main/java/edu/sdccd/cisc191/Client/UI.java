@@ -255,8 +255,8 @@ public class UI extends Application {
      */
     public void start(Stage stage) throws Exception {
         User mainUser = Client.getMainUser();
-        System.out.println(mainUser +"cowabunga");
         ArrayList<Game> allGames  = Client.getGames();
+        Client.updateBets();
 
         // Build the main layout
         System.out.println(allGames);
