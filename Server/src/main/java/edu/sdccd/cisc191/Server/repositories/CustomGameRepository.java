@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.joda.time.DateTime;
@@ -52,7 +53,9 @@ public class CustomGameRepository extends SimpleJpaRepository<Game, Long> implem
         if (team1OddsTree == null) {
             initializeTrees();
         }
-        return team1OddsTree.inorderTraversal();
+        return team1OddsTree.inorderTraversal().stream()
+                .sorted(Comparator.comparingDouble(Game::getTeam1Odd))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,7 +63,9 @@ public class CustomGameRepository extends SimpleJpaRepository<Game, Long> implem
         if (team2OddsTree == null) {
             initializeTrees();
         }
-        return team2OddsTree.inorderTraversal();
+        return team2OddsTree.inorderTraversal().stream()
+                .sorted(Comparator.comparingDouble(Game::getTeam2Odd))
+                .collect(Collectors.toList());
     }
 
     @Override
