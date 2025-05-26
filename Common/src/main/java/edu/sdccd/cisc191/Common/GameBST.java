@@ -79,4 +79,12 @@ public class GameBST {
         }
         return treeByTeam2Odds;
     }
+
+    public static BinarySearchTree<Game> buildDateTree(List<Game> games) {
+        BinarySearchTree<Game> treeByDate = new BinarySearchTree<>(Comparator.comparing(Game::getGameDate));
+        for (Game game : games) {
+            treeByDate.insert(game);
+        }
+        return treeByDate;
+    }
 }
