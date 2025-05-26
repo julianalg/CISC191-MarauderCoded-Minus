@@ -3,7 +3,7 @@ package edu.sdccd.cisc191.Server;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Server.API.BaseballGetter;
 import edu.sdccd.cisc191.Server.API.BasketballGetter;
-import edu.sdccd.cisc191.Server.repositories.GameRepositoryImpl;
+import edu.sdccd.cisc191.Server.repositories.CustomGameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ class GameControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private GameRepositoryImpl gameRepository;
+    public CustomGameRepository gameRepository;
 
     @Autowired
     private BaseballGetter baseballGetter;
