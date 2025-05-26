@@ -24,18 +24,18 @@ import static org.mockito.Mockito.*;
 class DatabaseServerTest {
 
     @Mock
-    private UserRepository userRepository;
+    public UserRepository userRepository;
 
     @Mock
-    private GameRepository gameRepository;
+    public GameRepository gameRepository;
 
     @Mock
-    private GameDatabase gameDatabase;
+    public GameDatabase gameDatabase;
 
     @Mock
-    private UserDatabase userDatabase;
+    public UserDatabase userDatabase;
 
-    private DatabaseServer databaseServer;
+    public DatabaseServer databaseServer;
 
     @BeforeEach
     void setUp() throws IOException {
