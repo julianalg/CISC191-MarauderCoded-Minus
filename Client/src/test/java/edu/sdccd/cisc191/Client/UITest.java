@@ -28,8 +28,8 @@ public class UITest extends ApplicationTest {
         setupTestData();
         
         // Set the static fields in UI
-        UI.allGames = testGames;
-        UI.user = testUser;
+        this.testGames = Client.getGames();
+        this.testUser = Client.getMainUser() ;
         
         // Create and start the UI
         ui = new UI();
@@ -51,7 +51,7 @@ public class UITest extends ApplicationTest {
         game1.setGameDate(new DateTime());
 
         Game game2 = new Game("1", "2", 99999, new Date(), "Basketball", 1, 2);
-        game2.setDate(LocalDateTime.now().plusDays(1));
+        game2.setGameDate(DateTime.now().plusDays(1));
 
         testGames.add(game1);
         testGames.add(game2);

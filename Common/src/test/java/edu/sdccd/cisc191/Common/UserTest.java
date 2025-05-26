@@ -25,7 +25,7 @@ public class UserTest {
         User user = new User("Charlie", 1000);
         // Create a game that will be associated with the bet
         Game game = new Game("Team A", "Team B", 1, new Date(), "Soccer", 1.5, 2.5);
-        Bet bet = new Bet(game, 200, "team1");
+        Bet bet = new Bet(game, 200, "team1", 100);
 
         int initialMoneyBet = user.getMoneyBet();
         int initialMoneyLine = user.getMoneyLine();
@@ -47,7 +47,7 @@ public class UserTest {
         User user = new User("Dana", 1000);
         Game game1 = new Game("Team A", "Team B", 1, new Date(), "Basketball", 1.8, 2.2);
         Game game2 = new Game("Team C", "Team D", 2, new Date(), "Basketball", 1.9, 2.1);
-        Bet bet = new Bet(game1, 150, "team1");
+        Bet bet = new Bet(game1, 150, "team1", 100);
 
         // Before the bet is added, checkBet should be false.
         assertFalse(user.checkBet(game1), "User should not have an active bet for team games yet");

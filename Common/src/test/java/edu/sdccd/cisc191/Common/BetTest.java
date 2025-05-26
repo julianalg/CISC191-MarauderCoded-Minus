@@ -17,7 +17,7 @@ public class BetTest {
     @Test
     public void testUpdateUserWhenFulfilled() {
         Game game = new Game("Team X", "Team Y", 1, new Date(), "Soccer", 1.5, 2.5);
-        Bet bet = new Bet(game, 100, "team1");
+        Bet bet = new Bet(game, 100, "team1", 150);
         // Manually set fulfillment and potential winning amount.
         bet.setFulfillment(true);
         bet.setWinAmt(150);
@@ -31,7 +31,7 @@ public class BetTest {
     @Test
     public void testUpdateUserWhenNotFulfilled() {
         Game game = new Game("Team X", "Team Y", 1, new Date(), "Soccer", 1.5, 2.5);
-        Bet bet = new Bet(game, 100, "team1");
+        Bet bet = new Bet(game, 100, "team1", 150);
         // Manually set fulfillment to false.
         bet.setFulfillment(false);
         bet.setWinAmt(150);
@@ -45,7 +45,7 @@ public class BetTest {
     @Test
     public void testUpdateFulfillment() {
         Game game = new Game("Team X", "Team Y", 1, new Date(), "Soccer", 1.5, 2.5);
-        Bet bet = new Bet(game, 100, "team1");
+        Bet bet = new Bet(game, 100, "team1", 100);
         // Calling updateFulfillment sets the fulfillment field based on random odds.
         bet.updateFulfillment();
         boolean fulfillment = bet.getFulfillment();
@@ -56,8 +56,8 @@ public class BetTest {
     @Test
     public void testEqualsAndHashCode() {
         Game game = new Game("Team A", "Team B", 1, new Date(), "Football", 1.8, 2.2);
-        Bet bet1 = new Bet(game, 100, "team1");
-        Bet bet2 = new Bet(game, 100, "team1");
+        Bet bet1 = new Bet(game, 100, "team1", 100);
+        Bet bet2 = new Bet(game, 100, "team1", 100);
 
         // With null IDs, equals should return false.
         assertFalse(bet1.equals(bet2), "Bets with null IDs are not equal");
