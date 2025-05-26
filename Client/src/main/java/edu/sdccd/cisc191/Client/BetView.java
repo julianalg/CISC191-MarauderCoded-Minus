@@ -93,20 +93,16 @@ public class BetView extends Application {
             if (team.equals(game.getTeam1())) {
                 double odds;
                 try {
-                    odds = Client.getOdds((int) game.getId(), game.getSport(), 0);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
+                    odds = this.grabOdds(0);
+                } catch (IOException | InterruptedException | ParseException e) {
                     throw new RuntimeException(e);
                 }
                 winAmt = (int) (amount * odds);
             } else {
                 double odds;
                 try {
-                    odds = Client.getOdds((int) game.getId(), game.getSport(), 1);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
+                    odds = this.grabOdds(1);
+                } catch (IOException | ParseException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 winAmt = (int) (amount * odds);

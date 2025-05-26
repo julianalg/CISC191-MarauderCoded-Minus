@@ -1,5 +1,7 @@
 package edu.sdccd.cisc191.Client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.sdccd.cisc191.Common.Models.Bet;
@@ -318,8 +320,50 @@ public class Client {
         System.out.println("Response Body: " + response.body());
     }
 
+    private static ArrayList<BotBase> bots = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static ArrayList<BotBase> getBots() {
+        return bots;
+    }
+
+    public static void createBotArray() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:9090/users"))
+                .GET() // or .POST(HttpRequest.BodyPublishers.ofString("your JSON"))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status: " + response.statusCode());
+        System.out.println("Body: " + response.body());
+
+        ObjectMapper mapper = new ObjectMapper()
+                // ignore any JSON properties you don’t have in your class
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // readValue will call your no-arg constructor and setters (or @JsonCreator)
+        List<User> botUsers = mapper.readValue(response.body(), new TypeReference<List<User>>() {});
+        botUsers.remove(botUsers.getFirst());
+
+        for (User user : botUsers) {
+            BotBase newBot = new BotBase(user);
+            bots.add(newBot);
+        }
+    }
+
+    public static void launchBots() throws Exception {
+        createBotArray();
+        for (BotBase bot : bots) {
+            bot.startBot();
+        }
+    }
+
+
+
+    public static void main(String[] args) throws Exception {
+        launchBots();
         Application.launch(UI.class, args);
     }
 
