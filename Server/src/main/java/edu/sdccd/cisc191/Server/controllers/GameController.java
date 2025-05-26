@@ -6,10 +6,13 @@ import edu.sdccd.cisc191.Server.API.BasketballGetter;
 import edu.sdccd.cisc191.Server.exceptions.GameNotFoundException;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import edu.sdccd.cisc191.Server.repositories.GameRepositoryImpl;
+import org.joda.time.DateTime;
 import org.json.simple.parser.ParseException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 class GameController {
@@ -73,4 +76,37 @@ class GameController {
             default -> "Invalid sport";
         };
     }
+
+    // Get games by sport
+    @GetMapping("/games/sport/{sport}")
+    List<Game> getGamesBySport(@PathVariable String sport) {
+        return repository.findAll().stream()
+                .filter(game -> game.getSport().equalsIgnoreCase(sport))
+                .collect(Collectors.toList());
+    }
+
+    // Get future games
+    @GetMapping("/games/upcoming")
+    List<Game> getUpcomingGames() {
+        DateTime now = new DateTime();
+        return repository.findAll().stream()
+                .filter(game -> game.getGameDate().isAfter(now))
+                .sorted(Comparator.comparing(Game::getGameDate))
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/games/dateRange")
+    List<Game> findGamesByDateRange(
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate) {
+        DateTime start = DateTime.parse(startDate);
+        DateTime end = DateTime.parse(endDate);
+
+        return repository.findAll().stream()
+                .filter(game -> game.getGameDate().isAfter(start)
+                        && game.getGameDate().isBefore(end))
+                .sorted(Comparator.comparing(Game::getGameDate))
+                .collect(Collectors.toList());
+    }
+
 }
