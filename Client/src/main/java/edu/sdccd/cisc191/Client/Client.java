@@ -1,5 +1,6 @@
 package edu.sdccd.cisc191.Client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
@@ -143,7 +144,7 @@ public class Client {
         return null;
     }
 
-    public static String getOdds(int gameId, String sport) throws IOException, InterruptedException {
+    public static double getOdds(int gameId, String sport, int homeOrAway) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -156,7 +157,37 @@ public class Client {
         System.out.println("Status: " + response.statusCode());
 //        System.out.println("Body: " + response.body());
 
-        return response.body();
+        String json = response.body();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(json);
+
+        double homeOddStat = 2.25;
+        double awayOddStat = 2.25;
+
+        for (JsonNode bookmaker : root) {
+            String bookName = bookmaker.get("name").asText();
+            JsonNode bets = bookmaker.get("bets");
+            JsonNode firstBet = bets.get(0);
+
+            if ("Home/Away".equals(firstBet.get("name").asText())) {
+                JsonNode values = firstBet.get("values");
+                // assume values[0] is Home, values[1] is Away
+                homeOddStat = Double.parseDouble(values.get(0).get("odd").asText());
+                awayOddStat = Double.parseDouble(values.get(1).get("odd").asText());
+                System.out.printf(
+                        "%s → Home: %s, Away: %s%n",
+                        bookName, homeOddStat, awayOddStat
+                );
+                break; // stop scanning other markets for this bookmaker
+            }
+        }
+
+        if (homeOrAway == 0) {
+            return homeOddStat;
+        } else {
+            return awayOddStat;
+        }
+
     }
 
     /**
