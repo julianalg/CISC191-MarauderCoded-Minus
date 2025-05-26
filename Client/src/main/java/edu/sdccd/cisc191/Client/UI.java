@@ -18,6 +18,7 @@ import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class UI extends Application {
@@ -243,6 +244,47 @@ public class UI extends Application {
         return betList;
     }
 
+    /**
+     * Creates a VBox listing other users in the game, showing each user's
+     * name and current money.
+     *
+     * @param players the list of other User objects to display
+     * @return a VBox containing one HBox per player
+     */
+    private VBox createOtherPlayersBox(ArrayList<BotBase> players) {
+        VBox container = new VBox(10);
+        container.setPadding(new Insets(10));
+        container.getStyleClass().add("other-players-box"); // for custom styling
+
+        // Title
+        Label title = new Label("Other Players");
+        title.setFont(new Font(18));
+        title.setTextFill(Color.BLACK);
+        container.getChildren().add(title);
+
+        // One row per player
+        for (BotBase pl : players) {
+            User p = pl.getUser();
+            HBox row = new HBox(15);
+            row.setPadding(new Insets(5));
+            row.getStyleClass().add("other-player-row");
+
+            Label nameLabel = new Label(p.getName());
+            nameLabel.setFont(new Font(14));
+            nameLabel.setTextFill(Color.BLACK);
+
+            Label moneyLabel = new Label("$" + p.getMoney());
+            moneyLabel.setFont(new Font(14));
+            moneyLabel.setTextFill(Color.LIGHTGREEN);
+
+            row.getChildren().addAll(nameLabel, moneyLabel);
+            container.getChildren().add(row);
+        }
+
+        return container;
+    }
+
+
 
     @Override
     /**
@@ -267,14 +309,16 @@ public class UI extends Application {
         TableView<Game> gameTable = createGameTableView(allGames.toArray(new Game[0]), mainUser, stage);
         HBox userInfoBox = createUserInfoBox(mainUser);
         HBox betListBox = createBetListBox(stage, mainUser);
+        VBox otherPlayersBox = createOtherPlayersBox(Client.getBots());
 
         // Assemble components into the BorderPane
         borderPane.setCenter(gameTable);
         borderPane.setTop(userInfoBox);
         borderPane.setBottom(betListBox);
+        borderPane.setRight(otherPlayersBox);
 
         // Create and set the scene
-        Scene scene = new Scene(borderPane, 1000, 800);
+        Scene scene = new Scene(borderPane, 1500, 1500);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Marauder Bets");
