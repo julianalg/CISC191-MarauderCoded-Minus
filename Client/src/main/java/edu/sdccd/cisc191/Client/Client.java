@@ -102,6 +102,11 @@ public class Client {
         }
     }
 
+    protected HttpClient httpClient() {
+        return HttpClient.newHttpClient();
+    }
+
+
 
     public User userGetRequest(int id) throws IOException {
         Client client = new Client();
@@ -147,7 +152,7 @@ public class Client {
     }
 
     public static double getOdds(int gameId, String sport, int homeOrAway) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = new Client().httpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:9090/games/odds/" + sport + "/" + gameId))
@@ -199,7 +204,7 @@ public class Client {
      * @throws IOException if an I/O error occurs during retrieval.
      */
     public static ArrayList<Game> getGames() throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = new Client().httpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:9090/games"))
@@ -229,7 +234,7 @@ public class Client {
     }
 
     public static User getMainUser() throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = new Client().httpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:9090/users/1"))
@@ -263,7 +268,7 @@ public class Client {
     }
 
     private static void updateMainUserMoney(long money) throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = new Client().httpClient();
 
         String jsonBody = "{\"id\": 1, \"name\": \"Chase\", \"money\": " + money + "}";
 
@@ -281,7 +286,7 @@ public class Client {
     }
 
     public static void updateBets() throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = new Client().httpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:9090/updateAllBets"))
@@ -306,7 +311,7 @@ public class Client {
 
         System.out.println("PATCH body: " + jsonBody);
 
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = new Client().httpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:9090/" + userId + "/bets"))
                 .header("Content-Type", "application/json")
@@ -327,7 +332,7 @@ public class Client {
     }
 
     public static void createBotArray() throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = new Client().httpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:9090/users"))
