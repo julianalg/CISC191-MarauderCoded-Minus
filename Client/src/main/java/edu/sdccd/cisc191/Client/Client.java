@@ -10,6 +10,7 @@ import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Common.Request;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import lombok.Getter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -28,129 +29,18 @@ import java.util.*;
  * It handles game, user, and size requests, as well as modifications to user data.
  */
 public class Client {
-    /**
-     * A static user representing the client user. Initialized with name "Chase" and money 1000000.
-     */
-
-    /**
-     * The socket used to connect to the server.
-     */
-    private static Socket clientSocket;
-
-    private static ObjectOutputStream out; // The output stream for sending requests to the server.
-    private static ObjectInputStream in; // The input stream for receiving responses from the server.
-
-    // --- Socket and Request Methods ---
-    /**
-     * Establishes a connection to the server using the provided IP address and port.
-     *
-     * @param ip   the IP address of the server.
-     * @param port the port number on the server.
-     * @throws IOException if an I/O error occurs when opening the connection.
-     */
-    public static void startConnection(String ip, int port) throws IOException {
-        clientSocket = new Socket(ip, port);
-
-        out = new ObjectOutputStream(clientSocket.getOutputStream());
-        in = new ObjectInputStream(clientSocket.getInputStream());
-    }
-
-
-    /**
-     * Sends a request to the server and returns a response of the expected type.
-     *
-     * Never call this method directly, call one of its wrappers for safe usage.
-     *
-     * @param <T>         the type parameter corresponding to the expected response type.
-     * @return the response from the server cast to the specified type.
-     * @throws Exception if an error occurs during the request.
-     */
-    static <T> T sendRequest(Request request, Class<T> responseType) throws Exception {
-        // Write request
-        out.writeObject(request);
-        out.flush();
-
-        // read back whatever the server sent
-        Object raw = in. readObject();
-        System.out.println("Raw: " + raw);
-        System.out.println("Raw type: " + raw.getClass());
-        System.out.println("Response Type: " + responseType);
-
-        // cast into the expected type
-
-        try {
-            return responseType.cast(raw);
-        }
-        catch (ClassCastException e) {
-            System.out.println("ClassCastException, could not cast " + raw.getClass() + " to " + responseType);
-        }
-
-        return null;
-
-    }
-
-    // Update stopConnection to check for null before closing resources:
-    public void stopConnection() throws IOException {
-        if (in != null) {
-            in.close();
-        }
-        if (out != null) {
-            out.close();
-        }
-        if (clientSocket != null) {
-            clientSocket.close();
-        }
-    }
 
     protected HttpClient httpClient() {
         return HttpClient.newHttpClient();
     }
 
-
-
-    public User userGetRequest(int id) throws IOException {
-        Client client = new Client();
-
-        try {
-            client.startConnection("localhost", 4445);
-
-            // build a request object
-            Request req = new Request("User", id);
-
-            return client.sendRequest(req, User.class);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                client.stopConnection();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
     /**
-     * Modifies a user on the server with the provided attributes and returns the updated user.
+     * Grabs odds from the Sports API via the Database Server
      *
-     * @param id                 the identifier of the user to modify.
-     * @param modifiedAttributes a map containing the fields and their new values.
-     *                            Valid Fields: ("Name", "Money", "addBet", "removeBet")
-     * @return the updated User object if modification is successful; null otherwise.
-     * @throws IOException if an I/O error occurs during the request.
-     */
-    public User userModifyRequest(int id, Map<String, Object> modifiedAttributes) throws IOException {
-        Client client = new Client();
-        try {
-            client.startConnection("localhost", 4444);
-            System.out.println("Sending userModifyRequest with ID: " + id);
-            return client.sendRequest(new Request("ModifyUser", id, modifiedAttributes), User.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        stopConnection();
-        return null;
-    }
-
+     * @param gameId the game ID (from the API) to grab the odds for.
+     * @param sport the sport to grab the odds for.
+     * @param homeOrAway 0 for home, 1 for away.
+     * */
     public static double getOdds(int gameId, String sport, int homeOrAway) throws IOException, InterruptedException {
         HttpClient client = new Client().httpClient();
 
@@ -233,6 +123,9 @@ public class Client {
         return allGames;
     }
 
+    /**
+     * Retrieves the primary user, user of ID 1, from the server and initializes it to a User object
+     * */
     public static User getMainUser() throws Exception {
         HttpClient client = new Client().httpClient();
 
@@ -267,6 +160,10 @@ public class Client {
 
     }
 
+    /**
+     * Uses a PUT request to update the main user's money amount.
+     * @param money the new amount of money to set the main user's money to.
+     * */
     private static void updateMainUserMoney(long money) throws Exception {
         HttpClient client = new Client().httpClient();
 
@@ -285,6 +182,9 @@ public class Client {
 
     }
 
+    /**
+     * Calls a GET method on the Database server to fulfill expired user bets
+     * */
     public static void updateBets() throws Exception {
         HttpClient client = new Client().httpClient();
 
@@ -298,6 +198,14 @@ public class Client {
         System.out.println("Status Code (update bets on app open): " + response.statusCode());
     }
 
+    /**
+     * Calls a PATCH method on the Database server to add a bet to a user's bets.
+     * @param userId the ID of the user to add the bet to.
+     * @param gameId the ID (from the API) of the game to add the bet for.
+     * @param betTeam the team the user bets on.
+     * @param betAmt the amount the user bets.
+     * @param winAmt the amount the user wins.
+     * */
     public static void patchAddBetToMainUser(Long userId, Long gameId, String betTeam, int betAmt, int winAmt) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         // build only the DTO fields
@@ -325,12 +233,13 @@ public class Client {
         System.out.println("Response Body: " + response.body());
     }
 
+    @Getter
     private static ArrayList<BotBase> bots = new ArrayList<>();
 
-    public static ArrayList<BotBase> getBots() {
-        return bots;
-    }
-
+    /**
+     * Creates an array of BotBase objects from the server.
+     * @throws Exception if an error occurs during retrieval.
+     * */
     public static void createBotArray() throws Exception {
         HttpClient client = new Client().httpClient();
 
@@ -358,6 +267,10 @@ public class Client {
         }
     }
 
+    /**
+     * Starts all the bots in the array.
+     * @throws Exception if an error occurs during retrieval.
+     */
     public static void launchBots() throws Exception {
         createBotArray();
         for (BotBase bot : bots) {
@@ -365,8 +278,11 @@ public class Client {
         }
     }
 
-
-
+    /**
+     * Launches bots and the JavaFX UI
+     * @param args the command line arguments.
+     * @throws Exception if an error occurs during retrieval.
+     * */
     public static void main(String[] args) throws Exception {
         launchBots();
         Application.launch(UI.class, args);
