@@ -29,7 +29,7 @@ import org.joda.time.DateTime;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class GameControllerTest {
+class ZGameControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
