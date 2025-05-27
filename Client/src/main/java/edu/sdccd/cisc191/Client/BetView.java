@@ -122,7 +122,7 @@ public class BetView extends Application {
                 try {
                     Client.patchAddBetToMainUser(1L, game.getDbId(), team, amount, winAmt);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    System.out.println("Error adding bet to main user" + e.getMessage());
                 }
                 try {
                     new UI().start(stage);

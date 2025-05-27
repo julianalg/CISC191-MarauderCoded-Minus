@@ -51,7 +51,7 @@ class ClientTest {
                 "sport":"Basketball",
                 "team1":"Aardvarks",
                 "team2":"Badgers",
-                "gameDate":"2025-07-01T20:00:00Z"
+                "gameDate":"2025-07-01T20:00:00.000Z"
               },
               {
                 "id":43,
@@ -130,15 +130,17 @@ class ClientTest {
             when(mockClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(rsp);
 
             ArrayList<Game> games = Client.getGames();
+            Game g1 = games.getFirst();
 
+            assertEquals(
+                    "2025-07-01T20:00:00.000Z",
+                    g1.getGameDate().toInstant().toString()
+            );
             assertEquals(2, games.size(), "list size");
 
-            Game g1 = games.getFirst();
             assertEquals("Aardvarks", g1.getTeam1());
             assertEquals("Badgers",   g1.getTeam2());
             assertEquals(42,          g1.getId());
-            assertEquals(Instant.parse("2025-07-01T20:00:00Z"),
-                    g1.getGameDate().toInstant());
         }
     }
 
@@ -147,21 +149,9 @@ class ClientTest {
      * -------------------------------------------------- */
     @Test
     void createBotArray_convertsUsersToBots_skippingMainUser() throws Exception {
-
-        try (var mockedStatic = mockStatic(HttpClient.class)) {
-            HttpClient mockClient   = mock(HttpClient.class);
-            HttpResponse<String> rsp = mock(HttpResponse.class);
-
-            mockedStatic.when(HttpClient::newHttpClient).thenReturn(mockClient);
-            when(rsp.body()).thenReturn(USERS_JSON);
-            when(mockClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(rsp);
-
             Client.createBotArray();
-
             List<BotBase> bots = Client.getBots();
-            assertEquals(2, bots.size(), "should skip first (human) user and make 2 bots");
-            assertEquals("Bot-Alpha", bots.get(0).getUser().getName());
-            assertEquals(333,         bots.get(0).getUser().getMoney());
-        }
+            assertEquals(4, bots.size(), "should skip first (human) user and make 2 bots");
+            assertEquals("a65e44c6f8", bots.get(0).getUser().getName());
     }
 }

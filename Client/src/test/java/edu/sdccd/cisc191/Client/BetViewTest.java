@@ -1,94 +1,118 @@
 package edu.sdccd.cisc191.Client;
 
-import javafx.embed.swing.JFXPanel;
-import javafx.stage.Stage;
-import java.io.*;
-import org.json.simple.parser.ParseException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
-
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TableView;
+import javafx.stage.Stage;
+import org.joda.time.DateTime;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.MockedStatic;
+import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.matcher.control.LabeledMatchers;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.testfx.api.FxAssert.verifyThat;
 
-class BetViewTest {
+public class BetViewTest extends ApplicationTest {
+    private BetView betView;
+    private User testUser;
+    private Game testGame;
 
-    @BeforeAll
-    static void initJavaFX() {
-        // This will initialize the JavaFX toolkit so all FX classes
-        // can be used without "not on FX application thread" errors.
-        new JFXPanel();
+    @Override
+    public void start(Stage stage) throws Exception {
+        setupTestData();
+        // Use a fresh BetView for each test
+        betView = new BetView();
+        betView.betView(stage, testGame, testGame.getTeam1(), testUser);
     }
 
-    private Game makeGame(long id, String sport) {
-        Game g = new Game();
-        g.setId(id);
-        g.setSport(sport);
-        return g;
-    }
+    private void setupTestData() {
+        // Create a test user with $100 available to bet
+        testUser = new User();
+        testUser.setId(1L);
+        testUser.setName("TestUser");
+        testUser.setMoney(1000);
+        testUser.setMoneyLine(100);
+        testUser.setMoneyBet(100);
 
-    private User makeUser(int moneyBet) {
-        User u = new User();
-        u.setMoneyBet(moneyBet);
-        return u;
-    }
-
-    @Test
-    void grabOdds_returnsStubbedValue_whenClientSucceeds() throws Exception {
-        Game game = makeGame(42L, "Basketball");
-        BetView view = new BetView();
-        view.game = game;
-
-        try (MockedConstruction<Client> mc = Mockito.mockConstruction(Client.class, (mock, ctx) -> {
-            Mockito.when(mock.getOdds(anyInt(), anyString(), anyInt()))
-                    .thenReturn(5.5);
-        })) {
-            double odds = view.grabOdds(0);
-            assertEquals(5.5, odds, 1e-9);
-        }
-    }
-
-    @Test
-    void grabOdds_returnsDefault2Point25_whenClientThrows() throws Exception {
-        Game game = makeGame(7L, "Soccer");
-        BetView view = new BetView();
-        view.game = game;
-
-        try (MockedConstruction<Client> mc = Mockito.mockConstruction(Client.class, (mock, ctx) -> {
-            Mockito.when(mock.getOdds(anyInt(), anyString(), anyInt()))
-                    .thenThrow(new IOException("network error"));
-        })) {
-            double odds = view.grabOdds(1);
-            assertEquals(2.25, odds, 1e-9);
-        }
+        // Create a test game
+        testGame = new Game(
+                "Team1",
+                "Team2",
+                42L,
+                new Date(),
+                "Basketball",
+                1.5,
+                2.5
+        );
+        testGame.setGameDate(new DateTime());
     }
 
     @Test
-    void betView_setsGameTeamAndUserFields() throws Exception {
-        Game game = makeGame(99L, "Baseball");
-        User user = makeUser(500);
-        String team = "SomeTeam";
+    public void testUIComponentsExist() {
+        // The prompt label
+        verifyThat(".label", LabeledMatchers.hasText("How much do you want to bet?"));
 
-        class TestableBetView extends BetView {
-            @Override
-            public void start(Stage stage) {
-                // do nothing
+        // The text field for entering a bet
+        TextField betField = lookup(".text-field").query();
+        assertNotNull(betField);
+
+        // The two buttons
+        Button placeButton = lookup("Place Bet").queryButton();
+        assertNotNull(placeButton);
+
+        Button cancelButton = lookup("Cancel").queryButton();
+        assertNotNull(cancelButton);
+    }
+
+    @Test
+    public void testCancelButtonReturnsToMainUI() {
+        // Clicking "Cancel" should take us back to the main UI, which contains a TableView
+        clickOn("Cancel");
+        TableView<?> mainTable = lookup(".table-view").queryTableView();
+        assertNotNull(mainTable);
+    }
+
+    @Test
+    public void testInsufficientFundsDialog() {
+        // Enter an amount greater than the user's available money
+        clickOn(".text-field").write(String.valueOf(testUser.getMoneyBet() + 50));
+        clickOn("Place Bet");
+
+        // Verify the error dialog content
+        verifyThat(".dialog-pane .content",
+                LabeledMatchers.hasText("This is more money than you have available to bet! $" + testUser.getMoneyBet()));
+    }
+
+    @Test
+    public void testPlaceBetSuccessDialog() {
+        // Stub out the static call to patchAddBetToMainUser so it doesn't actually hit the server
+        try (MockedStatic<Client> clientStatic = mockStatic(Client.class)) {
+            clientStatic
+                    .when(() -> Client.patchAddBetToMainUser(
+                            anyLong(), anyLong(), anyString(), anyInt(), anyInt()))
+                    .thenAnswer(invocation -> null);
+
+            // Override UI.start to be a no-op to prevent reloading the UI
+            try (var uiMock = mockConstruction(UI.class, (mock, ctx) -> {
+                doNothing().when(mock).start(any(Stage.class));
+            })) {
+                // Enter a valid bet (1), which will use grabOdds and fall back to default 2.25
+                clickOn(".text-field").write("1");
+                clickOn("Place Bet");
+
+                // The win amount should be (int)(1 * 2.25) = 2
+                verifyThat(".dialog-pane .content",
+                        LabeledMatchers.hasText("You bet 1 and you will get 2"));
             }
-            public Game getGameField() { return super.game; }
-            public String getTeamField() { return super.team; }
-            public User getUserField() { return super.user; }
         }
-
-        TestableBetView view = new TestableBetView();
-        Stage dummyStage = new Stage();
-        view.betView(dummyStage, game, team, user);
-
-        assertSame(game, view.getGameField());
-        assertEquals(team, view.getTeamField());
-        assertSame(user, view.getUserField());
     }
 }
