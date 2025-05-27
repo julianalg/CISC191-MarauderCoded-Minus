@@ -6,21 +6,21 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.joda.time.DateTime;
-
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.DoubleSummaryStatistics;
 
 @Repository
-public class CustomGameRepository extends SimpleJpaRepository<Game, Long> implements GameRepository {
+public class GameRepositoryImpl extends SimpleJpaRepository<Game, Long> implements GameRepository {
     private GameBST.BinarySearchTree<Game> idTree;
     private GameBST.BinarySearchTree<Game> team1OddsTree;
     private GameBST.BinarySearchTree<Game> team2OddsTree;
     private GameBST.BinarySearchTree<Game> dateTree;
 
-    public CustomGameRepository(EntityManager em) {
+    public GameRepositoryImpl(EntityManager em) {
         super(Game.class, em);
     }
 
@@ -53,9 +53,7 @@ public class CustomGameRepository extends SimpleJpaRepository<Game, Long> implem
         if (team1OddsTree == null) {
             initializeTrees();
         }
-        return team1OddsTree.inorderTraversal().stream()
-                .sorted(Comparator.comparingDouble(Game::getTeam1Odd))
-                .collect(Collectors.toList());
+        return team1OddsTree.inorderTraversal();
     }
 
     @Override
@@ -63,9 +61,7 @@ public class CustomGameRepository extends SimpleJpaRepository<Game, Long> implem
         if (team2OddsTree == null) {
             initializeTrees();
         }
-        return team2OddsTree.inorderTraversal().stream()
-                .sorted(Comparator.comparingDouble(Game::getTeam2Odd))
-                .collect(Collectors.toList());
+        return team2OddsTree.inorderTraversal();
     }
 
     @Override

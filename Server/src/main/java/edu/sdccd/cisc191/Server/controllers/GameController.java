@@ -5,7 +5,7 @@ import edu.sdccd.cisc191.Server.API.BaseballGetter;
 import edu.sdccd.cisc191.Server.API.BasketballGetter;
 import edu.sdccd.cisc191.Server.exceptions.GameNotFoundException;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
-import edu.sdccd.cisc191.Server.repositories.CustomGameRepository;
+import edu.sdccd.cisc191.Server.repositories.GameRepositoryImpl;
 import org.joda.time.DateTime;
 import org.json.simple.parser.ParseException;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 class GameController {
     private final GameRepository repository;
 
-    GameController(CustomGameRepository repository) {
+    GameController(GameRepositoryImpl repository) {
         this.repository = repository; 
     }
 

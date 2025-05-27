@@ -36,10 +36,10 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    public UserRepository userRepository;
+    private UserRepository userRepository;
 
     @MockBean
-    public GameRepository gameRepository;
+    private GameRepository gameRepository;
 
     private User testUser;
     private Game testGame;
