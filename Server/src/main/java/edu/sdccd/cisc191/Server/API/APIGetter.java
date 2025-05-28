@@ -19,48 +19,91 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * Abstract class responsible for retrieving game and betting data from an external sports API.
+ * This class provides methods for sending HTTP requests, parsing game and odds data,
+ * and retrieving betting odds and game results.
+ */
 public abstract class APIGetter {
-    String apiURL;
-    String leagueName;
+    protected String apiURL;
+    protected String leagueName;
 
-    public APIGetter() {
-    }
+    /**
+     * Default constructor.
+     */
+    public APIGetter() {}
 
+    /**
+     * Gets the date string formatted as yyyy-MM-dd for tomorrow’s date.
+     *
+     * @return formatted string representing tomorrow's date
+     */
     public String getDateAsString() {
-        Date today = new Date(); // current date
+        Date today = new Date();
         LocalDate localDate = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
         LocalDate nextDay = localDate.plusDays(1);
         Date nextDayDate = Date.from(nextDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
         LocalDate tomorrowLocalDate = nextDayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        String tomorrowArg;
+
         if (tomorrowLocalDate.getDayOfMonth() < 10) {
-            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
+            return tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-0" + tomorrowLocalDate.getDayOfMonth();
         } else {
-            tomorrowArg = tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
+            return tomorrowLocalDate.getYear() + "-0" + tomorrowLocalDate.getMonthValue() + "-" + tomorrowLocalDate.getDayOfMonth();
         }
-        return tomorrowArg;
     }
 
+    /**
+     * Retrieves a list of {@link Game} objects for the given sport based on the next day's schedule.
+     *
+     * @param sport the sport type (e.g., "Baseball", "Basketball")
+     * @return a list of games for the specified sport
+     * @throws Exception if the API request or parsing fails
+     */
     public ArrayList<Game> getGames(String sport) throws Exception {
         String fullUrl = apiURL + "games?date=" + getDateAsString();
         URI requestURI = URI.create(fullUrl);
-//        System.out.println(requestURI);
-
         String response = sendRequest(requestURI);
-        System.out.println(response);
-
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
-
-
-        ArrayList<Game> games = parse(json, sport);
-        return games;
+        return parse(json, sport);
     }
 
-    public abstract String sendRequest(URI requestURI) throws Exception;
+    /**
+     * Sends an HTTP GET request to the given URI and returns the response body.
+     *
+     * @param requestURI the target URI for the GET request
+     * @return the response body as a String
+     * @throws Exception if the request fails
+     */
+    public String sendRequest(URI requestURI) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String apiKey = System.getenv("API_KEY");
 
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(requestURI)
+                .header("x-rapidapi-host", "v1.baseball.api-sports.io")
+                .header("x-rapidapi-key", apiKey)
+                .GET()
+                .build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .exceptionally(e -> {
+                    System.out.println("Error: " + e.getMessage());
+                    return null;
+                })
+                .join()
+                .toString();
+    }
+
+    /**
+     * Parses a JSON object and extracts a list of {@link Game} objects for the given sport.
+     *
+     * @param json the root JSON object from the API
+     * @param sport the sport type to filter games by
+     * @return a list of parsed games
+     * @throws ParseException if parsing fails
+     */
     public ArrayList<Game> parse(JSONObject json, String sport) throws ParseException {
         ArrayList<Game> games = new ArrayList<>();
 
@@ -68,26 +111,19 @@ public abstract class APIGetter {
             String key = (String) keyObj;
             Object value = json.get(key);
 
-            long gameId;
-
-            System.out.println("Key: " + key + " - Value: " + value);
-
-            // Optional: if the value is a nested JSON array or another JSONObject, you can iterate them too.
             if (value instanceof JSONArray) {
                 JSONArray array = (JSONArray) value;
                 for (Object item : array) {
-                    // Here, you might need to cast item to a JSONObject if that's what it is.
                     if (item instanceof JSONObject) {
                         JSONObject nestedObj = (JSONObject) item;
-//                        System.out.println(nestedObj);
-                        // Process nestedObj here
                         JSONObject league = (JSONObject) nestedObj.get("league");
                         int gameID = Integer.parseInt(nestedObj.get("id").toString());
+
                         if (Objects.equals(league.get("name").toString(), leagueName)) {
                             JSONObject teams = (JSONObject) nestedObj.get("teams");
-                            System.out.println(gameID);
                             JSONObject awayTeam = (JSONObject) teams.get("away");
                             JSONObject homeTeam = (JSONObject) teams.get("home");
+
                             String awayTeamName = awayTeam.get("name").toString();
                             String homeTeamName = homeTeam.get("name").toString();
                             String date = nestedObj.get("date").toString();
@@ -95,48 +131,56 @@ public abstract class APIGetter {
                             OffsetDateTime odt = OffsetDateTime.parse(date);
                             Instant instant = odt.toInstant();
                             Date legacyDate = Date.from(instant);
-//                            System.out.println(legacyDate);
-
-//                            System.out.println(awayTeamName + homeTeamName);
 
                             Game newGame = new Game(awayTeamName, homeTeamName, gameID, legacyDate, sport, 0, 0);
-
                             games.add(newGame);
                         }
                     }
                 }
             }
         }
+
         return games;
     }
 
+    /**
+     * Fetches the betting odds string for a given game ID.
+     *
+     * @param gameId the unique identifier of the game
+     * @return the odds information as a string
+     * @throws ParseException if JSON parsing fails
+     */
     public String getOdd(long gameId) throws ParseException {
-        // Create an HttpClient instance
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
         URI betURI = URI.create(apiURL + "odds?game=" + gameId);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(betURI)                  // <-- pass your concatenated URI here
+                .uri(betURI)
                 .header("x-rapidapi-host", apiURL)
                 .header("x-rapidapi-key", apiKey)
                 .GET()
                 .build();
 
-        // Make an asynchronous request similar to using JavaScript promises
         String response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .exceptionally(e -> {
                     System.out.println("Error: " + e.getMessage());
                     return null;
                 })
-                .join().toString(); // Waits for the async call to complete
-
-//        System.out.println(response);
+                .join()
+                .toString();
 
         return parseBet(response);
     }
 
+    /**
+     * Parses the JSON response from the odds API and extracts bookmaker information.
+     *
+     * @param response the raw JSON string response
+     * @return a string representation of the bookmaker data
+     * @throws ParseException if parsing fails
+     */
     public String parseBet(String response) throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
@@ -145,28 +189,33 @@ public abstract class APIGetter {
         return gameObj.get("bookmakers").toString();
     }
 
+    /**
+     * Retrieves the winning team name for a completed game by its ID.
+     *
+     * @param id the game ID
+     * @return the name of the winning team or "Drop" if the result is unavailable
+     * @throws ParseException if parsing fails
+     */
     public String getWinner(long id) throws ParseException {
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
         URI betURI = URI.create(apiURL + "/games?id=" + id);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(betURI)                  // <-- pass your concatenated URI here
+                .uri(betURI)
                 .header("x-rapidapi-host", apiURL)
                 .header("x-rapidapi-key", apiKey)
                 .GET()
                 .build();
 
-        // Make an asynchronous request similar to using JavaScript promises
         String response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .exceptionally(e -> {
                     System.out.println("Error: " + e.getMessage());
                     return null;
                 })
-                .join().toString(); // Waits for the async call to complete
-
-//        System.out.println(response);
+                .join()
+                .toString();
 
         try {
             JSONParser parser = new JSONParser();
@@ -178,22 +227,15 @@ public abstract class APIGetter {
             JSONObject homeTeam = (JSONObject) teams.get("home");
             String homeTeamName = homeTeam.get("name").toString();
             String awayTeamName = awayTeam.get("name").toString();
+
             JSONObject scores = (JSONObject) gameObj.get("scores");
+            int awayTeamScore = Integer.parseInt(((JSONObject) scores.get("away")).get("total").toString());
+            int homeTeamScore = Integer.parseInt(((JSONObject) scores.get("home")).get("total").toString());
 
-            JSONObject awayTeamStats = (JSONObject) scores.get("away");
-            int awayTeamScore = Integer.parseInt(awayTeamStats.get("total").toString());
-            JSONObject homeTeamStats = (JSONObject) scores.get("home");
-            int homeTeamScore = Integer.parseInt(homeTeamStats.get("total").toString());
-
-            if (awayTeamScore > homeTeamScore) {
-                return awayTeamName;
-            } else {
-                return homeTeamName;
-            }
+            return awayTeamScore > homeTeamScore ? awayTeamName : homeTeamName;
         } catch (IndexOutOfBoundsException | NoSuchElementException e) {
             System.out.println("IndexOutOfBoundsException, presumably game is outside API call radius");
             return "Drop";
         }
-//        return parseBet(response);
     }
 }

@@ -84,12 +84,17 @@ public class UserController {
         Game game = gRepository.findById(dto.getGameId())
                 .orElseThrow(() -> new GameNotFoundException(dto.getGameId()));
 
-        // 2. build a new Bet instance
-        Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam(), dto.getWinAmt());
+        try {
+            // 2. build a new Bet instance
+            Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam(), dto.getWinAmt());
 
-        // 3. add & save
-        user.addBet(bet);
-        return repository.save(user);
+            // 3. add & save
+            user.addBet(bet);
+            return repository.save(user);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
     }
 
     @GetMapping("/updateAllBets")

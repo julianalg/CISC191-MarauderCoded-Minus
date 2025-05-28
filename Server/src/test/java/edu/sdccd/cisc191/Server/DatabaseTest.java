@@ -4,6 +4,7 @@ import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,8 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -111,5 +116,7 @@ class DatabaseServerTest {
         verify(gameDatabase, times(1)).saveToFile();
         verify(userDatabase, times(1)).saveToFile();
     }
+
+
 
 }

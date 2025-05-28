@@ -83,6 +83,7 @@ public class GameRepositoryImpl extends SimpleJpaRepository<Game, Long> implemen
                     && game.getGameDate().isBefore(end))
                 .collect(Collectors.toList());
     }
+
     public List<Game> findAllSortedByDate() {
         if (dateTree == null) {
             initializeTrees();

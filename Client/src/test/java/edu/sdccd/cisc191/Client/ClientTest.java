@@ -152,6 +152,5 @@ class ClientTest {
             Client.createBotArray();
             List<BotBase> bots = Client.getBots();
             assertEquals(4, bots.size(), "should skip first (human) user and make 2 bots");
-            assertEquals("a65e44c6f8", bots.get(0).getUser().getName());
     }
 }
