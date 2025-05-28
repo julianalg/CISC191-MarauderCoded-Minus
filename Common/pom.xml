@@ -38,11 +38,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>edu.sdccd.cisc191.template</groupId>
-            <artifactId>Common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
@@ -65,11 +60,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>edu.sdccd.cisc191.template</groupId>
-            <artifactId>Common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>

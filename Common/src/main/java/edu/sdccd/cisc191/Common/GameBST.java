@@ -57,34 +57,26 @@ public class GameBST {
     }
 
     public static BinarySearchTree<Game> buildGameIdTree(List<Game> games) {
-        BinarySearchTree<Game> treeById = new BinarySearchTree<>(Comparator.comparingLong(Game::getId));
-        for (Game game : games) {
-            treeById.insert(game);
-        }
+        BinarySearchTree<Game> treeById = new BinarySearchTree<>(Comparator.comparing(Game::getId));
+        games.forEach(treeById::insert);
         return treeById;
     }
 
     public static BinarySearchTree<Game> buildOddsTree(List<Game> games) {
-        BinarySearchTree<Game> treeByOdds = new BinarySearchTree<>(Comparator.comparingDouble(Game::getTeam1Odd));
-        for (Game game : games) {
-            treeByOdds.insert(game);
-        }
+        BinarySearchTree<Game> treeByOdds = new BinarySearchTree<>(Comparator.comparing(Game::getTeam1Odd));
+        games.forEach(treeByOdds::insert);
         return treeByOdds;
     }
 
     public static BinarySearchTree<Game> buildTeam2OddsTree(List<Game> games) {
-        BinarySearchTree<Game> treeByTeam2Odds = new BinarySearchTree<>(Comparator.comparingDouble(Game::getTeam2Odd));
-        for (Game game : games) {
-            treeByTeam2Odds.insert(game);
-        }
+        BinarySearchTree<Game> treeByTeam2Odds = new BinarySearchTree<>(Comparator.comparing(Game::getTeam2Odd));
+        games.forEach(treeByTeam2Odds::insert);
         return treeByTeam2Odds;
     }
 
     public static BinarySearchTree<Game> buildDateTree(List<Game> games) {
         BinarySearchTree<Game> treeByDate = new BinarySearchTree<>(Comparator.comparing(Game::getGameDate));
-        for (Game game : games) {
-            treeByDate.insert(game);
-        }
+        games.forEach(treeByDate::insert);
         return treeByDate;
     }
 }
