@@ -86,7 +86,7 @@ class ClientTest {
      *  getOdds
      * -------------------------------------------------- */
     @Test
-    void getOdds_returnsCorrectHomeAndAway() throws Exception {
+    void getOdds() throws Exception {
 
         /* ---------- mock the static constructor ---------- */
         try (var mockedStatic = mockStatic(HttpClient.class)) {
@@ -119,7 +119,7 @@ class ClientTest {
      *  getGames
      * -------------------------------------------------- */
     @Test
-    void getGames_parsesListIntoDomainObjects() throws Exception {
+    void getGamesParseToObjects() throws Exception {
 
         try (var mockedStatic = mockStatic(HttpClient.class)) {
             HttpClient mockClient   = mock(HttpClient.class);
@@ -148,7 +148,7 @@ class ClientTest {
      *  createBotArray → getBots
      * -------------------------------------------------- */
     @Test
-    void createBotArray_convertsUsersToBots_skippingMainUser() throws Exception {
+    void createBotArray() throws Exception {
             Client.createBotArray();
             List<BotBase> bots = Client.getBots();
             assertEquals(4, bots.size(), "should skip first (human) user and make 2 bots");

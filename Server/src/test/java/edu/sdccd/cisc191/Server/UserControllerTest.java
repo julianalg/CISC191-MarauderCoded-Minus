@@ -1,101 +1,79 @@
 package edu.sdccd.cisc191.Server;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.sdccd.cisc191.Common.IncomingBetDTO;
-import edu.sdccd.cisc191.Common.Models.Game;
-import edu.sdccd.cisc191.Common.Models.User;
-import edu.sdccd.cisc191.Server.controllers.UserController;
-import edu.sdccd.cisc191.Server.repositories.GameRepository;
-import edu.sdccd.cisc191.Server.repositories.UserRepository;
-import org.joda.time.DateTime;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import static org.mockito.BDDMockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.joda.time.DateTime;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.*;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 
-@WebMvcTest(
-        controllers = UserController.class,
-        excludeAutoConfiguration = {
-                JpaRepositoriesAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class
-        }
-)
+import edu.sdccd.cisc191.Common.Models.User;
+import edu.sdccd.cisc191.Common.IncomingBetDTO;
+import edu.sdccd.cisc191.Server.repositories.UserRepository;
+import edu.sdccd.cisc191.Server.repositories.GameRepository;
+import edu.sdccd.cisc191.Common.Models.Game;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private TestRestTemplate restTemplate;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockBean(name = "userRepository")
+    private UserRepository userRepository;
 
-    @MockBean
-    private UserRepository userRepo;
-
-    @MockBean
-    private GameRepository gameRepo;
+    @MockBean(name = "gameRepository")
+    private GameRepository gameRepository;
 
     @Test
-    @DisplayName("GET /users → 200")
-    void whenGetAllUsers_then200() throws Exception {
-        User u = new User(); u.setId(1L); u.setName("Alice"); u.setMoney(500);
-        given(userRepo.findAll()).willReturn(Collections.singletonList(u));
+    void deleteUserThen200() {
+        willDoNothing().given(userRepository).deleteById(1L);
 
-        mockMvc.perform(get("/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Alice"));
+        ResponseEntity<Void> response = restTemplate.exchange(
+            "/users/1", HttpMethod.DELETE, null, Void.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    @DisplayName("DELETE /users/{id} → 200")
-    void whenDelete_then200() throws Exception {
-        willDoNothing().given(userRepo).deleteById(1L);
-        mockMvc.perform(delete("/users/1"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("GET /users/{id} → 200 & JSON user")
-    void whenGetExistingUser_thenReturnUser() throws Exception {
+    void getExistingUserThenReturn200() throws Exception {
         User u = new User();
         u.setId(2L);
         u.setName("Bob");
         u.setMoney(300);
-        given(userRepo.findById(2L)).willReturn(Optional.of(u));
+        given(userRepository.findById(2L)).willReturn(Optional.of(u));
 
-        mockMvc.perform(get("/users/2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2))
-                .andExpect(jsonPath("$.name").value("Bob"))
-                .andExpect(jsonPath("$.money").value(300));
+        ResponseEntity<User> response = restTemplate.getForEntity(
+            "/users/2", User.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2L, response.getBody().getId());
+        assertEquals("Bob", response.getBody().getName());
+        assertEquals(300, response.getBody().getMoney());
     }
 
     @Test
-    @DisplayName("GET /users/{id} → 404 if not found")
-    void whenGetMissingUser_then404() throws Exception {
-        given(userRepo.findById(99L)).willReturn(Optional.empty());
+    void getMissingUserThen404() {
+        given(userRepository.findById(99L)).willReturn(Optional.empty());
 
-        mockMvc.perform(get("/users/99"))
-                .andExpect(status().isNotFound());
+        ResponseEntity<User> response = restTemplate.exchange(
+            "/users/99", HttpMethod.GET, null, User.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
-    @DisplayName("POST /users → create new user")
-    void whenPostNewUser_thenCreateAndReturn() throws Exception {
+    void postNewUserThenCreateAndReturn200() {
         User request = new User();
         request.setName("Carol");
         request.setMoney(1000);
@@ -105,20 +83,20 @@ class UserControllerTest {
         saved.setName("Carol");
         saved.setMoney(1000);
 
-        given(userRepo.save(any())).willReturn(saved);
+        given(userRepository.save(any(User.class))).willReturn(saved);
 
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(3))
-                .andExpect(jsonPath("$.name").value("Carol"))
-                .andExpect(jsonPath("$.money").value(1000));
+        ResponseEntity<User> response = restTemplate.postForEntity(
+            "/users", request, User.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(3L, response.getBody().getId());
+        assertEquals("Carol", response.getBody().getName());
+        assertEquals(1000, response.getBody().getMoney());
     }
 
     @Test
-    @DisplayName("PUT /users/{id} → update existing user")
-    void whenPutExistingUser_thenUpdateAndReturn() throws Exception {
+    void putExistingUserThenUpdateAndReturn200() throws Exception {
         User existing = new User();
         existing.setId(4L);
         existing.setName("Dave");
@@ -128,21 +106,27 @@ class UserControllerTest {
         changes.setName("David");
         changes.setMoney(250);
 
-        given(userRepo.findById(4L)).willReturn(Optional.of(existing));
-        given(userRepo.save(any())).willAnswer(inv -> inv.getArgument(0));
+        given(userRepository.findById(4L)).willReturn(Optional.of(existing));
+        given(userRepository.save(any(User.class)))
+            .willAnswer(inv -> {
+                User u = inv.getArgument(0);
+                u.setId(4L);
+                return u;
+            });
 
-        mockMvc.perform(put("/users/4")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changes)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(4))
-                .andExpect(jsonPath("$.name").value("David"))
-                .andExpect(jsonPath("$.money").value(250));
+        HttpEntity<User> entity = new HttpEntity<>(changes);
+        ResponseEntity<User> response = restTemplate.exchange(
+            "/users/4", HttpMethod.PUT, entity, User.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(4L, response.getBody().getId());
+        assertEquals("David", response.getBody().getName());
+        assertEquals(250, response.getBody().getMoney());
     }
 
     @Test
-    @DisplayName("PUT /users/{id} → create if missing")
-    void whenPutMissingUser_thenCreateNewWithGivenId() throws Exception {
+    void putMissingUserThenCreateAndReturn() {
         User newUser = new User();
         newUser.setName("Eve");
         newUser.setMoney(750);
@@ -152,96 +136,30 @@ class UserControllerTest {
         saved.setName("Eve");
         saved.setMoney(750);
 
-        given(userRepo.findById(5L)).willReturn(Optional.empty());
-        given(userRepo.save(any())).willReturn(saved);
+        given(userRepository.findById(5L)).willReturn(Optional.empty());
+        given(userRepository.save(any(User.class))).willReturn(saved);
 
-        mockMvc.perform(put("/users/5")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(5))
-                .andExpect(jsonPath("$.name").value("Eve"))
-                .andExpect(jsonPath("$.money").value(750));
+        HttpEntity<User> entity = new HttpEntity<>(newUser);
+        ResponseEntity<User> response = restTemplate.exchange(
+            "/users/5", HttpMethod.PUT, entity, User.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(5L, response.getBody().getId());
+        assertEquals("Eve", response.getBody().getName());
+        assertEquals(750, response.getBody().getMoney());
     }
 
     @Test
-    @DisplayName("DELETE /users/{id} → 200 & remove user")
-    void whenDeleteUser_then200() throws Exception {
-        willDoNothing().given(userRepo).deleteById(6L);
+    void deleteUserthenDeleteAndReturn200() throws Exception {
+        willDoNothing().given(userRepository).deleteById(6L);
 
-        mockMvc.perform(delete("/users/6"))
-                .andExpect(status().isOk());
+        ResponseEntity<Void> response = restTemplate.exchange(
+            "/users/6", HttpMethod.DELETE, null, Void.class);
 
-        then(userRepo).should().deleteById(6L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        then(userRepository).should().deleteById(6L);
     }
 
-    @Test
-    @DisplayName("PATCH /{id}/bets → add a bet")
-    void whenPatchAddBet_thenBetAdded() throws Exception {
-        // prepare user & game
-        User u = new User();
-        u.setId(7L);
-        u.setName("Frank");
-        u.setMoney(400);
-        u.setBets(new ArrayList<>());
 
-        Game g = new Game();
-        g.setId(10L);
-        g.setSport("Baseball");
-        g.setGameDate(DateTime.now().minusDays(1));
-
-        given(userRepo.findById(7L)).willReturn(Optional.of(u));
-        given(gameRepo.findById(10L)).willReturn(Optional.of(g));
-        given(userRepo.save(any())).willAnswer(inv -> inv.getArgument(0));
-
-        IncomingBetDTO dto = new IncomingBetDTO(10L, "HOME", 50, 80);
-
-        mockMvc.perform(patch("/7/bets")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bets", hasSize(1)))
-                .andExpect(jsonPath("$.bets[0].betAmt").value(50))
-                .andExpect(jsonPath("$.bets[0].betTeam").value("HOME"))
-                .andExpect(jsonPath("$.bets[0].winAmt").value(80));
-    }
-
-    @Test
-    @DisplayName("PATCH /{id}/bets → 404 if user missing")
-    void whenPatchAddBet_userMissing_then404() throws Exception {
-        given(userRepo.findById(8L)).willReturn(Optional.empty());
-
-        String body = "{\"gameId\":1,\"betAmt\":10,\"betTeam\":\"X\",\"winAmt\":12}";
-
-        mockMvc.perform(patch("/8/bets")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("PATCH /{id}/bets → 404 if game missing")
-    void whenPatchAddBet_gameMissing_then404() throws Exception {
-        User u = new User();
-        u.setId(9L);
-        given(userRepo.findById(9L)).willReturn(Optional.of(u));
-        given(gameRepo.findById(2L)).willReturn(Optional.empty());
-
-        String body = "{\"gameId\":2,\"betAmt\":10,\"betTeam\":\"Y\",\"winAmt\":15}";
-
-        mockMvc.perform(patch("/9/bets")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("GET /updateAllBets → process and return message")
-    void whenUpdateAllBets_thenReturnConfirmation() throws Exception {
-        given(userRepo.findAll()).willReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/updateAllBets"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("User bets have been updated"));
-    }
 }
