@@ -129,7 +129,7 @@ public class Game implements Serializable {
      * Default constructor for  Game .
      * Required for JSON serialization/deserialization.
      */
-    protected Game() {
+    public Game() {
         // Default constructor for deserialization purposes
     }
 

@@ -31,6 +31,7 @@ public class Bet implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "game_db_id", unique = true)
+    @Getter @Setter
     private Game game;
     private String betTeam;
     private int betAmt;

@@ -40,6 +40,54 @@ class JacksonConfigUser {
 @Setter
 @ToString
 public class User implements Serializable {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public long getMoney() {
+        return money;
+    }
+
+    public void setMoney(long money) {
+        this.money = money;
+    }
+
+    public int getMoneyLine() {
+        return moneyLine;
+    }
+
+    public void setMoneyLine(int moneyLine) {
+        this.moneyLine = moneyLine;
+    }
+
+    public List<Bet> getBets() {
+        return bets;
+    }
+
+    public void setBets(List<Bet> bets) {
+        this.bets = bets;
+    }
+
+    public int getMoneyBet() {
+        return moneyBet;
+    }
+
+    public void setMoneyBet(int moneyBet) {
+        this.moneyBet = moneyBet;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -84,7 +132,7 @@ public class User implements Serializable {
      * Default constructor for  User .
      * Required for JSON serialization/deserialization.
      */
-    protected User() {
+    public User() {
         // Default constructor for deserialization purposes
     }
 

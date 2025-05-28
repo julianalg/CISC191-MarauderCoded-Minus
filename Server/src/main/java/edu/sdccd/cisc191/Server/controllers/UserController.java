@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 // Pulled straight from andrew huang repo
 
 @RestController
-class UserController {
+public class UserController {
 
     private final UserRepository repository;
     private final GameRepository gRepository;
@@ -129,6 +129,6 @@ class UserController {
             user.getBets().removeAll(toRemove);
             replaceUser(user, (long) dbId);
         }
-        return "Bad things have happened here";
+        return "User bets have been updated";
     }
 }
