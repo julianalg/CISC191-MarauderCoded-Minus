@@ -154,5 +154,5 @@ public class GameBST {
         return treeByDate;
     }
 
-    //TODO compare games by name for searching in UI
+    //TODO compare games by name for search in UI
 }
