@@ -325,4 +325,5 @@ public class UI extends Application {
         stage.show();
     }
 
+    //TODO add a search bar to search for games by name
 }

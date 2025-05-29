@@ -35,9 +35,6 @@ public class BetView extends Application {
 
     User user;
 
-    double homeOddStat;
-    double awayOddStat;
-
     /**
      * Initializes the bet view with the specified stage, game, and team.
      * It sets up the necessary data and starts the JavaFX application.

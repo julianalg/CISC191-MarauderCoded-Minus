@@ -153,4 +153,6 @@ public class GameBST {
         games.forEach(treeByDate::insert);
         return treeByDate;
     }
+
+    //TODO compare games by name for searching in UI
 }

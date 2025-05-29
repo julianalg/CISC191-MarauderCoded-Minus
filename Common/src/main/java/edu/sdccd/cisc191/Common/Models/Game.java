@@ -80,6 +80,9 @@ public class Game implements Serializable {
      * @param team1Odd   Decimal odds for team 1
      * @param team2Odd   Decimal odds for team 2
      */
+
+    //TODO convert givenDate into LocalDate for better persistence and manipulation in the JPARepository
+    //TODO remove the id attribute from the constructor. Let JPA handle that
     public Game(String t1, String t2, long id, Date givenDate, String sport, double team1Odd, double team2Odd) {
         this.team1 = t1;
         this.team2 = t2;
@@ -132,6 +135,8 @@ public class Game implements Serializable {
     public Game() {
         // Default constructor for deserialization purposes
     }
+
+    //TODO convert givenDate to LocalDate for better parsing of m, d, y. No use for getDateClean() method
 
     /**
      * Generates a string representation of the game.
