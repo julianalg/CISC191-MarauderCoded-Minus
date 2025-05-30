@@ -46,10 +46,9 @@ public class GameDatabase extends GenericDatabase<Game, Long, GameRepository> {
      * Provides a default initialization for the Game database if no data is found.
      * Currently adds an empty list, but can be extended for actual default data.
      *
-     * @throws Exception if initialization fails
      */
     @Override
-    protected void initializeDefaultEntities() throws Exception {
+    protected void initializeDefaultEntities() {
         List<Game> defaultGames = new ArrayList<>();
         repository.saveAll(defaultGames);
     }

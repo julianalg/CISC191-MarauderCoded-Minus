@@ -6,7 +6,6 @@ import edu.sdccd.cisc191.Common.Models.Game;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
 
 /**
  * Unit tests for the Game class.

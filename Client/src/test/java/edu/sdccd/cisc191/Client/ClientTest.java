@@ -1,7 +1,6 @@
 package edu.sdccd.cisc191.Client;
 
 import edu.sdccd.cisc191.Common.Models.Game;
-import edu.sdccd.cisc191.Common.Models.User;
 import javafx.embed.swing.JFXPanel;          // only for toolkit boot
 import org.junit.jupiter.api.*;
 
@@ -9,7 +8,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 

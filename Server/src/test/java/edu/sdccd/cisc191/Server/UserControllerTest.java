@@ -3,24 +3,18 @@ package edu.sdccd.cisc191.Server;
 import static org.mockito.BDDMockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.*;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import edu.sdccd.cisc191.Common.Models.User;
-import edu.sdccd.cisc191.Common.IncomingBetDTO;
 import edu.sdccd.cisc191.Server.repositories.UserRepository;
 import edu.sdccd.cisc191.Server.repositories.GameRepository;
-import edu.sdccd.cisc191.Common.Models.Game;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserControllerTest {

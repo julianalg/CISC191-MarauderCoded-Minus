@@ -152,5 +152,7 @@ public class GameBST {
         BinarySearchTree<Game> treeByDate = new BinarySearchTree<>(Comparator.comparing(Game::getGameDate));
         games.forEach(treeByDate::insert);
         return treeByDate;
+
+        //TODO: If you implement the search bar feature, compare names of players and games for UI
     }
 }

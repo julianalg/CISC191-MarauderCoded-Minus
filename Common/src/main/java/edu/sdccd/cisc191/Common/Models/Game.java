@@ -28,7 +28,7 @@ import java.util.Date;
  *
  * @author Andy Ly, Julian Garcia
  */
-
+//TODO: Migrate to java.time if possible; Joda-Time is now legacy.
 @Configuration
 class JacksonConfigGame {
     @Bean
@@ -61,6 +61,7 @@ public class Game implements Serializable {
     @JsonDeserialize(using = DateTimeDeserializer.class)
     private DateTime gameDate;
 
+    //TODO: Delete or implement dateClean String
     private String dateClean;
     private double team1Odd;
     private double team2Odd;
@@ -102,6 +103,7 @@ public class Game implements Serializable {
      * @param givenDate  Date of the game
      * @param sport      Sport (e.g., "NFL")
      */
+    //TODO: Replace DateTime with LocalDateTime, ZonedDateTime, or Instant
     public Game(String t1, String t2, long id, Date givenDate, String sport, long dbId) {
         this.team1 = t1;
         this.team2 = t2;

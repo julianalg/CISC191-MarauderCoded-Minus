@@ -7,16 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
-import edu.sdccd.cisc191.Common.Request;
 import javafx.application.Application;
-import javafx.stage.Stage;
 import lombok.Getter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

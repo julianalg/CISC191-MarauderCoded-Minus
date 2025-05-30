@@ -79,6 +79,7 @@ public class UserDatabase extends GenericDatabase<User, Long, UserRepository> {
      * @param name the name of the user
      * @return the  User with the specified name, or  null if not found
      */
+    //TODO: findByName is never used, either delete or implement
     public User findByName(String name) {
         return repository.findByName(name);
     }
