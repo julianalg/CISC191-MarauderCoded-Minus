@@ -17,8 +17,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class UI extends Application {
@@ -324,5 +322,5 @@ public class UI extends Application {
         stage.setTitle("Marauder Bets");
         stage.show();
     }
-
+    // TODO: Consider adding a search feature to search for games or player stats
 }

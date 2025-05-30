@@ -160,6 +160,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
      * @param id the ID of the entity
      * @return the entity if found, otherwise {@code null}
      */
+    //TODO: findByID is never used, either delete or implement
     public T findById(ID id) {
         return repository.findById(id).orElse(null);
     }
@@ -169,6 +170,7 @@ public abstract class GenericDatabase<T, ID, R extends JpaRepository<T, ID>> {
      *
      * @return the total entity count
      */
+    //TODO: getSize is never used, either delete or implement
     public long getSize() {
         return repository.count();
     }

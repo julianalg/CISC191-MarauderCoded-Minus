@@ -2,7 +2,6 @@ package edu.sdccd.cisc191.Client;
 
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.User;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.matcher.control.LabeledMatchers;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 

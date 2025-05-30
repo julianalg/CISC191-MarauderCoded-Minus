@@ -73,9 +73,8 @@ public abstract class APIGetter {
      *
      * @param requestURI the target URI for the GET request
      * @return the response body as a String
-     * @throws Exception if the request fails
      */
-    public String sendRequest(URI requestURI) throws Exception {
+    public String sendRequest(URI requestURI) {
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
 
@@ -102,9 +101,8 @@ public abstract class APIGetter {
      * @param json the root JSON object from the API
      * @param sport the sport type to filter games by
      * @return a list of parsed games
-     * @throws ParseException if parsing fails
      */
-    public ArrayList<Game> parse(JSONObject json, String sport) throws ParseException {
+    public ArrayList<Game> parse(JSONObject json, String sport) {
         ArrayList<Game> games = new ArrayList<>();
 
         for (Object keyObj : json.keySet()) {

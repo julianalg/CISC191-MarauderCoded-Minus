@@ -35,6 +35,7 @@ public class BetView extends Application {
 
     User user;
 
+    // TODO: Remove or implement these unused doubles
     double homeOddStat;
     double awayOddStat;
 

@@ -3,11 +3,8 @@ package edu.sdccd.cisc191.Client;
 import edu.sdccd.cisc191.Common.Models.Game;
 import edu.sdccd.cisc191.Common.Models.Bet;
 import edu.sdccd.cisc191.Common.Models.User;
+import lombok.Getter;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -19,6 +16,7 @@ import java.util.TimerTask;
 public class BotBase {
     private Timer timer;
     private Random random;
+    @Getter
     private User user;
     ArrayList<Game> allGames = new ArrayList<>();
 
@@ -86,7 +84,4 @@ public class BotBase {
         System.out.println("Bot placed bet: " + newBet);
     }
 
-    public User getUser() {
-        return user;
-    }
 }

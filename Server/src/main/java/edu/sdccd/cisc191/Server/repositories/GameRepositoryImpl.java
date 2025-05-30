@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import org.joda.time.DateTime;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.DoubleSummaryStatistics;
 
 @Repository
 public class GameRepositoryImpl extends SimpleJpaRepository<Game, Long> implements GameRepository {
