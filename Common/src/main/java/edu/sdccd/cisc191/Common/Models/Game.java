@@ -34,8 +34,10 @@ class JacksonConfigGame {
     @Bean
     public JodaModule jodaModule() {
         return new JodaModule();
+        // TODO: Consider configuring additional modules if needed for date/time formats
     }
 }
+
 @Entity
 @Table(name = "games")
 @Getter @Setter
@@ -66,8 +68,9 @@ public class Game implements Serializable {
     private double team2Odd;
 
     @JsonIgnore
-    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JodaModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JodaModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     /**
      * Constructor for a Game.
@@ -87,10 +90,10 @@ public class Game implements Serializable {
         this.gameDate = new DateTime(givenDate);
         this.sport = sport;
 
-
         this.team1Odd = team1Odd;
         this.team2Odd = team2Odd;
         this.dateClean = this.getDateClean();
+        // TODO: Consider validating input parameters (e.g., non-null, valid odds)
     }
 
     /**
@@ -111,8 +114,8 @@ public class Game implements Serializable {
         this.dbId = dbId;
 
         this.dateClean = this.getDateClean();
+        // TODO: Add validation for dbId if necessary
     }
-
 
     /**
      * Serializes a  Game  object into a JSON string.
@@ -122,6 +125,7 @@ public class Game implements Serializable {
      * @throws Exception If serialization fails.
      */
     public static String toJSON(Game customer) throws Exception {
+        // TODO: Handle serialization exceptions more specifically
         return objectMapper.writeValueAsString(customer);
     }
 
@@ -131,6 +135,7 @@ public class Game implements Serializable {
      */
     public Game() {
         // Default constructor for deserialization purposes
+        // TODO: Initialize default values if needed
     }
 
     /**
@@ -141,7 +146,9 @@ public class Game implements Serializable {
     @Override
     public String toString() {
         return team1 + " vs. " + team2 + " on " + gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear();
+        // TODO: Consider formatting the date in a more user-friendly way
     }
+
     /**
      * Generates a clean string representation of the date range for the game.
      *
@@ -153,5 +160,6 @@ public class Game implements Serializable {
         } else {
             return gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear() + " " + gameDate.getHourOfDay() + ":0" + gameDate.getMinuteOfHour();
         }
+        // TODO: Consider using a date formatting library to simplify this method
     }
 }
