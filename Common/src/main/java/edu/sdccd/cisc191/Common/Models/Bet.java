@@ -33,15 +33,21 @@ public class Bet implements Serializable {
     @JoinColumn(name = "game_db_id", unique = true)
     @Getter @Setter
     private Game game;
+
     private String betTeam;
+
     private int betAmt;
+
     private int winAmt;
+
     private int winOdds;
 
     private final int numHours = 10; // Number of hours to track odds
 
     private boolean fulfillment;
+
     private final long currentEpochSeconds = System.currentTimeMillis() / 1000; // Current time in seconds
+
     private final Random random = new Random();
 
     /**
@@ -52,7 +58,6 @@ public class Bet implements Serializable {
      */
     @Transient
     private final double[][] winOddsOvertime = new double[numHours][2]; // Array to track odds over time
-
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -69,6 +74,7 @@ public class Bet implements Serializable {
      * @throws Exception If serialization fails.
      */
     public static String toJSON(Bet bet) throws Exception {
+        // TODO: Handle exceptions more gracefully than throwing generic Exception
         return objectMapper.writeValueAsString(bet);
     }
 
@@ -81,6 +87,7 @@ public class Bet implements Serializable {
      */
     public static Bet fromJSON(String input) throws Exception {
         System.out.println(input);
+        // TODO: Add validation for input JSON before deserializing
         return objectMapper.readValue(input, Bet.class);
     }
 
@@ -89,9 +96,8 @@ public class Bet implements Serializable {
      * Required for JSON serialization/deserialization.
      */
     protected Bet() {
-        // Default constructor for deserialization purposes
+        // TODO: Consider logging when default constructor is called
     }
-
 
     /**
      * Constructs a new  Bet  with specified game, bet amount, and team.
@@ -107,7 +113,6 @@ public class Bet implements Serializable {
         this.betAmt = amt;
         this.winAmt = winAmt;
 
-
         // Populate winOddsOvertime with odds and timestamps
         for (int j = 0; j < numHours; j++) {
             long timeStamp = currentEpochSeconds - (j * 3600L); // Decrement by hours
@@ -115,11 +120,8 @@ public class Bet implements Serializable {
             winOddsOvertime[j][0] = odd;
             winOddsOvertime[j][1] = timeStamp;
         }
-
+        // TODO: Consider making winOddsOvertime data persistent if needed
     }
-
-
-
 
     /**
      * Calculates the odds for a game at a specific timestamp.
@@ -128,6 +130,7 @@ public class Bet implements Serializable {
      * @return A random value representing the odds at the specified time.
      */
     private double calculateOddsForGameAtTime(long timeStamp) {
+        // TODO: Replace random odds with real odds calculation logic
         return 1 + random.nextInt(100); // Generate a random value between 1 and 100
     }
 
@@ -147,6 +150,7 @@ public class Bet implements Serializable {
         } else {
             user.setMoney((int) (user.getMoney() - winAmt));
         }
+        // TODO: Add checks to prevent negative money balance for user
         return user;
     }
 
@@ -156,6 +160,7 @@ public class Bet implements Serializable {
     public void updateFulfillment() {
         int randomNumber = random.nextInt(100) + 1; // Generate a number from 1 to 100
         fulfillment = randomNumber <= winOdds;
+        // TODO: Consider improving fulfillment logic with more accurate probability model
     }
 
     /**
@@ -186,7 +191,6 @@ public class Bet implements Serializable {
         Bet bet = (Bet) o;
         return getId() != null && Objects.equals(getId(), bet.getId());
     }
-
 
     @Override
     public final int hashCode() {
