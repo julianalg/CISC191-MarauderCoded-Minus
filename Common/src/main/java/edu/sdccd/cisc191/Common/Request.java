@@ -33,6 +33,7 @@ public class Request implements Serializable {
      * @throws Exception If serialization fails.
      */
     public static String toJSON(Request customer) throws Exception {
+        // TODO: Consider not throwing a generic Exception, use a specific one for better error handling
         return objectMapper.writeValueAsString(customer);
     }
 
@@ -44,6 +45,7 @@ public class Request implements Serializable {
      * @throws Exception If deserialization fails.
      */
     public static Request fromJSON(String input) throws Exception {
+        // TODO: Add null check for input to avoid errors if input is null
         return objectMapper.readValue(input, Request.class);
     }
 
@@ -65,6 +67,7 @@ public class Request implements Serializable {
         this.requestType = requestType;
         this.id = id;
         this.attributesToModify = new HashMap<>();
+        // TODO: Add input validation for null or invalid values (e.g. requestType or id)
     }
 
     /**
@@ -79,6 +82,7 @@ public class Request implements Serializable {
         this.requestType = requestType;
         this.id = id;
         this.attributesToModify = attributesToModify;
+        // TODO: Consider making a copy of the map to avoid external modification
     }
 
     /**
