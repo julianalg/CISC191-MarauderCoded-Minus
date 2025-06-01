@@ -29,6 +29,7 @@ public class GameBST {
             this.data = data;
             this.left = null;
             this.right = null;
+            // TODO: Add null check for data to avoid inserting null nodes
         }
     }
 
@@ -49,6 +50,7 @@ public class GameBST {
          */
         public BinarySearchTree(Comparator<T> comparator) {
             this.comparator = comparator;
+            // TODO: Check if comparator is null before using it
         }
 
         /**
@@ -58,6 +60,7 @@ public class GameBST {
          */
         public void insert(T data) {
             root = insertRecursive(root, data);
+            // TODO: Consider handling duplicates if needed (currently goes to right subtree)
         }
 
         /**
@@ -88,6 +91,7 @@ public class GameBST {
             List<T> result = new ArrayList<>();
             inorderRecursive(root, result);
             return result;
+            // TODO: Consider adding other traversal methods like preorder or postorder
         }
 
         /**
@@ -115,6 +119,7 @@ public class GameBST {
     public static BinarySearchTree<Game> buildGameIdTree(List<Game> games) {
         BinarySearchTree<Game> treeById = new BinarySearchTree<>(Comparator.comparing(Game::getId));
         games.forEach(treeById::insert);
+        // TODO: Add null check for games list to avoid NullPointerException
         return treeById;
     }
 
