@@ -88,6 +88,8 @@ public class UserController {
             // 2. build a new Bet instance
             Bet bet = new Bet(game, dto.getBetAmt(), dto.getBetTeam(), dto.getWinAmt());
 
+            // TODO: Consider adding logging for bet placement for better traceability
+
             // 3. add & save
             user.addBet(bet);
             return repository.save(user);
@@ -129,6 +131,8 @@ public class UserController {
                     }
                 }
             }
+
+            // TODO: Handle concurrency when updating bets to avoid race conditions
 
             // one single mutation & save
             user.getBets().removeAll(toRemove);
