@@ -31,6 +31,7 @@ class JacksonConfigUser {
     @Bean
     public JodaModule jodaModule() {
         return new JodaModule();
+        // TODO: Consider configuring additional modules if needed for date/time formats
     }
 }
 
@@ -66,6 +67,7 @@ public class User implements Serializable {
      * @throws Exception If serialization fails.
      */
     public static String toJSON(User customer) throws Exception {
+        // TODO: Handle serialization exceptions more specifically
         return objectMapper.writeValueAsString(customer);
     }
 
@@ -77,6 +79,7 @@ public class User implements Serializable {
      * @throws Exception If deserialization fails.
      */
     public static User fromJSON(String input) throws Exception {
+        // TODO: Handle deserialization exceptions more specifically
         return objectMapper.readValue(input, User.class);
     }
 
@@ -86,6 +89,7 @@ public class User implements Serializable {
      */
     public User() {
         // Default constructor for deserialization purposes
+        // TODO: Initialize default values if needed
     }
 
     /**
@@ -100,9 +104,8 @@ public class User implements Serializable {
         this.money = money;
         this.moneyLine = 0;
         this.moneyBet = Math.toIntExact(money);
+        // TODO: Validate that money fits into int without loss
     }
-
-
 
     /**
      * Checks if the user has an active bet on the specified game.
@@ -113,7 +116,7 @@ public class User implements Serializable {
     public boolean checkBet(Game game) {
         for (Bet bet : bets) {
             boolean result = bet.getGame().equals(game);
-//            System.out.println("Checking bet: " + bet.getGame() + " with game: " + game + " Result: " + result);
+            // TODO: Consider using a stream or other optimized lookup if bets list grows large
             if (result) {
                 return true;
             }
@@ -128,6 +131,7 @@ public class User implements Serializable {
      */
     public void incrMoney(int amt) {
         this.money += amt;
+        // TODO: Consider adding validation to prevent overflow
     }
 
     /**
@@ -137,6 +141,7 @@ public class User implements Serializable {
      */
     public void decrMoney(int amt) {
         this.money -= amt;
+        // TODO: Consider adding validation to prevent negative balance
     }
 
     /**
@@ -148,6 +153,7 @@ public class User implements Serializable {
         bets.add(b);
         moneyBet -= b.getBetAmt();
         moneyLine += b.getBetAmt();
+        // TODO: Add checks to prevent negative moneyBet
     }
 
     /**
@@ -157,6 +163,7 @@ public class User implements Serializable {
      */
     public void removeBet(Bet b) {
         bets.remove(b);
+        // TODO: Consider adjusting moneyLine and moneyBet accordingly when a bet is removed
     }
 
     // IDE auto-generated code

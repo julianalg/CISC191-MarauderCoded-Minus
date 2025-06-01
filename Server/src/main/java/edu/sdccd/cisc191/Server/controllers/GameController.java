@@ -19,35 +19,38 @@ class GameController {
     private final GameRepository repository;
 
     GameController(GameRepositoryImpl repository) {
-        this.repository = repository; 
+        this.repository = repository;
+        // TODO: Validate repository is not null
     }
 
-    // Changed to use BST-sorted by team1 odds
     @GetMapping("/games")
     List<Game> all() {
         return repository.findAll();
+        // TODO: Add pagination if list gets large
     }
 
-    // Added new endpoint for team2 odds sorting
     @GetMapping("/games/byTeam2Odds")
     List<Game> allByTeam2Odds() {
         return repository.findAllSortedByTeam2Odds();
+        // TODO: Handle empty or null results
     }
 
     @PostMapping("/games")
     Game newGame(@RequestBody Game game) {
+        // TODO: Validate game before saving
         return repository.save(game);
     }
 
-    // Updated to use BST-based search
     @GetMapping("/games/{id}")
     Game one(@PathVariable Long id) {
+        // TODO: Validate id
         return repository.findByIdUsingBST(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
     }
 
     @DeleteMapping("/games/{id}")
     void deleteGame(@PathVariable Long id) {
+        // TODO: Check existence before deletion
         repository.deleteById(id);
     }
 
@@ -56,8 +59,7 @@ class GameController {
         return switch (sport) {
             case "Baseball" -> {
                 try {
-                    BaseballGetter baseballGetter = new BaseballGetter();
-                    yield baseballGetter.getOdd(id);
+                    yield new BaseballGetter().getOdd(id);
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
                     yield "No bets for this game yet.";
@@ -65,8 +67,7 @@ class GameController {
             }
             case "Basketball" -> {
                 try {
-                    BasketballGetter basketballGetter = new BasketballGetter();
-                    yield basketballGetter.getOdd(id);
+                    yield new BasketballGetter().getOdd(id);
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
                     yield "No bets for this game yet.";
@@ -74,17 +75,17 @@ class GameController {
             }
             default -> "Invalid sport";
         };
+        // TODO: Improve sport validation and logging
     }
 
-    // Get games by sport
     @GetMapping("/games/sport/{sport}")
     List<Game> getGamesBySport(@PathVariable String sport) {
+        // TODO: Normalize sport input
         return repository.findAll().stream()
                 .filter(game -> game.getSport().equalsIgnoreCase(sport))
                 .collect(Collectors.toList());
     }
 
-    // Get future games
     @GetMapping("/games/upcoming")
     List<Game> getUpcomingGames() {
         DateTime now = new DateTime();
@@ -92,6 +93,7 @@ class GameController {
                 .filter(game -> game.getGameDate().isAfter(now))
                 .sorted(Comparator.comparing(Game::getGameDate))
                 .collect(Collectors.toList());
+        // TODO: Consider timezone issues
     }
 
     @GetMapping("/games/dateRange")
@@ -100,12 +102,11 @@ class GameController {
             @RequestParam("endDate") String endDate) {
         DateTime start = DateTime.parse(startDate);
         DateTime end = DateTime.parse(endDate);
+        // TODO: Validate date range
 
         return repository.findAll().stream()
-                .filter(game -> game.getGameDate().isAfter(start)
-                        && game.getGameDate().isBefore(end))
+                .filter(game -> game.getGameDate().isAfter(start) && game.getGameDate().isBefore(end))
                 .sorted(Comparator.comparing(Game::getGameDate))
                 .collect(Collectors.toList());
     }
-
 }

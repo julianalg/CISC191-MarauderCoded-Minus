@@ -21,22 +21,22 @@ public class IncomingBetDTO {
     /**
      * The ID of the game that the bet is placed on.
      */
-    private Long gameId;
+    private Long gameId; // TODO: Validate that gameId is not null before processing
 
     /**
      * The name or identifier of the team that the user is betting on.
      */
-    private String betTeam;
+    private String betTeam; // TODO: Verify betTeam corresponds to a valid team in the game
 
     /**
      * The amount of money the user is betting.
      */
-    private int betAmt;
+    private int betAmt; // TODO: Ensure betAmt is positive and within user's available funds
 
     /**
      * The potential amount the user can win if the bet is successful.
      */
-    private int winAmt;
+    private int winAmt; // TODO: Calculate and validate winAmt based on odds before accepting bet
 
     /**
      * Constructs a new {@code IncomingBetDTO} with the specified values.
