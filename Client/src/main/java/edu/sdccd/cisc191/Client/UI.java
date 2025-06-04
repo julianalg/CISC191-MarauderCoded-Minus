@@ -211,7 +211,7 @@ public class UI extends Application {
                 betBox.setPrefHeight(200);
                 betBox.setPrefWidth(200);
                 betBox.getStyleClass().add("bet-box");
-// TODO: If team names are long, consider shortening them or adding ellipses; quality of life
+// TODO: If team names are long, consider shortening them; quality of life
                 Label gameLabel = new Label(bet.getGame().getTeam1() + " vs " + bet.getGame().getTeam2());
                 Label dateLabel = new Label(bet.getGame().getDateClean());
                 Label teamLabel = new Label(bet.getBetTeam());
