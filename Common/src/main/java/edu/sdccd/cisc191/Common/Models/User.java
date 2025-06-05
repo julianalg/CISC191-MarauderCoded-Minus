@@ -100,6 +100,8 @@ public class User implements Serializable {
         this.money = money;
         this.moneyLine = 0;
         this.moneyBet = Math.toIntExact(money);
+        // TODO: Add null or empty check for name if needed
+    // TODO: Check if money is negative and handle it if needed
     }
 
 
@@ -114,6 +116,7 @@ public class User implements Serializable {
         for (Bet bet : bets) {
             boolean result = bet.getGame().equals(game);
 //            System.out.println("Checking bet: " + bet.getGame() + " with game: " + game + " Result: " + result);
+            // TODO: Uncomment the print line if you want to debug which bet is being checked
             if (result) {
                 return true;
             }
@@ -157,6 +160,7 @@ public class User implements Serializable {
      */
     public void removeBet(Bet b) {
         bets.remove(b);
+        // TODO: You may want to update moneyLine and moneyBet here to reflect the removal
     }
 
     // IDE auto-generated code
