@@ -31,6 +31,7 @@ public class Bet implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "game_db_id", unique = true)
+    // TODO: If multiple bets per game are allowed in the future, you can remove "unique = true"
     @Getter @Setter
     private Game game;
     private String betTeam;
@@ -52,7 +53,7 @@ public class Bet implements Serializable {
      */
     @Transient
     private final double[][] winOddsOvertime = new double[numHours][2]; // Array to track odds over time
-
+    // TODO: Add a method to access or print this array for debugging or UI purposes
 
     @JsonIgnore
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -70,6 +71,7 @@ public class Bet implements Serializable {
      */
     public static String toJSON(Bet bet) throws Exception {
         return objectMapper.writeValueAsString(bet);
+        // TODO: Add a null check for 'bet' to prevent errors if it's null
     }
 
     /**
@@ -106,6 +108,7 @@ public class Bet implements Serializable {
         this.betTeam = betTeam;
         this.betAmt = amt;
         this.winAmt = winAmt;
+        // TODO: Consider checking if game, betTeam, and amounts are valid (not null or negative numbers)
 
 
         // Populate winOddsOvertime with odds and timestamps
@@ -129,6 +132,7 @@ public class Bet implements Serializable {
      */
     private double calculateOddsForGameAtTime(long timeStamp) {
         return 1 + random.nextInt(100); // Generate a random value between 1 and 100
+        // TODO: In the future, if you want to, replace this with real logic instead of random numbers to make it more realistic
     }
 
     public double getWinOdds() {
@@ -148,6 +152,7 @@ public class Bet implements Serializable {
             user.setMoney((int) (user.getMoney() - winAmt));
         }
         return user;
+        // TODO: Consider adding a print or log to show the user's updated money for debugging purposes
     }
 
     /**
@@ -173,6 +178,7 @@ public class Bet implements Serializable {
     @Override
     public String toString() {
         return "Bet on " + game + " for " + betAmt;
+        // TODO: You could include more info here like the team or win amount for better output
     }
 
     // IDE generated code to compare the bets
