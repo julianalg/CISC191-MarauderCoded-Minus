@@ -27,6 +27,7 @@ public class UserController {
     UserController(UserRepository repository, GameRepository gameRepository) {
         this.repository = repository;
         this.gRepository = gameRepository;
+// TODO: Consider checking if repository or gameRepository is null to avoid bugs
     }
 
 
@@ -41,6 +42,7 @@ public class UserController {
     @PostMapping("/users")
     User newUser(@RequestBody User newUser) {
         return repository.save(newUser);
+        // TODO: Add basic validation to make sure newUser has required fields like name and money
     }
 
     // Single item
@@ -64,6 +66,7 @@ public class UserController {
                     newUser.setId(id);
                     return repository.save(newUser);
                 });
+        // TODO: Add a comment to explain what happens if the user doesn’t exist (a new user is created)
     }
 
     @DeleteMapping("/users/{id}")
@@ -94,6 +97,7 @@ public class UserController {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             return null;
+            // TODO: Returning null here could cause problems, so maybe consider returning a proper error response.
         }
     }
 
@@ -125,6 +129,7 @@ public class UserController {
                         }
 
                         toRemove.add(bet);
+                        // TODO: Add a case for other sports if needed later
 
                     }
                 }

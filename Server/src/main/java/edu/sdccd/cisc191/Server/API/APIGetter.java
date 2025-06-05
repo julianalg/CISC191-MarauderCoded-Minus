@@ -39,6 +39,7 @@ public abstract class APIGetter {
      * @return formatted string representing tomorrow's date
      */
     public String getDateAsString() {
+        // TODO: This method is doing multiple date conversions, so you can simplify it later by reusing variables
         Date today = new Date();
         LocalDate localDate = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate nextDay = localDate.plusDays(1);
@@ -78,6 +79,7 @@ public abstract class APIGetter {
     public String sendRequest(URI requestURI) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         String apiKey = System.getenv("API_KEY");
+        // TODO: Check if apiKey is null and handle it if needed (like a throw custom error)
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(requestURI)
@@ -132,6 +134,7 @@ public abstract class APIGetter {
                             Instant instant = odt.toInstant();
                             Date legacyDate = Date.from(instant);
 
+                            // TODO: Odds are hardcoded to 0 — you can add real values when available from API
                             Game newGame = new Game(awayTeamName, homeTeamName, gameID, legacyDate, sport, 0, 0);
                             games.add(newGame);
                         }
@@ -182,6 +185,7 @@ public abstract class APIGetter {
      * @throws ParseException if parsing fails
      */
     public String parseBet(String response) throws ParseException {
+        // TODO: Add a check here in case 'response' is null/empty before parsing
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(response);
         JSONArray jsonResponse = (JSONArray) json.get("response");
@@ -218,6 +222,7 @@ public abstract class APIGetter {
                 .toString();
 
         try {
+            // TODO: Add null check before parsing to avoid crashes
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(response);
             JSONArray jsonResponse = (JSONArray) obj.get("response");

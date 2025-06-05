@@ -20,6 +20,7 @@ class GameController {
 
     GameController(GameRepositoryImpl repository) {
         this.repository = repository; 
+        // TODO: You can add a null check for repository to avoid errors if it's not passed correctly
     }
 
     // Changed to use BST-sorted by team1 odds
@@ -32,6 +33,7 @@ class GameController {
     @GetMapping("/games/byTeam2Odds")
     List<Game> allByTeam2Odds() {
         return repository.findAllSortedByTeam2Odds();
+        // TODO: You could add validation to check if list is empty and return a message if needed
     }
 
     @PostMapping("/games")
@@ -44,6 +46,7 @@ class GameController {
     Game one(@PathVariable Long id) {
         return repository.findByIdUsingBST(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
+        // TODO: Add a print statement for debugging in case the game isn't found
     }
 
     @DeleteMapping("/games/{id}")
@@ -61,6 +64,7 @@ class GameController {
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
                     yield "No bets for this game yet.";
+// TODO: Add a fallback in case the sport name is typed incorrectly
                 }
             }
             case "Basketball" -> {
@@ -82,6 +86,7 @@ class GameController {
         return repository.findAll().stream()
                 .filter(game -> game.getSport().equalsIgnoreCase(sport))
                 .collect(Collectors.toList());
+        // TODO: If no games match, maybe return a message like "No games found for this sport"
     }
 
     // Get future games
@@ -92,6 +97,7 @@ class GameController {
                 .filter(game -> game.getGameDate().isAfter(now))
                 .sorted(Comparator.comparing(Game::getGameDate))
                 .collect(Collectors.toList());
+        // TODO: You could add a filter by sport too, if needed later
     }
 
     @GetMapping("/games/dateRange")
@@ -106,6 +112,7 @@ class GameController {
                         && game.getGameDate().isBefore(end))
                 .sorted(Comparator.comparing(Game::getGameDate))
                 .collect(Collectors.toList());
+        // TODO: You could add a check to make sure start is before end to avoid confusion
     }
 
 }

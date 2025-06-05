@@ -34,6 +34,7 @@ public class UI extends Application {
      */
     private <T extends Game> TableView<T> createGameTableView(T[] games, User user, Stage stage) {
         TableView<T> tableView = new TableView<>();
+         // TODO: Add a null check for the games array to prevent crashing if it's null
 
         // Column for Team 1
         TableColumn<T, String> team1Col = new TableColumn<>("Team 1");
@@ -171,7 +172,7 @@ public class UI extends Application {
         userName.setId("userNameLabel");
         userName.setFont(new Font(20));
         userName.setTextFill(Color.WHITE);
-
+ // TODO: Format money to two decimal places so it looks cleaner (like $10.00)
         Label money = new Label("$" + user.getMoney());
         money.setFont(new Font(20));
         money.setTextFill(Color.WHITE);
@@ -198,7 +199,7 @@ public class UI extends Application {
     private HBox createBetListBox(Stage stage, User user) {
         HBox betList = new HBox(10);
         betList.setPrefHeight(200);
-
+// TODO: Use a ScrollPane here if the user has many bets to avoid layout issues
         if (user.getBets().isEmpty()) {
             Label emptyLabel = new Label("Your bets will appear here");
             emptyLabel.setId("betListPlaceholderLabel");
@@ -210,7 +211,7 @@ public class UI extends Application {
                 betBox.setPrefHeight(200);
                 betBox.setPrefWidth(200);
                 betBox.getStyleClass().add("bet-box");
-
+// TODO: If team names are long, consider shortening them; quality of life
                 Label gameLabel = new Label(bet.getGame().getTeam1() + " vs " + bet.getGame().getTeam2());
                 Label dateLabel = new Label(bet.getGame().getDateClean());
                 Label teamLabel = new Label(bet.getBetTeam());
@@ -255,6 +256,7 @@ public class UI extends Application {
         VBox container = new VBox(10);
         container.setPadding(new Insets(10));
         container.getStyleClass().add("other-players-box"); // for custom styling
+         // TODO: If the player list is long, wrap container in a ScrollPane to make it scrollable; quality of life
 
         // Title
         Label title = new Label("Other Players");
@@ -320,6 +322,7 @@ public class UI extends Application {
         // Create and set the scene
         Scene scene = new Scene(borderPane, 1500, 1500);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        // TODO: Add a check to make sure the CSS file is found as to avoid a null pointer exception
         stage.setScene(scene);
         stage.setTitle("Marauder Bets");
         stage.show();
