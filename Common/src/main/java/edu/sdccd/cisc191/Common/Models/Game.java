@@ -91,6 +91,7 @@ public class Game implements Serializable {
         this.team1Odd = team1Odd;
         this.team2Odd = team2Odd;
         this.dateClean = this.getDateClean();
+        // TODO: Check if any of these values should be validated (making sure odds are not negative)
     }
 
     /**
@@ -141,6 +142,7 @@ public class Game implements Serializable {
     @Override
     public String toString() {
         return team1 + " vs. " + team2 + " on " + gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear();
+        // TODO: You could add time to the output string if more detail is needed
     }
     /**
      * Generates a clean string representation of the date range for the game.
@@ -152,6 +154,7 @@ public class Game implements Serializable {
             return gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear() + " " + gameDate.getHourOfDay() + ":" + gameDate.getMinuteOfHour();
         } else {
             return gameDate.getMonthOfYear() + "/" + gameDate.getDayOfMonth() + "/" + gameDate.getYear() + " " + gameDate.getHourOfDay() + ":0" + gameDate.getMinuteOfHour();
+            // TODO: You might want to switch to a proper date formatter instead of manual string building
         }
     }
 }
